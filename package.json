@@ -1,0 +1,26 @@
+{
+  "name": "unicode",
+  "version": "1.0.0",
+  "description": "project home for unicode/ capstone project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/casjack00-boop/Unicode.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/casjack00-boop/Unicode/issues"
+  },
+  "homepage": "https://github.com/casjack00-boop/Unicode#readme",
+  "dependencies": {
+    "dotenv": "^18.0.9",
+    "express": "^5.3.0",
+    "pg": "^8.23.1"
+  }
+}
