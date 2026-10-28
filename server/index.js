@@ -2,22 +2,22 @@
 require('dotenv').config();
 
 const express = require('express');
-const { Pool } = require('pg');
+const pool = require('./db');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 
-// Connection to PostgreSQL, using the address in .env
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+// Let the server read JSON sent from the app
+app.use(express.json());
 
-// A test page: checks the database and counts students
+// Sign-up and login routes live at /api/auth/...
+app.use('/api/auth', authRoutes);
+
+// Test page: checks the database and counts students
 app.get('/api/health', async (req, res) => {
   try {
     const result = await pool.query('SELECT COUNT(*) AS students FROM users');
-    res.json({
-      status: 'ok',
-      database: 'connected',
-      students: Number(result.rows[0].students),
-    });
+    res.json({ status: 'ok', database: 'connected', students: Number(result.rows[0].students) });
   } catch (err) {
     console.error(err);
     res.status(500).json({ status: 'error', database: 'not connected' });
