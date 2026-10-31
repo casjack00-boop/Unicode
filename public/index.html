@@ -1,0 +1,77 @@
+<!docutype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name ="viewport" content="width=device-width, initial-scale=1">
+    <title>UniMarket</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2family=Archivo:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap">
+    <link rel="stylesheet" href="styles.css">
+    </head>
+</body>
+    <!--Navy header-->
+    <header class="hero">
+        <div class="brand">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#F47A20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 9l1.5-5h15L21 9"></path>
+                <path d="M3 9h18v2a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0z"></path>
+                <path d="M5 13v7h14v-7"></path>
+            </svg>
+            <span class="logo">UniMarket</span>
+        </div>
+        <p class="tagline">Buy and sell with verified UT Tyler students. No strangers, no shipping </p>
+    </header>
+
+    <main>
+        <!-- Screen 1: enter school email-->
+         <section id="view-email">
+            <h1>Sign up or log in</h1>
+            <p class="muted">We will email a 6-digit code to your school email address.</p>
+
+            <form id="email-form">
+                <label for="email">School email</label>
+                <input id="email" type="email" placeholder="you@patriots.uttyler.edu" autocomplete="email" required>
+
+            <label for="name">Your name <span class="muted">(new students only)</span></label>
+            <input id="name" type="text" placeholder="First and last name" autocomplete="name">
+
+            <button type="submit">Send my code</button>
+            </form>
+
+            <div class="notice">
+                <svg width="20" height="20" viewbox="0 0 24 24" fill="none" stroke="#B4500C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 318 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path>
+                    <path> d="M9 1212 2 4-4"></path>
+                </svg>
+                <p>Only UT Tyler student emails can join, so everyone you trade with is a verified student. </p>
+            </div>
+         </section>
+
+        <!-- Screen 2: enter the code-->
+        <section id="view-code" hidden>
+            <h1>Check you email</h1>
+            <p class="muted">We sent a 6-digit code to <strong id="code-email"></strong></p>
+
+            <form id="code-form">
+                <label for="code">Verification code</label>
+                <input id="code" class="code-input" type="text" inputmode="numeric" maxlength="6" placeholder="123456" autocomplete="one-time-code" required>
+                <button type="submit">Verify and continue</button>
+            </form>
+
+            <p class="muted center">The code expires in 10 minutes</p>
+            <button id="back-btn" class="link-btn" type="button">Use a different email</button>
+        </section>
+
+        <!-- Screen 3: logged in -->
+         <section id="view-home" hidden>
+            <h1>Welcome, <span id="user-name"></span>!</h1>
+            <p class="muted">You're now  verified UT Tyler student. Listings are coming soon. </p>
+            <button id="logout-btn" class="link-btn" type="button">Log out</button>
+         </section>
+
+         <!-- Messages (errors and success) show here-->
+          <p id="message" role="status"></p>
+    </main>
+
+    <script src="app.js"></script>
+    </body>
+    </html>
