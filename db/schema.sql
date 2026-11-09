@@ -44,3 +44,11 @@ CREATE TABLE IF NOT EXISTS listing_photos (
     position    INTEGER NOT NULL CHECK (position BETWEEN 1 AND 3),
     UNIQUE (listing_id, position)
 );
+
+--login sessions (the browser keeps the ticket in the coookie, only its hash is stored here)
+CREATE TABLE IF NOT EXISTS sessions (
+    token_hash  TEXT PRIMARY KEY,
+    user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    expires_at  TIMESTAMPTZ NOT NULL,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
