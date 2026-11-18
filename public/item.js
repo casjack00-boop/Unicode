@@ -19,6 +19,13 @@ function formatPrice(cents) {
   return '$' + (cents / 100).toFixed(2);
 }
 
+// "like_new" -> "Like New", "textbooks" -> "Textbooks"
+function formatLabel(text) {
+  return String(text ?? '')
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
 // Put text into the element with the given id.
 // textContent (not innerHTML) keeps user-typed text from being run as code.
 function setText(id, value) {
@@ -56,11 +63,11 @@ async function loadListing() {
     // Fill in the page
     setText('price', formatPrice(listing.price_cents));
     setText('title', listing.title);
-    setText('condition', listing.condition);
-    setText('category', listing.category);
+    setText('condition', formatLabel(listing.condition));
+    setText('category', formatLabel(listing.category));
     setText('description', listing.description);
     setText('seller-name', listing.seller_name);
-    setText('seller-housing', listing.seller_housing);
+    setText('seller-housing', formatLabel(listing.seller_housing));
     setText('meeting-spot', listing.meeting_spot);
     document.title = listing.title + ' | UniMarket';
 
