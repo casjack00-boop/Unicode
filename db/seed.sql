@@ -51,7 +51,7 @@ VALUES
 
   ((SELECT id FROM users WHERE email = 'tbrooks@patriots.uttyler.edu'),
    'Dell Laptop',
-   'Used a lot but it's all clear and ready, still works great',
+   'Used a lot but it''s all clear and ready, still works great',
    20000, 'Electronic', 'Fine', 'Patriot Village main office'),
 
   ((SELECT id FROM users WHERE email = 'mjohnson@patriots.uttyler.edu'),
