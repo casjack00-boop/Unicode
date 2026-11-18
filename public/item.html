@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Item Details | UniMarket</title>
+  <link rel="stylesheet" href="item.css">
+</head>
+<body>
+  <header class="topbar">
+    <a href="index.html" class="back-link">&larr; Back to Browse</a>
+  </header>
+
+  <main class="page">
+    <!-- Shown while the item loads, and if something goes wrong -->
+    <p id="status" class="status">Loading...</p>
+
+    <!-- Hidden until the data arrives (item.js un-hides it) -->
+    <article id="item" class="item" hidden>
+      <div class="photo">No photo yet</div>
+
+      <div class="info">
+        <p id="price" class="price"></p>
+        <h1 id="title" class="title"></h1>
+
+        <div class="tags">
+          <span id="condition" class="tag"></span>
+          <span id="category" class="tag"></span>
+        </div>
+
+        <h2>Description</h2>
+        <p id="description" class="description"></p>
+
+        <section class="card">
+          <h2>Seller</h2>
+          <p id="seller-name" class="seller-name"></p>
+          <p id="seller-housing" class="muted"></p>
+        </section>
+
+        <section class="card">
+          <h2>Suggested meeting spot</h2>
+          <p id="meeting-spot"></p>
+        </section>
+
+        <button id="message-btn" class="message-btn" type="button">Message seller</button>
+        <p id="coming-soon" class="muted" hidden>Coming soon</p>
+      </div>
+    </article>
+  </main>
+
+  <script src="item.js"></script>
+</body>
+</html>
