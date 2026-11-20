@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Browse Items | UniMarket</title>
+  <link rel="stylesheet" href="/browse.css">
+  <script src="/browse.js" defer></script>
+</head>
+<body>
+  <main class="browse-app">
+    <header class="browse-header">
+      <a href="/" class="back-button" aria-label="Back to home">←</a>
+      <h1>Browse UniMarket</h1>
+      <button id="filterToggle" class="filter-button"
+        aria-label="Show filters" aria-expanded="false">☷</button>
+    </header>
+
+    <section class="browse-content">
+      <label class="search-box">
+        <span aria-hidden="true">⌕</span>
+        <input id="searchInput" type="search"
+          placeholder="Search for items"
+          aria-label="Search listings">
+      </label>
+
+      <nav class="categories" aria-label="Item categories">
+        <button class="category-button" data-category="textbooks">
+          Textbooks
+        </button>
+        <button class="category-button" data-category="furniture">
+          Furniture
+        </button>
+        <button class="category-button active" data-category="all">
+          All Items
+        </button>
+      </nav>
+
+      <section id="filters" class="filters" hidden>
+        <h2>Filters</h2>
+
+        <div id="textbookFilters" class="textbook-filters" hidden>
+          <label>Department
+            <select id="department">
+              <option value="">All departments</option>
+            </select>
+          </label>
+
+          <label>Course Number
+            <select id="course">
+              <option value="">All courses</option>
+            </select>
+          </label>
+
+          <label>Edition
+            <select id="edition">
+              <option value="">All editions</option>
+            </select>
+          </label>
+        </div>
+
+        <label>Minimum Price ($)
+          <input id="minPrice" type="number" min="0" step="0.01">
+        </label>
+
+        <label>Maximum Price ($)
+          <input id="maxPrice" type="number" min="0" step="0.01">
+        </label>
+
+        <button id="clearFilters" class="clear-button">
+          Clear Filters
+        </button>
+      </section>
+
+      <div class="results-toolbar">
+        <span id="resultCount">Loading...</span>
+
+        <label class="sort-control">
+          Sort:
+          <select id="sortSelect">
+            <option value="recommended">Recommended</option>
+            <option value="newest">Newest</option>
+            <option value="price_asc">Price: Low to High</option>
+            <option value="price_desc">Price: High to Low</option>
+          </select>
+        </label>
+      </div>
+
+      <div id="listingResults" class="listing-results"
+        aria-live="polite"></div>
+
+      <p id="errorMessage" class="error-message" role="alert" hidden></p>
+    </section>
+  </main>
+</body>
+</html>

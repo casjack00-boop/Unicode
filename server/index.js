@@ -6,6 +6,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const pool = require('./db');
 const authRoutes = require('./routes/auth');
+const listingsRoutes = require('./routes/listings');
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(cookieParser());
 
 // Sign-up and login routes live at /api/auth/...
 app.use('/api/auth', authRoutes);
+app.use('/api/listings', listingsRoutes);
 
 //Serve the app's pages (HTML, CSS, JavaScript) from the public folder
 app.use(express.static(path.join(__dirname, '..', 'public')));
