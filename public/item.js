@@ -12,11 +12,64 @@ function showError(message) {
   statusEl.classList.add('error');
   statusEl.hidden = false;
   itemEl.hidden = true;
+
+  // Give them a way back
+  const back = document.createElement('a');
+  back.href = '/browse.html';
+  back.textContent = 'Back to Browse';
+  back.className = 'status-back';
+  statusEl.appendChild(document.createElement('br'));
+  statusEl.appendChild(back);
 }
 
-// 6000 cents -> "$60.00"
+// 6000 cents -> "$60", 2550 -> "$25.50", 0 -> "Free"
 function formatPrice(cents) {
-  return '$' + (cents / 100).toFixed(2);
+  if (cents === 0) return 'Free';
+  const dollars = cents / 100;
+  return '$' + (Number.isInteger(dollars) ? dollars : dollars.toFixed(2));
+}
+
+// "Maya Johnson" -> "MJ"
+function initials(name) {
+  return String(name || '?').trim().split(/\s+/).slice(0, 2)
+    .map((part) => part[0].toUpperCase()).join('');
+}
+
+// created_at -> "Posted today" / "Posted 2 days ago"
+function postedAgo(dateText) {
+  const days = Math.floor((Date.now() - new Date(dateText)) / 86400000);
+  if (!Number.isFinite(days)) return '';
+  if (days <= 0) return 'Posted today';
+  if (days === 1) return 'Posted yesterday';
+  return `Posted ${days} days ago`;
+}
+
+// Show photo number "which" (0, 1, 2) with a "1 / 3" counter you can tap
+function showPhotos(photos, title) {
+  const box = document.getElementById('photo');
+  const counter = document.getElementById('photo-count');
+  let which = 0;
+
+  const img = document.createElement('img');
+  img.className = 'photo-img';
+  img.alt = title;
+  box.querySelector('.photo-placeholder').replaceWith(img);
+
+  function draw() {
+    img.src = photos[which].url;
+    counter.textContent = `${which + 1} / ${photos.length}`;
+  }
+
+  if (photos.length > 1) {
+    counter.hidden = false;
+    counter.setAttribute('role', 'button');
+    counter.tabIndex = 0;
+    counter.title = 'Next photo';
+    const next = () => { which = (which + 1) % photos.length; draw(); };
+    counter.addEventListener('click', next);
+    img.addEventListener('click', next);
+  }
+  draw();
 }
 
 // "like_new" -> "Like New", "textbooks" -> "Textbooks"
@@ -66,9 +119,19 @@ async function loadListing() {
     setText('condition', formatLabel(listing.condition));
     setText('category', formatLabel(listing.category));
     setText('description', listing.description);
+    setText('posted', postedAgo(listing.created_at));
     setText('seller-name', listing.seller_name);
-    setText('seller-housing', formatLabel(listing.seller_housing));
-    setText('meeting-spot', listing.meeting_spot);
+    setText('seller-initials', initials(listing.seller_name));
+    setText('seller-housing', listing.seller_housing ? ' · ' + formatLabel(listing.seller_housing).replace('Campus', 'campus') : '');
+    setText('meeting-spot', listing.meeting_spot || 'Ask the seller');
+
+    // Show the listing's photos (if it has any)
+    if (listing.photos && listing.photos.length > 0) {
+      showPhotos(listing.photos, listing.title);
+    }
+
+    // Seller rating (stars + rate form)
+    loadRating(listing.seller_id);
     document.title = listing.title + ' | UniMarket';
 
     // Swap "Loading..." for the real content
@@ -86,5 +149,89 @@ messageBtn.addEventListener('click', () => {
   comingSoon.hidden = false;
 });
 
-// ---------- 5. Go! ----------
+// Heart button: save / unsave (just on this screen for now)
+const saveBtn = document.getElementById('save-btn');
+saveBtn.addEventListener('click', () => {
+  const saved = saveBtn.getAttribute('aria-pressed') === 'true';
+  saveBtn.setAttribute('aria-pressed', String(!saved));
+});
+
+// ---------- 5. Seller ratings ----------
+let ratingSellerId = null;
+let pickedStars = 0;
+
+function starText(avg) {
+  const full = Math.round(avg || 0);
+  return '★'.repeat(full) + '☆'.repeat(5 - full);
+}
+
+function showPicked(n) {
+  pickedStars = n;
+  document.querySelectorAll('#star-pick button').forEach((b) => {
+    const on = Number(b.dataset.stars) <= n;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', String(Number(b.dataset.stars) === n));
+  });
+}
+
+async function loadRating(sellerId) {
+  ratingSellerId = sellerId;
+  try {
+    const res = await fetch('/api/sellers/' + encodeURIComponent(sellerId) + '/rating', { credentials: 'same-origin' });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+
+    document.getElementById('stars-show').textContent = starText(data.average);
+    document.getElementById('rating-summary').textContent = data.count
+      ? data.average + ' · ' + data.count + (data.count === 1 ? ' rating' : ' ratings')
+      : 'No ratings yet';
+
+    // Comments
+    const list = document.getElementById('rating-comments');
+    list.replaceChildren();
+    data.recent.forEach((r) => {
+      const li = document.createElement('li');
+      const who = document.createElement('b');
+      who.textContent = r.rater_name + ' ' + '★'.repeat(r.stars) + ': ';
+      li.append(who, document.createTextNode(r.comment));
+      list.append(li);
+    });
+
+    // Only logged-in students who aren't the seller can rate
+    const form = document.getElementById('rate-form');
+    form.hidden = !data.loggedIn || data.isSelf;
+    if (data.mine) {
+      showPicked(data.mine.stars);
+      document.getElementById('rate-comment').value = data.mine.comment || '';
+    }
+  } catch (e) {
+    document.getElementById('rating-summary').textContent = 'Ratings unavailable';
+  }
+}
+
+document.querySelectorAll('#star-pick button').forEach((b) => {
+  b.addEventListener('click', () => showPicked(Number(b.dataset.stars)));
+});
+
+document.getElementById('rate-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById('rate-message');
+  if (!pickedStars) { msg.textContent = 'Tap 1 to 5 stars first.'; return; }
+  try {
+    const res = await fetch('/api/sellers/' + encodeURIComponent(ratingSellerId) + '/rating', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({ stars: pickedStars, comment: document.getElementById('rate-comment').value })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Could not save your rating.');
+    msg.textContent = 'Thanks! Your rating is saved.';
+    loadRating(ratingSellerId);
+  } catch (err) {
+    msg.textContent = err.message;
+  }
+});
+
+// ---------- 6. Go! ----------
 loadListing();

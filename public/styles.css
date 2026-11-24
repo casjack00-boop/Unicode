@@ -159,3 +159,33 @@ button:disabled { opacity: 0.6; cursor:wait;}
 #message.success{
     color: #157F3B;
 }
+
+/* Browse button on the welcome screen */
+.primary-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 52px;
+    margin-top: 20px;
+    background: #002D72;
+    color: white;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 17px;
+    text-decoration: none;
+}
+
+.primary-link:hover {
+    background: #001A45;
+}
+
+/* On computers, show it as a phone-width column like Browse */
+html {
+    background: #E9EDF4;
+}
+
+body {
+    max-width: 480px;
+    min-height: 100vh;
+    margin: 0 auto;
+}

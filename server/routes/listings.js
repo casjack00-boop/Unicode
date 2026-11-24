@@ -1,6 +1,7 @@
 
 const express = require('express');
 const pool = require('../db');
+const requireUser = require('../requireUser');
 
 const router = express.Router();
 
@@ -56,7 +57,7 @@ router.get('/filters', async (req, res) => {
         ) AS editions
     `);
 
-    res.json({ listing: result.rows[0] });
+    res.json(result.rows[0]);
   } catch (error) {
     console.error('Filter error:', error);
     res.status(500).json({ error: 'Unable to load filters' });
@@ -96,7 +97,8 @@ router.get('/', async (req, res) => {
     if (search) {
       addCondition(
         `(l.title ILIKE '%' || ? || '%'
-          OR COALESCE(l.description, '') ILIKE '%' || $${values.length + 1} || '%')`,
+          OR COALESCE(l.description, '') ILIKE '%' || $${values.length + 1} || '%'
+          OR l.category ILIKE '%' || $${values.length + 1} || '%')`,
         search
       );
     }
@@ -129,6 +131,7 @@ router.get('/', async (req, res) => {
         l.id, l.title, l.description, l.price_cents,
         l.category, l.condition, l.department,
         l.course_number, l.edition, l.created_at,
+        (SELECT u.housing FROM users u WHERE u.id = l.seller_id) AS seller_housing,
         (
           SELECT lp.url
           FROM listing_photos lp
@@ -150,6 +153,59 @@ router.get('/', async (req, res) => {
   }
 });
 
+
+
+// My Listings: the logged-in student's own items (for my-listings.html)
+// Must come BEFORE '/:id' or "mine" would be read as a listing id.
+router.get('/mine', requireUser, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT l.id, l.title, l.price_cents, l.category, l.condition, l.status, l.created_at,
+              (SELECT lp.url FROM listing_photos lp
+                WHERE lp.listing_id = l.id ORDER BY lp.position LIMIT 1) AS photo_url
+         FROM listings l
+        WHERE l.seller_id = $1 AND l.status <> 'removed'
+        ORDER BY l.created_at DESC, l.id DESC`,
+      [req.user.id]
+    );
+    res.json({ listings: result.rows });
+  } catch (error) {
+    console.error('My listings error:', error);
+    res.status(500).json({ error: 'Unable to load your listings.' });
+  }
+});
+
+// Mark your own listing as sold (or bring it back) or remove it
+const STATUS_CHANGES = ['active', 'sold', 'removed'];
+
+router.patch('/:id/status', requireUser, async (req, res) => {
+  const id = Number(req.params.id);
+  const { status } = req.body;
+
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    return res.status(400).json({ error: 'Invalid listing ID' });
+  }
+  if (!STATUS_CHANGES.includes(status)) {
+    return res.status(400).json({ error: 'Status must be active, sold, or removed.' });
+  }
+
+  try {
+    // Only the seller can change it: the WHERE checks both the id and the owner
+    const result = await pool.query(
+      `UPDATE listings SET status = $1
+        WHERE id = $2 AND seller_id = $3 AND status <> 'removed'
+        RETURNING id, status`,
+      [status, id, req.user.id]
+    );
+    if (!result.rows.length) {
+      return res.status(404).json({ error: 'Listing not found.' });
+    }
+    res.json({ ok: true, listing: result.rows[0] });
+  } catch (error) {
+    console.error('Update status error:', error);
+    res.status(500).json({ error: 'Unable to update listing.' });
+  }
+});
 
 
 // Get one listing for the Item Details page
@@ -206,6 +262,60 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({
       error: 'Unable to load listing'
     });
+  }
+});
+
+
+// Post a new listing (must be logged in)
+const CATEGORIES = ['textbooks', 'furniture', 'dorm', 'electronics', 'clothing', 'other'];
+const CONDITIONS = ['new', 'like_new', 'good', 'fair'];
+
+function cleanText(value, max) {
+  const text = String(value || '').trim();
+  return text ? text.slice(0, max) : null;
+}
+
+router.post('/', requireUser, async (req, res) => {
+  const title = cleanText(req.body.title, 80);
+  const description = cleanText(req.body.description, 1000);
+  const meetingSpot = cleanText(req.body.meetingSpot, 120);
+  const price = Number(req.body.price);
+  const { category, condition } = req.body;
+
+  if (!title) {
+    return res.status(400).json({ error: 'Title is required (80 characters max).' });
+  }
+  if (!Number.isFinite(price) || price < 0 || price > 10000) {
+    return res.status(400).json({ error: 'Price must be between $0 and $10,000.' });
+  }
+  if (!CATEGORIES.includes(category)) {
+    return res.status(400).json({ error: 'Please pick a category.' });
+  }
+  if (!CONDITIONS.includes(condition)) {
+    return res.status(400).json({ error: 'Please pick a condition.' });
+  }
+
+  // Textbook details only matter for textbooks
+  const isBook = category === 'textbooks';
+
+  try {
+    const result = await pool.query(`
+      INSERT INTO listings
+        (seller_id, title, description, price_cents, category, condition, meeting_spot,
+         department, course_number, edition, author)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      RETURNING id
+    `, [
+      req.user.id, title, description, Math.round(price * 100), category, condition, meetingSpot,
+      isBook ? cleanText(req.body.department, 20) : null,
+      isBook ? cleanText(req.body.courseNumber, 20) : null,
+      isBook ? cleanText(req.body.edition, 30) : null,
+      isBook ? cleanText(req.body.author, 80) : null
+    ]);
+    res.status(201).json({ ok: true, id: result.rows[0].id });
+  } catch (error) {
+    console.error('Post listing error:', error);
+    res.status(500).json({ error: 'Something went wrong. Please try again.' });
   }
 });
 

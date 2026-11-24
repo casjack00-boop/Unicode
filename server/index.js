@@ -7,6 +7,8 @@ const cookieParser = require('cookie-parser');
 const pool = require('./db');
 const authRoutes = require('./routes/auth');
 const listingsRoutes = require('./routes/listings');
+const photoRoutes = require('./routes/photos');
+const ratingRoutes = require('./routes/ratings');
 
 const app = express();
 
@@ -18,9 +20,13 @@ app.use(cookieParser());
 
 // Sign-up and login routes live at /api/auth/...
 app.use('/api/auth', authRoutes);
+// Photos go first so /api/listings/photo-files/... isn't mistaken for a listing id
+app.use('/api/listings', photoRoutes);
 app.use('/api/listings', listingsRoutes);
+// Seller ratings
+app.use('/api/sellers', ratingRoutes);
 
-//Serve the app's pages (HTML, CSS, JavaScript) from the public folder
+// Serve the app's pages (HTML, CSS, JavaScript) from the public folder
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // Test page: checks the database and counts students

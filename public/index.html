@@ -1,77 +1,143 @@
-<!docutype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name ="viewport" content="width=device-width, initial-scale=1">
-    <title>UniMarket</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2family=Archivo:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap">
-    <link rel="stylesheet" href="styles.css">
-    </head>
-</body>
-    <!--Navy header-->
-    <header class="hero">
-        <div class="brand">
-            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#F47A20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M3 9l1.5-5h15L21 9"></path>
-                <path d="M3 9h18v2a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0z"></path>
-                <path d="M5 13v7h14v-7"></path>
-            </svg>
-            <span class="logo">UniMarket</span>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UniMarket</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap">
+  <link rel="stylesheet" href="landing.css">
+</head>
+<body>
+
+  <!-- Part 1: Top bar -->
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a href="/" class="logo">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#F47A20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 9l1.5-5h15L21 9"></path>
+          <path d="M3 9h18v2a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0z"></path>
+          <path d="M5 13v7h14v-7"></path>
+        </svg>
+        UniMarket
+      </a>
+      <nav class="topnav" aria-label="Main">
+        <a href="#how">How it works</a>
+        <a href="#install">Get the app</a>
+        <a href="login.html" class="btn-navy">Log in</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Part 2: Navy hero -->
+  <section class="hero">
+    <div class="wrap hero-inner">
+
+      <div class="hero-text">
+        <span class="badge">For UT Tyler students only</span>
+        <h1>Buy and sell with students from your community</h1>
+        <p>Textbooks, furniture, electronics, dorm gear and more, from verified students. No strangers, no shipping, just meet on campus.</p>
+        <div class="hero-buttons">
+          <a href="#install" class="btn-orange">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#14213D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2"></rect><path d="M11 18h2"></path></svg>
+            Get it on your phone
+          </a>
+          <a href="login.html" class="btn-outline">Use it in your browser</a>
         </div>
-        <p class="tagline">Buy and sell with verified UT Tyler students. No strangers, no shipping </p>
-    </header>
+      </div>
 
-    <main>
-        <!-- Screen 1: enter school email-->
-         <section id="view-email">
-            <h1>Sign up or log in</h1>
-            <p class="muted">We will email a 6-digit code to your school email address.</p>
-
-            <form id="email-form">
-                <label for="email">School email</label>
-                <input id="email" type="email" placeholder="you@patriots.uttyler.edu" autocomplete="email" required>
-
-            <label for="name">Your name <span class="muted">(new students only)</span></label>
-            <input id="name" type="text" placeholder="First and last name" autocomplete="name">
-
-            <button type="submit">Send my code</button>
-            </form>
-
-            <div class="notice">
-                <svg width="20" height="20" viewbox="0 0 24 24" fill="none" stroke="#B4500C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M12 318 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path>
-                    <path> d="M9 1212 2 4-4"></path>
-                </svg>
-                <p>Only UT Tyler student emails can join, so everyone you trade with is a verified student. </p>
+      <div class="phone-holder" aria-hidden="true">
+        <div class="phone">
+          <div class="phone-screen">
+            <div class="phone-top">
+              <span>UniMarket</span>
+              <div class="phone-search"></div>
             </div>
-         </section>
+            <div class="phone-grid">
+              <div class="mini"><div class="mini-photo"></div><div class="mini-body"><b>$60</b><span>Mini fridge</span></div></div>
+              <div class="mini"><div class="mini-photo"></div><div class="mini-body"><b>$35</b><span>Textbook</span></div></div>
+              <div class="mini"><div class="mini-photo"></div><div class="mini-body"><b>$85</b><span>Futon</span></div></div>
+              <div class="mini"><div class="mini-photo"></div><div class="mini-body"><b>$45</b><span>Calculator</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <!-- Screen 2: enter the code-->
-        <section id="view-code" hidden>
-            <h1>Check your email</h1>
-            <p class="muted">We sent a 6-digit code to <strong id="code-email"></strong></p>
+    </div>
+  </section>
 
-            <form id="code-form">
-                <label for="code">Verification code</label>
-                <input id="code" class="code-input" type="text" inputmode="numeric" maxlength="6" placeholder="123456" autocomplete="one-time-code" required>
-                <button type="submit">Verify and continue</button>
-            </form>
+  <!-- Part 3: How it works -->
+  <section id="how" class="wrap section">
+    <h2>How it works</h2>
+    <div class="cards">
+      <div class="card">
+        <span class="num">1</span>
+        <h3>Verify your school email</h3>
+        <p>Sign up with your UT Tyler email and enter the code we send you. Only students get in.</p>
+      </div>
+      <div class="card">
+        <span class="num">2</span>
+        <h3>List or browse</h3>
+        <p>Post something in under a minute, or search what other students are selling.</p>
+      </div>
+      <div class="card">
+        <span class="num">3</span>
+        <h3>Message and meet on campus</h3>
+        <p>Chat in the app, then meet at a suggested public spot on campus.</p>
+      </div>
+    </div>
+  </section>
 
-            <p class="muted center">The code expires in 10 minutes</p>
-            <button id="back-btn" class="link-btn" type="button">Use a different email</button>
-        </section>
+  <!-- Part 4: Get the app -->
+  <section id="install" class="install">
+    <div class="wrap section">
+      <div class="center">
+        <h2>Get UniMarket on your phone</h2>
+        <p class="lead">No app store needed. Open UniMarket in your phone's browser, then add it to your home screen. It gets its own icon and opens just like an app.</p>
+      </div>
+      <div class="cards">
+        <div class="card card-navy">
+          <h3>1. Open it on your phone</h3>
+          <div class="address-box">
+            <span>Type this address:</span>
+            <strong>unimarket (link coming soon)</strong>
+          </div>
+          <p>A QR code will go here once UniMarket is online.</p>
+        </div>
+        <div class="card">
+          <h3>2. iPhone</h3>
+          <ol>
+            <li>Open the link in <strong>Safari</strong>.</li>
+            <li>Tap the <strong>Share</strong> button.</li>
+            <li>Tap <strong>Add to Home Screen</strong>.</li>
+            <li>Tap <strong>Add</strong>. Done!</li>
+          </ol>
+        </div>
+        <div class="card">
+          <h3>2. Android</h3>
+          <ol>
+            <li>Open the link in <strong>Chrome</strong>.</li>
+            <li>Tap the <strong>⋮</strong> menu.</li>
+            <li>Tap <strong>Install app</strong> or <strong>Add to Home screen</strong>.</li>
+            <li>Tap <strong>Install</strong>. Done!</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        <!-- Screen 3: logged in -->
-         <section id="view-home" hidden>
-            <h1>Welcome, <span id="user-name"></span>!</h1>
-            <p class="muted">You're now  verified UT Tyler student. Listings are coming soon. </p>
-            <button id="logout-btn" class="link-btn" type="button">Log out</button>
-         </section>
+  <!-- Part 5: Features + footer -->
+  <section class="wrap section features">
+    <div class="feature"><span class="check">✓</span><div><h3>Verified students only</h3><p>Every account is tied to a real UT Tyler email address.</p></div></div>
+    <div class="feature"><span class="check">✓</span><div><h3>No shipping, no fees</h3><p>Everyone is local, so you meet up and trade in person.</p></div></div>
+    <div class="feature"><span class="check">✓</span><div><h3>Safer meetups</h3><p>Each listing suggests a public, well-lit spot on campus.</p></div></div>
+  </section>
 
-         <!-- Messages (errors and success) show here-->
-          <p id="message" role="status"></p>
-    </main>
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <span class="footer-logo">UniMarket</span>
+      <span>A UT Tyler student project. Not an official university service.</span>
+    </div>
+  </footer>
 
-    <script src="app.js"></script>
-    </body>
-    </html>
+</body>
+</html>

@@ -24,6 +24,11 @@ const labels = {
   fair: 'Fair'
 };
 
+const housingLabels = {
+  on_campus: 'On campus',
+  off_campus: 'Off campus'
+};
+
 function createElement(tag, className, value) {
   const element = document.createElement(tag);
   if (className) element.className = className;
@@ -31,54 +36,55 @@ function createElement(tag, className, value) {
   return element;
 }
 
-function addDetail(container, text, full = false) {
-  container.appendChild(
-    createElement('span', full ? 'detail full' : 'detail', text)
-  );
+// 6000 -> "$60", 2550 -> "$25.50", 0 -> "Free"
+function formatPrice(cents) {
+  if (cents === 0) return 'Free';
+  const dollars = cents / 100;
+  return '$' + (Number.isInteger(dollars) ? dollars : dollars.toFixed(2));
 }
+
+const photoIcon = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#5A6478" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="9" cy="10" r="2"></circle><path d="M21 16l-5-5-9 9"></path></svg>';
 
 function renderListings(listings) {
   results.replaceChildren();
 
   if (!listings.length) {
-    results.appendChild(
-      createElement('p', 'empty-state', 'No matching listings found.')
-    );
+    results.appendChild(createElement('p', 'empty', 'No matching listings found.'));
     return;
   }
 
   listings.forEach(item => {
-    const card = createElement('a', 'listing-card');
+    const card = createElement('a', 'card');
     card.href = `/item.html?id=${encodeURIComponent(item.id)}`;
 
-    const img = createElement('img', 'listing-image');
-    img.alt = item.title;
-    img.src = item.photo_url || '/placeholder.svg';
-    img.onerror = () => {
-      img.onerror = null;
-      img.src = '/placeholder.svg';
-    };
-
-    const info = createElement('div', 'listing-info');
-    info.appendChild(createElement('h3', 'listing-title', item.title));
-
-    const details = createElement('div', 'listing-details');
-    addDetail(details, `Price: $${(item.price_cents / 100).toFixed(2)}`);
-
-    if (item.category === 'textbooks') {
-      addDetail(details, item.edition ? `Edition: ${item.edition}` : 'Textbook');
-      const courseText = [item.department, item.course_number]
-        .filter(Boolean).join(' ');
-      addDetail(details, `Course: ${courseText || 'Not specified'}`, true);
+    // Photo (or the "Photo" placeholder from the design)
+    const photo = createElement('div', 'card-photo');
+    if (item.photo_url) {
+      const img = document.createElement('img');
+      img.src = item.photo_url;
+      img.alt = item.title;
+      img.onerror = () => { photo.innerHTML = photoIcon; };
+      photo.appendChild(img);
     } else {
-      addDetail(details, item.category);
-      addDetail(details, `Condition: ${labels[item.condition] || item.condition}`, true);
+      photo.innerHTML = photoIcon; // fixed icon, no user text
+      photo.appendChild(createElement('span', null, 'Photo'));
     }
 
-    info.appendChild(details);
-    card.appendChild(img);
-    card.appendChild(info);
-    card.appendChild(createElement('span', 'card-arrow', '›'));
+    // Price, title, and one small details line
+    const body = createElement('div', 'card-body');
+    body.appendChild(createElement('span', 'card-price', formatPrice(item.price_cents)));
+    body.appendChild(createElement('span', 'card-title', item.title));
+
+    const meta = [labels[item.condition] || item.condition];
+    if (item.category === 'textbooks') {
+      const courseText = [item.department, item.course_number].filter(Boolean).join(' ');
+      if (courseText) meta.push(courseText);
+    }
+    if (housingLabels[item.seller_housing]) meta.push(housingLabels[item.seller_housing]);
+    body.appendChild(createElement('span', 'card-meta', meta.join(' · ')));
+
+    card.appendChild(photo);
+    card.appendChild(body);
     results.appendChild(card);
   });
 }
@@ -110,7 +116,7 @@ async function loadListings() {
     const data = await response.json();
     if (currentRequest !== requestNumber) return;
 
-    count.textContent = `${data.length} results`;
+    count.textContent = `${data.length} ${data.length === 1 ? 'result' : 'results'}`;
     renderListings(data);
   } catch (error) {
     if (currentRequest !== requestNumber) return;
@@ -147,11 +153,11 @@ async function loadFilterOptions() {
   }
 }
 
-document.querySelectorAll('.category-button').forEach(button => {
+document.querySelectorAll('.chip').forEach(button => {
   button.addEventListener('click', () => {
     category = button.dataset.category;
 
-    document.querySelectorAll('.category-button').forEach(b => {
+    document.querySelectorAll('.chip').forEach(b => {
       b.classList.toggle('active', b === button);
     });
 

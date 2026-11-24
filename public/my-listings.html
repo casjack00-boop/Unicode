@@ -1,37 +1,31 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>My Listings | UniMarket</title>
-
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="post.css">
-
-    <script src="my-listings.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Listings | UniMarket</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap">
+  <link rel="stylesheet" href="/post.css">
+  <script src="/my-listings.js" defer></script>
 </head>
 <body>
-
-    <header>
-        <h1>UniMarket</h1>
-        <p>Buy and Sell with UT Tyler Students</p>
+  <div class="app">
+    <header class="bar">
+      <a href="/browse.html" class="icon-btn" aria-label="Back to Browse">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#002D72" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
+      </a>
+      <h1>My listings</h1>
     </header>
 
-    <main>
-        <h2>My Listings</h2>
-        <p>Manage the items you have posted.</p>
-
-        <a href="post.html">+ Post a New Item</a>
-
-        <p id="message" role="status"></p>
-
-        <div id="listings">
-            <p>Loading your listings...</p>
-        </div>
+    <main class="mine">
+      <div class="mine-top">
+        <p>Manage the items you've posted.</p>
+        <a href="/post.html" class="sell-link">+ Sell</a>
+      </div>
+      <p id="message" class="message" role="status" aria-live="polite"></p>
+      <div id="listings"><p class="empty">Loading your listings...</p></div>
     </main>
-
+  </div>
 </body>
 </html>
-

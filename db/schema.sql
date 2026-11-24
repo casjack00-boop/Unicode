@@ -51,12 +51,38 @@ CREATE TABLE IF NOT EXISTS sessions (
     user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     expires_at  TIMESTAMPTZ NOT NULL,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 
---Browser Page
-ALTER TABLE public.listings
+-- Browse page: extra textbook details (cade)
+ALTER TABLE listings
 ADD COLUMN IF NOT EXISTS department TEXT,
 ADD COLUMN IF NOT EXISTS course_number TEXT,
 ADD COLUMN IF NOT EXISTS edition TEXT,
 ADD COLUMN IF NOT EXISTS author TEXT;
 
+
+--Seller ratings: one rating per student seller (rating again updates it)
+CREATE TABLE IF NOT EXISTS seller_ratings (
+    id SERIAL PRIMARY KEY,
+    seller_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    rater_id  INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    stars     INTEGER NOT NULL CHECK (stars BETWEEN 1 AND 5),
+    comment   TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (seller_id, rater_id),
+    CHECK (seller_id <> rater_id)
+);
+
+-----Roomate finder: students looking for someone to share a lease with----\
+id  SERIAL PRIMARY KEY,
+user_id      INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+title        TEXT NOT NULL,
+budget_cents INTEGER NOT NULL CHECK (budget_cents >= 0),
+movie_in     DATE,
+lease_months INTEGER CHECK (lease_months BETWEEN 1 AND 24),
+location TEXT NOT NULL CHECK (location IN ('on_campus','off_campus', 'either')),
+has_place     BOOLEAN NOT NULL DEFAULT FALSE,
+about         TEXT,
+status        TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'removed')),
+created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
