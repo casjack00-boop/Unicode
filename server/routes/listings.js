@@ -2,6 +2,7 @@
 const express = require('express');
 const pool = require('../db');
 const requireUser = require('../requireUser');
+const { normalizeISBN } = require('../isbn');
 
 const router = express.Router();
 
@@ -94,11 +95,15 @@ router.get('/', async (req, res) => {
       conditions.push(sql.replace('?', `$${values.length}`));
     }
 
-    if (search) {
+    const searchISBN = search ? normalizeISBN(search) : null;
+    if (searchISBN) {
+      addCondition('l.isbn = ?', searchISBN);
+    } else if (search) {
       addCondition(
         `(l.title ILIKE '%' || ? || '%'
           OR COALESCE(l.description, '') ILIKE '%' || $${values.length + 1} || '%'
-          OR l.category ILIKE '%' || $${values.length + 1} || '%')`,
+          OR l.category ILIKE '%' || $${values.length + 1} || '%'
+          OR COALESCE(l.author, '') ILIKE '%' || $${values.length + 1} || '%')`,
         search
       );
     }
@@ -130,7 +135,7 @@ router.get('/', async (req, res) => {
       SELECT
         l.id, l.title, l.description, l.price_cents,
         l.category, l.condition, l.department,
-        l.course_number, l.edition, l.created_at,
+        l.course_number, l.edition, l.isbn, l.created_at,
         (SELECT u.housing FROM users u WHERE u.id = l.seller_id) AS seller_housing,
         (
           SELECT lp.url
@@ -297,20 +302,32 @@ router.post('/', requireUser, async (req, res) => {
 
   // Textbook details only matter for textbooks
   const isBook = category === 'textbooks';
+  const rawISBN = req.body.isbn;
+  let isbn = null;
+  if (isBook && rawISBN !== undefined && rawISBN !== null) {
+    if (typeof rawISBN !== 'string' || rawISBN.length > 40) {
+      return res.status(400).json({ error: 'Enter a valid ISBN-10 or ISBN-13.' });
+    }
+    if (rawISBN.trim()) {
+      isbn = normalizeISBN(rawISBN);
+      if (!isbn) return res.status(400).json({ error: 'Enter a valid ISBN-10 or ISBN-13, or leave ISBN blank.' });
+    }
+  }
 
   try {
     const result = await pool.query(`
       INSERT INTO listings
         (seller_id, title, description, price_cents, category, condition, meeting_spot,
-         department, course_number, edition, author)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+         department, course_number, edition, author, isbn)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
       RETURNING id
     `, [
       req.user.id, title, description, Math.round(price * 100), category, condition, meetingSpot,
       isBook ? cleanText(req.body.department, 20) : null,
       isBook ? cleanText(req.body.courseNumber, 20) : null,
       isBook ? cleanText(req.body.edition, 30) : null,
-      isBook ? cleanText(req.body.author, 80) : null
+      isBook ? cleanText(req.body.author, 80) : null,
+      isbn
     ]);
     res.status(201).json({ ok: true, id: result.rows[0].id });
   } catch (error) {

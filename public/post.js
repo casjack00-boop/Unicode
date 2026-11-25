@@ -44,8 +44,16 @@ document.querySelectorAll('#conditionChips .chip').forEach((chip) => {
 });
 
 // ---------- Textbook fields only for Textbooks ----------
-categorySelect.addEventListener('change', () => {
+function syncBookFields() {
   bookFields.hidden = categorySelect.value !== 'textbooks';
+}
+
+categorySelect.addEventListener('change', syncBookFields);
+
+syncBookFields();
+
+window.addEventListener('pageshow', () => {
+  setTimeout(syncBookFields, 0);
 });
 
 // ---------- Photos ----------
@@ -142,6 +150,7 @@ form.addEventListener('submit', async (event) => {
     item.courseNumber = document.getElementById('courseNumber').value.trim();
     item.edition = document.getElementById('edition').value.trim();
     item.author = document.getElementById('author').value.trim();
+    item.isbn = document.getElementById('isbnInput')?.value.trim() || '';
   }
 
   try {
