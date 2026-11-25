@@ -121,6 +121,12 @@ async function loadListing() {
     setText('description', listing.description);
     setText('posted', postedAgo(listing.created_at));
     setText('seller-name', listing.seller_name);
+
+    document.getElementById('seller-name').href =
+      '/profile.html?id=' + encodeURIComponent(listing.seller_id);
+
+    setText('seller-initials', initials(listing.seller_name));
+
     setText('seller-initials', initials(listing.seller_name));
     setText('seller-housing', listing.seller_housing ? ' · ' + formatLabel(listing.seller_housing).replace('Campus', 'campus') : '');
     setText('meeting-spot', listing.meeting_spot || 'Ask the seller');
@@ -144,9 +150,14 @@ async function loadListing() {
   }
 }
 
-// ---------- 4. Message seller button (placeholder for now) ----------
+// ---------- 4. Message seller ----------
 messageBtn.addEventListener('click', () => {
-  comingSoon.hidden = false;
+  const id = new URLSearchParams(location.search).get('id');
+
+  if (id) {
+    window.location.href =
+      '/messages.html?listing=' + encodeURIComponent(id);
+  }
 });
 
 // Heart button: save / unsave (just on this screen for now)

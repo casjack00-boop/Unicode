@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Profile | UniMarket</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap">
+  <link rel="stylesheet" href="/browse.css">
+  <link rel="stylesheet" href="/profile.css">
+  <script src="/profile.js" defer></script>
+</head>
+<body>
+  <div class="app">
+    <header class="top"><div class="top-row"><a class="brand" href="/browse.html">UniMarket</a><span class="verified" id="page-label">Profile</span></div></header>
+    <main class="profile-main">
+      <p id="status" role="status">Loading profile...</p>
+      <a id="login-link" href="/login.html" hidden>Log in to UniMarket</a>
+      <div id="profile" hidden>
+        <section class="profile-panel identity">
+          <div class="profile-avatar" id="avatar" aria-hidden="true"></div>
+          <h1 id="name"></h1>
+          <p class="verified-student">✓ Verified UT Tyler student</p>
+          <p id="housing" class="profile-muted"></p>
+          <p id="member-since" class="profile-muted"></p>
+          <p id="rating" class="profile-rating">Loading ratings...</p>
+          <button id="edit-button" type="button" class="profile-button" hidden>Edit profile</button>
+        </section>
+        <section id="account" class="profile-panel" hidden>
+          <h2>Account information</h2>
+          <p class="profile-muted">School email (only visible to you)</p>
+          <p id="email" class="profile-email"></p>
+          <form id="edit-form" hidden>
+            <label for="display-name">Display name</label>
+            <input id="display-name" maxlength="80" required>
+            <label for="housing-select">Housing</label>
+            <select id="housing-select"><option value="">Prefer not to say</option><option value="on_campus">On campus</option><option value="off_campus">Off campus</option></select>
+            <div class="profile-actions"><button type="submit" class="profile-button" id="save-button">Save changes</button><button type="button" class="profile-secondary" id="cancel-button">Cancel</button></div>
+          </form>
+          <p id="edit-status" role="status"></p>
+          <a class="profile-link" href="/my-listings.html">Manage my listings <span aria-hidden="true">›</span></a>
+          <button type="button" id="logout" class="profile-secondary">Log out</button>
+        </section>
+        <section class="profile-panel"><h2>Active listings</h2><div id="active-listings" class="grid"></div></section>
+        <section class="profile-panel"><h2>Recent reviews</h2><div id="reviews"></div></section>
+      </div>
+    </main>
+    <nav class="bottom-nav" aria-label="Main">
+      <a href="/browse.html" class="nav-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10l9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg>
+        Browse
+      </a>
+      <a href="/post.html" class="nav-item">
+        <span class="sell-dot">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#14213D" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+        </span>
+        Sell
+      </a>
+      <a href="/messages.html" class="nav-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"></path></svg>
+        Messages
+      </a>
+      <a href="/profile.html" aria-current="page" class="nav-item active">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>
+        Profile
+      </a>
+    </nav>
+  </div>
+</body>
+</html>
