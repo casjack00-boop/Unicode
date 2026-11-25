@@ -232,3 +232,17 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 /* Hide the scrollbar under the chips (you can still swipe/scroll) */
 .chips { scrollbar-width: none; }
 .chips::-webkit-scrollbar { display: none; }
+
+
+/* "Find a roommate" link in the Browse header */
+.roommates-link {
+  margin-left: auto;
+  margin-right: 12px;
+  padding: 6px 12px;
+  border-radius: 16px;
+  background: var(--orange);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}

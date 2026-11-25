@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Find a Roommate | UniMarket</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap">
+  <link rel="stylesheet" href="/roommates.css">
+  <script src="/roommates.js" defer></script>
+</head>
+<body>
+  <div class="app">
+
+    <!-- Navy header -->
+    <header class="top">
+      <div class="top-row">
+        <a href="/browse.html" class="back" aria-label="Back to Browse">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
+        </a>
+        <h1>Find a roommate</h1>
+        <button type="button" id="openForm" class="post-toggle">+ Post</button>
+      </div>
+      <p class="sub">Split a lease with another verified UT Tyler student.</p>
+    </header>
+
+    <!-- Post form (opens from "+ Post") -->
+    <form id="postForm" class="card form" hidden novalidate>
+      <h2>Post your own</h2>
+      <p id="loginNote" class="note" hidden>Please <a href="/login.html">log in</a> to post.</p>
+
+      <div class="field">
+        <label for="title">Title</label>
+        <input id="title" type="text" maxlength="80" placeholder="e.g. Looking for a roommate for spring">
+      </div>
+
+      <div class="field">
+        <span class="label">I have…</span>
+        <div class="chips" id="placeChips">
+          <button type="button" class="chip active" data-value="false" aria-pressed="true">No place yet</button>
+          <button type="button" class="chip" data-value="true" aria-pressed="false">A place, need a roommate</button>
+        </div>
+      </div>
+
+      <div class="two">
+        <div class="field">
+          <label for="budget">Budget per month</label>
+          <div class="money"><span aria-hidden="true">$</span><input id="budget" type="number" min="0" max="5000" step="1" inputmode="numeric" placeholder="600"></div>
+        </div>
+        <div class="field">
+          <label for="location">Where</label>
+          <select id="location">
+            <option value="">Choose one</option>
+            <option value="on_campus">On campus</option>
+            <option value="off_campus">Off campus</option>
+            <option value="either">Either</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="two">
+        <div class="field">
+          <label for="moveIn">Move-in date</label>
+          <input id="moveIn" type="date">
+        </div>
+        <div class="field">
+          <label for="leaseMonths">Lease length (months)</label>
+          <input id="leaseMonths" type="number" min="1" max="24" step="1" inputmode="numeric" placeholder="12">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="about">About you</label>
+        <textarea id="about" rows="4" maxlength="1000" placeholder="Major, schedule, pets, quiet or social, what you're looking for"></textarea>
+      </div>
+
+      <p id="formMessage" class="message" role="status" aria-live="polite"></p>
+      <div class="form-buttons">
+        <button type="submit" id="postBtn" class="btn-navy">Post</button>
+        <button type="button" id="cancelForm" class="btn-plain">Cancel</button>
+      </div>
+    </form>
+
+    <!-- Filters -->
+    <nav class="chips filters" id="locationChips" aria-label="Where">
+      <button type="button" class="chip active" data-location="">All</button>
+      <button type="button" class="chip" data-location="on_campus">On campus</button>
+      <button type="button" class="chip" data-location="off_campus">Off campus</button>
+      <label class="budget-filter" for="maxBudget">Max $/mo
+        <input id="maxBudget" type="number" min="0" step="50" inputmode="numeric" placeholder="Any">
+      </label>
+    </nav>
+
+    <main class="list">
+      <p id="count" class="count">Loading...</p>
+      <div id="posts"></div>
+    </main>
+  </div>
+</body>
+</html>

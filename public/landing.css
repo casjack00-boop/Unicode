@@ -449,3 +449,32 @@ border-bottom: 1px solid var(--line);
   .section h2 {font-size: 28px;
   }
 }
+
+/* Phone preview cards: photo on top, text underneath */
+.mini {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #FFFFFF;
+}
+
+.mini-photo {
+  height: 96px;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: #E4E9F2;
+}
+
+.mini-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.mini-body {
+  padding: 6px 8px;
+  background: #FFFFFF;
+}

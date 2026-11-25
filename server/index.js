@@ -12,6 +12,7 @@ const ratingRoutes = require('./routes/ratings');
 const profileRoutes = require('./routes/profiles');
 const messageRoutes = require('./routes/messages');
 const bookRoutes = require('./routes/books');
+const roommateRoutes = require('./routes/roommates');
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use('/api/sellers', ratingRoutes);
 app.use('/api/profiles', profileRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/books', bookRoutes);
+app.use('/api/roommates', roommateRoutes);
  
 
 // Serve the app's pages (HTML, CSS, JavaScript) from the public folder

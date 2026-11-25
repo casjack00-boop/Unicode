@@ -88,6 +88,9 @@ $('back-btn').addEventListener('click', () => {
   show('view-email');
 });
 
+// Timer for the trip from the welcome screen to the listings
+let goToListings = null;
+
 // Ask the server who's logged in, then show the right screen
 async function loadUser() {
   const { ok, result } = await api('me');
@@ -95,6 +98,10 @@ async function loadUser() {
     $('user-name').textContent = result.user.display_name;
     show('view-home');
     showMessage('');
+    // Show "Welcome, name!" for a moment, then go to the listings
+    goToListings = setTimeout(() => {
+      window.location.href = '/browse.html';
+    }, 1500);
   } else {
     show('view-email');
   }
@@ -102,6 +109,7 @@ async function loadUser() {
 
 // The "Log out" button
 $('logout-btn').addEventListener('click', async () => {
+  clearTimeout(goToListings);   // stay here instead of going to the listings
   await api('logout', {});
   show('view-email');
   showMessage('You are logged out.', 'success');

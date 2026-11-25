@@ -63,3 +63,21 @@ VALUES
    'Scrub top and pants set (Small)',
    'Navy blue, worn twice for clinicals. Washed and in great shape.',
    2000, 'clothing', 'like_new', 'Soules College of Business lobby');
+
+   -- Photos for the sample listings (files live in public/images/listings)
+INSERT INTO listing_photos (listing_id, url, position)
+SELECT l.id, p.url, 1
+FROM (VALUES
+  ('Calculus: Early Transcendentals, 8th Ed.', '/images/listings/calculus.jpg'),
+  ('Serta Office Chair',                       '/images/listings/office-chair.jpg'),
+  ('TI-84 Plus graphing calculator',           '/images/listings/ti84.jpg'),
+  ('Desk lamp with USB charging port',         '/images/listings/desk-lamp.jpg'),
+  ('Fi-Fine microphone with desk arm',         '/images/listings/microphone.jpg'),
+  ('Wireless Bluetooth headphones',            '/images/listings/headphones.jpg'),
+  ('Organic Chemistry textbook + study guide', '/images/listings/ochem.jpg'),
+  ('Dell Laptop',                              '/images/listings/laptop.jpg'),
+  ('Backpack with laptop sleeve',              '/images/listings/backpack.jpg'),
+  ('Scrub top and pants set (Small)',          '/images/listings/scrubs.jpg')
+) AS p(title, url)
+JOIN listings l ON l.title = p.title
+ON CONFLICT (listing_id, position) DO NOTHING;

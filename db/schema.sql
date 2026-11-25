@@ -74,7 +74,8 @@ CREATE TABLE IF NOT EXISTS seller_ratings (
 );
 
 -----Roomate finder: students looking for someone to share a lease with----\
-id  SERIAL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS roommate_posts (
+id           SERIAL PRIMARY KEY,
 user_id      INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 title        TEXT NOT NULL,
 budget_cents INTEGER NOT NULL CHECK (budget_cents >= 0),

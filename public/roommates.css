@@ -1,0 +1,420 @@
+/* UniMarket: roommate finder (same look as Browse and Post) */
+
+:root {
+  --navy: #002D72;
+  --navy-dark: #001A45;
+  --orange: #F47A20;
+  --orange-soft: #FFF1E6;
+  --orange-text: #5C2A06;
+  --ink: #14213D;
+  --muted: #5A6478;
+  --line: #E1E5EE;
+  --field: #C5CCDA;
+  --bg: #F5F7FB;
+  --error: #B3261E;
+  --ok: #1E7B3A;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #E9EDF4;
+  color: var(--ink);
+  font-family: 'Source Sans 3', system-ui, sans-serif;
+}
+
+a {
+  color: var(--navy);
+}
+
+/* Phone-width column, centered on computers */
+.app {
+  max-width: 480px;
+  min-height: 100vh;
+  margin: 0 auto;
+  background: var(--bg);
+  padding-bottom: 32px;
+}
+
+/* ---------- Navy header ---------- */
+.top {
+  background: var(--navy);
+  color: #FFFFFF;
+  padding: 16px 16px 18px;
+}
+
+.top-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.top h1 {
+  margin: 0;
+  flex: 1;
+  font-family: Archivo, sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+}
+
+.back {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+}
+
+.back:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.post-toggle {
+  height: 38px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 19px;
+  background: var(--orange);
+  color: var(--ink);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.sub {
+  margin: 6px 0 0 48px;
+  color: #DCE4F2;
+  font-size: 15px;
+}
+
+/* ---------- Cards ---------- */
+.card {
+  background: #FFFFFF;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+/* ---------- Post form ---------- */
+.form {
+  margin: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form[hidden] {
+  display: none;
+}
+
+.form h2 {
+  margin: 0;
+  font-family: Archivo, sans-serif;
+  font-size: 19px;
+}
+
+.note {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--orange-soft);
+  color: var(--orange-text);
+}
+
+.note[hidden] {
+  display: none;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.field label,
+.label {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.two {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  height: 46px;
+  padding: 0 12px;
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--ink);
+  background: #FFFFFF;
+  border: 1.5px solid var(--field);
+  border-radius: 10px;
+}
+
+textarea {
+  height: auto;
+  padding: 10px 12px;
+  line-height: 1.45;
+  resize: vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--navy);
+  box-shadow: 0 0 0 3px rgba(0, 45, 114, 0.15);
+}
+
+.invalid {
+  border-color: var(--error) !important;
+}
+
+.money {
+  position: relative;
+}
+
+.money span {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  color: var(--muted);
+}
+
+.money input {
+  padding-left: 26px;
+}
+
+.message {
+  margin: 0;
+  font-weight: 600;
+}
+
+.message.error {
+  color: var(--error);
+}
+
+.message.ok {
+  color: var(--ok);
+}
+
+.form-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-navy,
+.btn-plain {
+  height: 46px;
+  padding: 0 22px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.btn-navy {
+  border: none;
+  background: var(--navy);
+  color: #FFFFFF;
+}
+
+.btn-navy:hover {
+  background: var(--navy-dark);
+}
+
+.btn-navy:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-plain {
+  border: 1.5px solid var(--field);
+  background: #FFFFFF;
+  color: var(--ink);
+}
+
+/* ---------- Chips (filters + "I have") ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.filters {
+  padding: 14px 16px 4px;
+}
+
+.chip {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 18px;
+  border: 1.5px solid var(--field);
+  background: #FFFFFF;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.chip.active {
+  border-color: var(--navy);
+  background: var(--navy);
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+.budget-filter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.budget-filter input {
+  width: 90px;
+  height: 36px;
+}
+
+/* ---------- Post list ---------- */
+.list {
+  padding: 8px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.count {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+#posts {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.post {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.post-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.post h3 {
+  margin: 0;
+  font-family: Archivo, sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.budget {
+  font-family: Archivo, sans-serif;
+  font-weight: 800;
+  color: var(--navy);
+  white-space: nowrap;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: #E4E9F2;
+  font-size: 13px;
+}
+
+.tag.place {
+  background: var(--orange-soft);
+  color: var(--orange-text);
+  font-weight: 600;
+}
+
+.about {
+  margin: 0;
+  line-height: 1.45;
+  white-space: pre-line;
+}
+
+.post-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.poster {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.poster b {
+  color: var(--ink);
+}
+
+.small-btn {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: none;
+  background: var(--navy);
+  color: #FFFFFF;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.small-btn.remove {
+  background: #FFFFFF;
+  color: var(--error);
+  border: 1.5px solid var(--field);
+}
+
+.soon {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.empty {
+  text-align: center;
+  color: var(--muted);
+  padding: 24px 0;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--orange);
+  outline-offset: 2px;
+}
