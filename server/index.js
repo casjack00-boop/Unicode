@@ -9,6 +9,8 @@ const authRoutes = require('./routes/auth');
 const listingsRoutes = require('./routes/listings');
 const photoRoutes = require('./routes/photos');
 const ratingRoutes = require('./routes/ratings');
+const profileRoutes = require('./routes/profiles');
+const messageRoutes = require('./routes/messages');
 const bookRoutes = require('./routes/books');
 
 const app = express();
@@ -26,7 +28,11 @@ app.use('/api/listings', photoRoutes);
 app.use('/api/listings', listingsRoutes);
 // Seller ratings
 app.use('/api/sellers', ratingRoutes);
+
+app.use('/api/profiles', profileRoutes);
+app.use('/api/messages', messageRoutes);
 app.use('/api/books', bookRoutes);
+ 
 
 // Serve the app's pages (HTML, CSS, JavaScript) from the public folder
 app.use(express.static(path.join(__dirname, '..', 'public')));

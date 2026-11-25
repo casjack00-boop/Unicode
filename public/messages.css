@@ -1,0 +1,40 @@
+/* Messaging uses the existing Browse design tokens and navigation. */
+[hidden] { display: none !important; }
+.messaging-header { gap: 10px; color: white; }
+.messaging-header h1 { margin: 0; font: 800 24px Archivo, sans-serif; overflow-wrap: anywhere; }
+.messaging-header a { color: white; }
+.messaging-header #other-profile { font-size: 14px; color: #DCE4F2; }
+.messaging-header .search input { padding-left: 16px; }
+.message-main { padding: 14px 16px; flex: 1; min-height: 0; }
+#message-status { color: var(--muted); margin: 10px 0; overflow-wrap: anywhere; }
+#message-status.is-error { color: #B3261E; }
+#login-link { color: var(--navy); font-weight: 600; }
+#conversation-list { display: flex; flex-direction: column; gap: 10px; }
+.conversation { display: flex; gap: 12px; align-items: center; background: white; border: 1px solid var(--line); border-radius: 12px; padding: 14px; color: var(--ink); text-decoration: none; }
+.conversation:hover { border-color: var(--navy); }
+.chat-avatar { width: 44px; height: 44px; flex: 0 0 44px; border-radius: 50%; background: var(--navy); color: white; display: grid; place-items: center; font-weight: 800; }
+.conversation-copy { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.conversation-copy strong, .conversation-copy span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.conversation-item { color: var(--navy); font-size: 14px; }
+.preview { color: var(--muted); font-size: 14px; }
+.conversation-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; font-size: 12px; color: var(--muted); flex-shrink: 0; }
+.unread { background: var(--orange); color: var(--ink); font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+.conversation.unread-thread strong { font-weight: 800; }
+.listing-context { padding: 12px; background: white; border: 1px solid var(--line); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.listing-context div { min-width: 0; display: flex; flex-direction: column; overflow-wrap: anywhere; }
+.listing-context span { color: var(--muted); font-size: 14px; }
+.listing-context a { flex-shrink: 0; color: var(--navy); font-size: 14px; }
+.messaging-app.chat-mode { height: 100vh; height: 100dvh; padding-bottom: 0; min-height: 0; }
+.chat-mode .message-main { display: flex; flex-direction: column; padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+#chat { min-height: 0; flex: 1; display: flex; flex-direction: column; gap: 12px; }
+#message-history { min-height: 80px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding: 4px 1px; }
+.bubble-row { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }
+.bubble-row.mine { align-items: flex-end; }
+.bubble { max-width: 85%; background: var(--photo-bg); color: var(--ink); padding: 10px 14px; border-radius: 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.mine .bubble { background: var(--navy); color: white; }
+.bubble-time { color: var(--muted); font-size: 12px; }
+.compose { display: flex; gap: 8px; align-items: flex-end; }
+.compose textarea { min-width: 0; flex: 1; resize: vertical; max-height: 130px; padding: 12px; font: inherit; border: 1px solid var(--chip-line); border-radius: 12px; background: white; }
+.compose button { background: var(--navy); color: white; border: 0; border-radius: 10px; padding: 14px; font: inherit; font-weight: 600; cursor: pointer; }
+.compose button:disabled { opacity: .5; cursor: not-allowed; }
+.compose textarea:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Messages | UniMarket</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap">
+  <link rel="stylesheet" href="/browse.css">
+  <link rel="stylesheet" href="/messages.css">
+  <script src="/messages.js" defer></script>
+</head>
+<body>
+  <div class="app messaging-app">
+    <header class="top messaging-header">
+      <div class="top-row">
+        <a class="brand" href="/browse.html">UniMarket</a>
+        <a id="back-inbox" href="/messages.html" hidden>‹ Inbox</a>
+      </div>
+      <h1 id="page-title">Messages</h1>
+      <a id="other-profile" hidden></a>
+      <div id="search-box" class="search" hidden>
+        <label for="conversation-search" class="sr-only">Search conversations</label>
+        <input id="conversation-search" type="search" placeholder="Search conversations">
+      </div>
+    </header>
+    <main class="message-main">
+      <p id="message-status" role="status">Loading messages...</p>
+      <a id="login-link" href="/login.html" hidden>Log in to continue</a>
+      <section id="inbox" hidden aria-label="Conversations">
+        <div id="conversation-list"></div>
+      </section>
+      <section id="chat" hidden aria-label="Conversation">
+        <div class="listing-context"><div><strong id="listing-title"></strong><span id="listing-info"></span></div><a id="listing-link">View item ›</a></div>
+        <div id="message-history" role="log" aria-label="Message history" aria-live="polite"></div>
+        <form id="message-form" class="compose">
+          <label for="message-input" class="sr-only">Write a message</label>
+          <textarea id="message-input" maxlength="2000" rows="2" placeholder="Write a message..." required></textarea>
+          <button id="send-button" type="submit">Send</button>
+        </form>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Main">
+      <a href="/browse.html" class="nav-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10l9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg>
+        Browse
+      </a>
+      <a href="/post.html" class="nav-item">
+        <span class="sell-dot">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#14213D" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+        </span>
+        Sell
+      </a>
+      <a href="/messages.html" aria-current="page" class="nav-item active">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"></path></svg>
+        Messages
+      </a>
+      <a href="/profile.html" class="nav-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>
+        Profile
+      </a>
+    </nav>
+  </div>
+</body>
+</html>
