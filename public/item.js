@@ -119,6 +119,11 @@ async function loadListing() {
     setText('condition', formatLabel(listing.condition));
     setText('category', formatLabel(listing.category));
     setText('description', listing.description);
+    const isbnDetails = document.getElementById('isbn-details');
+    if (isbnDetails) {
+      isbnDetails.hidden = !(listing.category === 'textbooks' && listing.isbn);
+      isbnDetails.textContent = isbnDetails.hidden ? '' : 'ISBN: ' + listing.isbn;
+    }
     setText('posted', postedAgo(listing.created_at));
     setText('seller-name', listing.seller_name);
 

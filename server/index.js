@@ -11,6 +11,7 @@ const photoRoutes = require('./routes/photos');
 const ratingRoutes = require('./routes/ratings');
 const profileRoutes = require('./routes/profiles');
 const messageRoutes = require('./routes/messages');
+const bookRoutes = require('./routes/books');
 
 const app = express();
 
@@ -27,11 +28,26 @@ app.use('/api/listings', photoRoutes);
 app.use('/api/listings', listingsRoutes);
 // Seller ratings
 app.use('/api/sellers', ratingRoutes);
+
 app.use('/api/profiles', profileRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/books', bookRoutes);
+ 
 
 // Serve the app's pages (HTML, CSS, JavaScript) from the public folder
 app.use(express.static(path.join(__dirname, '..', 'public')));
+// Serve the Quagga2 barcode recognition library
+app.get('/vendor/quagga.min.js', (req, res) => {
+  res.sendFile(path.join(
+    __dirname,
+    '..',
+    'node_modules',
+    '@ericblade',
+    'quagga2',
+    'dist',
+    'quagga.min.js'
+  ));
+});
 
 // Test page: checks the database and counts students
 app.get('/api/health', async (req, res) => {
