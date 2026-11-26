@@ -72,7 +72,7 @@ router.get('/', async (req, res) => {
     const category = String(req.query.category || 'all');
     const sort = String(req.query.sort || 'recommended');
 
-    if (!validCategories.includes(category) || !sortOptions[sort]) {
+    if (!validCategories.includes(category) || !Object.hasOwn(sortOptions, sort)) {
       return res.status(400).json({ error: 'Invalid filter or sort' });
     }
 
@@ -96,16 +96,35 @@ router.get('/', async (req, res) => {
     }
 
     const searchISBN = search ? normalizeISBN(search) : null;
+    let relevance = '';
     if (searchISBN) {
       addCondition('l.isbn = ?', searchISBN);
     } else if (search) {
-      addCondition(
-        `(l.title ILIKE '%' || ? || '%'
-          OR COALESCE(l.description, '') ILIKE '%' || $${values.length + 1} || '%'
-          OR l.category ILIKE '%' || $${values.length + 1} || '%'
-          OR COALESCE(l.author, '') ILIKE '%' || $${values.length + 1} || '%')`,
-        search
-      );
+      values.push(search.toLowerCase());
+      const term = `$${values.length}`;
+      const exact = `strpos(lower(concat_ws(' ', l.title, l.description, l.category,
+        l.author, l.department, l.course_number, l.edition)), ${term}) > 0`;
+      const fuzzy = `greatest(word_similarity(${term}, lower(l.title)),
+        word_similarity(${term}, lower(coalesce(l.author, ''))))`;
+      const allowFuzzy = search.length >= 4 && /[a-z]/i.test(search);
+      conditions.push(allowFuzzy ? `(${exact} OR ${fuzzy} >= 0.45)` : `(${exact})`);
+      if (sort === 'recommended') relevance = `CASE WHEN ${exact} THEN 0 ELSE 1 END, ${allowFuzzy ? fuzzy + ' DESC, ' : ''}`;
+    }
+
+    const condition = String(req.query.condition || '');
+    if (condition) {
+      if (!['new', 'like_new', 'good', 'fair'].includes(condition)) {
+        return res.status(400).json({ error: 'Invalid condition' });
+      }
+      addCondition('l.condition = ?', condition);
+    }
+
+    const housing = String(req.query.housing || '');
+    if (housing) {
+      if (!['on_campus', 'off_campus'].includes(housing)) {
+        return res.status(400).json({ error: 'Invalid housing filter' });
+      }
+      addCondition('EXISTS (SELECT 1 FROM users u WHERE u.id = l.seller_id AND u.housing = ?)', housing);
     }
 
     if (category !== 'all') {
@@ -146,7 +165,7 @@ router.get('/', async (req, res) => {
         ) AS photo_url
       FROM listings l
       WHERE ${conditions.join(' AND ')}
-      ORDER BY ${sortOptions[sort]}
+      ORDER BY ${relevance}${sortOptions[sort]}
       LIMIT 100
     `;
 

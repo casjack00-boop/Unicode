@@ -34,6 +34,7 @@ app.use('/api/profiles', profileRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/books', bookRoutes);
 app.use('/api/roommates', roommateRoutes);
+app.use('/api/discovery', require('./routes/discovery'));
  
 
 // Serve the app's pages (HTML, CSS, JavaScript) from the public folder

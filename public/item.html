@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap">
   <link rel="stylesheet" href="/item.css">
   <link rel="stylesheet" href="/accessibility.css">
+  <link rel="stylesheet" href="/discovery.css">
   <script src="/accessibility.js"></script>
 </head>
 <body>
@@ -94,6 +95,12 @@
             </div>
           </div>
 
+          <div class="discovery-links"><button type="button" id="share-listing" class="discovery-button">Share listing</button><a href="/saved.html" class="discovery-link">Saved items</a></div>
+          <p id="discovery-item-status" class="discovery-status" role="status"></p>
+          <section id="similar-section" class="discovery-section" aria-labelledby="similar-heading" hidden>
+            <h2 id="similar-heading">Similar items</h2>
+            <div id="similar-items" class="discovery-list"></div>
+          </section>
           <p id="coming-soon" class="coming-soon" hidden>Messaging is coming soon.</p>
         </div>
       </div>
@@ -111,6 +118,7 @@
     </article>
   </main>
 
+  <script src="/discovery.js"></script>
   <script src="/item.js"></script>
 </body>
 </html>

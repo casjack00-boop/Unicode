@@ -147,6 +147,7 @@ async function loadListing() {
     // Swap "Loading..." for the real content
     statusEl.hidden = true;
     itemEl.hidden = false;
+    window.UniMarketDiscovery?.initItem(listing);
   } catch (err) {
     // Network problem or the server is down
     console.error(err);
@@ -162,13 +163,6 @@ messageBtn.addEventListener('click', () => {
     window.location.href =
       '/messages.html?listing=' + encodeURIComponent(id);
   }
-});
-
-// Heart button: save / unsave (just on this screen for now)
-const saveBtn = document.getElementById('save-btn');
-saveBtn.addEventListener('click', () => {
-  const saved = saveBtn.getAttribute('aria-pressed') === 'true';
-  saveBtn.setAttribute('aria-pressed', String(!saved));
 });
 
 // ---------- 5. Seller ratings ----------

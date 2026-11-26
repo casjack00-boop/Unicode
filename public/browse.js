@@ -12,6 +12,8 @@ const edition = document.getElementById('edition');
 const minPrice = document.getElementById('minPrice');
 const maxPrice = document.getElementById('maxPrice');
 const sortSelect = document.getElementById('sortSelect');
+const conditionFilter = document.getElementById('conditionFilter');
+const housingFilter = document.getElementById('housingFilter');
 
 let category = 'all';
 let requestNumber = 0;
@@ -103,6 +105,8 @@ async function loadListings() {
     if (edition.value) params.set('edition', edition.value);
   }
 
+  if (conditionFilter.value) params.set('condition', conditionFilter.value);
+  if (housingFilter.value) params.set('housing', housingFilter.value);
   if (minPrice.value) params.set('minPrice', minPrice.value);
   if (maxPrice.value) params.set('maxPrice', maxPrice.value);
 
@@ -111,9 +115,8 @@ async function loadListings() {
 
   try {
     const response = await fetch(`/api/listings?${params}`);
-    if (!response.ok) throw new Error('Could not load listings');
-
     const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Could not load listings');
     if (currentRequest !== requestNumber) return;
 
     count.textContent = `${data.length} ${data.length === 1 ? 'result' : 'results'}`;
@@ -122,7 +125,7 @@ async function loadListings() {
     if (currentRequest !== requestNumber) return;
     count.textContent = '0 results';
     results.replaceChildren();
-    errorMessage.textContent = 'Unable to load listings. Check the server and database.';
+    errorMessage.textContent = error.message || 'Unable to load listings.';
     errorMessage.hidden = false;
   }
 }
@@ -178,6 +181,8 @@ document.getElementById('clearFilters').addEventListener('click', () => {
   edition.value = '';
   minPrice.value = '';
   maxPrice.value = '';
+  conditionFilter.value = '';
+  housingFilter.value = '';
   loadListings();
 });
 
@@ -186,7 +191,7 @@ searchInput.addEventListener('input', () => {
   searchTimer = setTimeout(loadListings, 250);
 });
 
-[department, course, edition, minPrice, maxPrice, sortSelect]
+[department, course, edition, minPrice, maxPrice, sortSelect, conditionFilter, housingFilter]
   .forEach(control => control.addEventListener('change', loadListings));
 
 loadFilterOptions();

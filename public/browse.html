@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="/browse.css">
   <script src="/browse.js" defer></script>
   <link rel="stylesheet" href="/accessibility.css">
+  <link rel="stylesheet" href="/discovery.css">
   <script src="/accessibility.js"></script>
 </head>
 <body>
@@ -68,9 +69,18 @@
             <input id="maxPrice" type="number" min="0" step="0.01" inputmode="decimal">
           </label>
         </div>
+        <div class="filter-grid">
+          <label>Condition
+            <select id="conditionFilter"><option value="">Any condition</option><option value="new">New</option><option value="like_new">Like new</option><option value="good">Good</option><option value="fair">Fair</option></select>
+          </label>
+          <label>Seller housing
+            <select id="housingFilter"><option value="">Any housing</option><option value="on_campus">On campus</option><option value="off_campus">Off campus</option></select>
+          </label>
+        </div>
         <button id="clearFilters" class="clear-btn" type="button">Clear filters</button>
       </section>
 
+      <div class="discovery-links"><a class="discovery-link" href="/saved.html">Saved &amp; recently viewed</a></div>
       <div class="toolbar">
         <span id="resultCount" role="status">Loading...</span>
         <label class="sort">Sort

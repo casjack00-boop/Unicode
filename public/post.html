@@ -14,7 +14,9 @@
   <script src="/isbn.js" defer></script>
   <script src="/vendor/quagga.min.js" defer></script>
   <script src="/isbn-scanner.js" defer></script>
+  <script src="/discovery.js" defer></script>
   <link rel="stylesheet" href="/accessibility.css">
+  <link rel="stylesheet" href="/discovery.css">
   <script src="/accessibility.js"></script>
 </head>
 <body>
@@ -104,6 +106,13 @@
           </div>
         </div>
       </div>
+
+      <section class="discovery-panel" aria-labelledby="price-guide-heading">
+        <h2 id="price-guide-heading">Price guidance</h2>
+        <p>Compare asking prices from similar active listings. This is optional and never changes your price automatically.</p>
+        <button type="button" id="price-guide-button" class="discovery-button">Compare prices</button>
+        <p id="price-guide-status" role="status"></p>
+      </section>
 
       <!-- Condition chips -->
       <fieldset class="field">
