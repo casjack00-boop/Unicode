@@ -37,6 +37,7 @@ app.use('/api/roommates', roommateRoutes);
 app.use('/api/discovery', require('./routes/discovery'));
 app.use('/api/transactions', require('./routes/transactions'));
 app.use('/api/notifications', require('./routes/notifications'));
+app.use('/api/safety', require('./routes/safety'));
  
 
 // Serve the app's pages (HTML, CSS, JavaScript) from the public folder

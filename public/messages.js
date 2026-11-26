@@ -6,6 +6,7 @@ let conversations = [];
 let refreshPromise = null;
 let stopped = false;
 let sending = false;
+let contactBlocked = false;
 let timer;
 let historySignature = null;
 
@@ -96,6 +97,11 @@ function renderHistory(data) {
     const row = element('div', 'bubble-row' + (m.sender_id === data.user_id ? ' mine' : ''));
     const speaker = element('span', 'sr-only', m.sender_id === data.user_id ? 'You: ' : 'Other student: ');
     row.append(speaker, element('div', 'bubble', m.body), element('span', 'bubble-time', timestamp(m.created_at)));
+    if (m.sender_id !== data.user_id) {
+      const report = element('a', 'safety-link', 'Report message');
+      report.href = '/safety.html?message=' + encodeURIComponent(m.id) + '&conversation=' + encodeURIComponent(conversationId);
+      row.append(report);
+    }
     history.append(row);
   }
   if (first || atBottom) history.scrollTop = history.scrollHeight;
@@ -113,6 +119,12 @@ async function refreshChat() {
   el('listing-link').href = '/item.html?id=' + encodeURIComponent(c.listing_id);
   el('listing-link').hidden = c.listing_status !== 'active';
   el('chat').hidden = false;
+  contactBlocked = Boolean(c.contact_blocked);
+  el('chat-safety').href = '/safety.html?user=' + encodeURIComponent(c.other_id);
+  el('chat-safety').hidden = false;
+  el('chat-blocked').hidden = !contactBlocked;
+  el('message-form').hidden = contactBlocked;
+  if (!sending) { el('send-button').disabled = contactBlocked; el('message-input').disabled = contactBlocked; }
   status('');
   renderHistory(data);
   if (!document.hidden && data.messages.some(m => m.sender_id !== data.user_id && !m.read_at)) {
@@ -132,7 +144,7 @@ function refresh() {
 el('conversation-search').addEventListener('input', renderInbox);
 el('message-form').addEventListener('submit', async event => {
   event.preventDefault();
-  if (sending || stopped || !conversationId) return;
+  if (sending || stopped || contactBlocked || !conversationId) return;
   const input = el('message-input');
   const body = input.value.trim();
   if (!body) return;
@@ -148,7 +160,7 @@ el('message-form').addEventListener('submit', async event => {
     await refreshChat();
     el('message-history').scrollTop = el('message-history').scrollHeight;
   } catch (err) { handleError(err); }
-  finally { sending = false; el('send-button').disabled = false; input.disabled = false; input.focus(); }
+  finally { sending = false; el('send-button').disabled = contactBlocked; input.disabled = contactBlocked; if (!contactBlocked) input.focus(); }
 });
 async function start() {
   try {

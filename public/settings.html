@@ -11,6 +11,8 @@
   <link rel="stylesheet" href="/notifications.css">
   <script src="/notifications.js" defer></script>
   <script src="/settings.js" defer></script>
+  <script src="/safety.js" defer></script>
+  <link rel="stylesheet" href="/safety.css">
 </head>
 <body>
   <div class="app">
@@ -44,6 +46,11 @@
           <label class="notice-pref-check"><input type="checkbox" name="saved_searches"> New items matching saved searches</label>
           <button type="submit">Save notification preferences</button>
         </form>
+      </section>
+      <section id="blocked-accounts" class="safety-panel" aria-labelledby="blocked-heading" hidden>
+        <h2 id="blocked-heading">Blocked accounts</h2>
+        <p id="blocked-status" role="status"></p><div id="blocked-list"></div>
+        <a href="/safety.html" class="safety-link">Community safety guidance</a>
       </section>
       <section id="account-session" class="notice-panel" aria-labelledby="session-heading" hidden>
         <h2 id="session-heading">Account</h2>

@@ -2,10 +2,12 @@ const express = require('express');
 const pool = require('../db');
 const requireUser = require('../requireUser');
 const { DealError, cents, transition } = require('../deal-rules');
+const {safetyError} = require('../safety-rules');
 const router = express.Router();
 router.use(requireUser, (req,res,next) => { res.setHeader('Cache-Control','private, no-store'); next(); });
 const idOf = value => { const n = Number(value); if (!/^\d+$/.test(String(value)) || !Number.isInteger(n) || n < 1 || n > 2147483647) throw new DealError(400,'Invalid ID.'); return n; };
 function fail(res, e) {
+  if (safetyError(e,res)) return;
   if (e instanceof DealError) return res.status(e.status).json({error:e.message});
   console.error('Transactions:',e); res.status(500).json({error:'Unable to complete the transaction request.'});
 }

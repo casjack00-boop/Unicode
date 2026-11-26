@@ -124,6 +124,8 @@ async function loadProfile() {
     el('account').hidden = !ownProfile;
     el('profile-settings').hidden = !ownProfile;
     el('edit-button').hidden = !ownProfile;
+    el('profile-safety').href = '/safety.html?user=' + encodeURIComponent(data.user.id);
+    el('profile-safety').hidden = ownProfile;
     el('status').hidden = true;
     el('profile').hidden = false;
     await loadRatings(data.user.id);

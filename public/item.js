@@ -113,6 +113,9 @@ async function loadListing() {
     }
 
     // Fill in the page
+    const reportLink = document.getElementById('report-listing');
+    reportLink.href = '/safety.html?listing=' + encodeURIComponent(listing.id);
+    reportLink.hidden = false;
     setText('price', formatPrice(listing.price_cents));
     setText('title', listing.title);
     setText('condition', formatLabel(listing.condition));

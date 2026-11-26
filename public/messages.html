@@ -10,6 +10,7 @@
   <script src="/messages.js" defer></script>
   <link rel="stylesheet" href="/accessibility.css">
   <script src="/accessibility.js"></script>
+  <link rel="stylesheet" href="/safety.css">
 </head>
 <body>
   <div class="app messaging-app">
@@ -35,6 +36,8 @@
       <section id="chat" hidden aria-label="Conversation">
         <div class="listing-context"><div><strong id="listing-title"></strong><span id="listing-info"></span></div><a id="listing-link">View item ›</a></div>
         <div id="message-history" role="log" aria-label="Message history" aria-live="polite"></div>
+        <a id="chat-safety" class="safety-link" hidden>Report or block student</a>
+        <p id="chat-blocked" role="status" hidden>New messages are unavailable for this conversation.</p>
         <form id="message-form" class="compose">
           <label for="message-input" class="sr-only">Write a message</label>
           <textarea id="message-input" maxlength="2000" rows="2" placeholder="Write a message..." required></textarea>
