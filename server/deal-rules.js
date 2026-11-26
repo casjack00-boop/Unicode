@@ -1,4 +1,5 @@
 // Pure validation/state transitions; routes apply these under a listing row lock.
+const {reservationExpired}=require('./meetup-rules');
 class DealError extends Error {
   constructor(status, message) { super(message); this.status = status; }
 }
@@ -13,6 +14,7 @@ function transition(deal, listing, user, body, now = Date.now()) {
   if (body.revision !== deal.revision) reject(409, 'This transaction changed. Refresh and review the latest details.');
   const action = body.action;
   if (!['pending','reserved'].includes(deal.status)) reject(409, 'This transaction is closed.');
+  if (action !== 'cancel' && reservationExpired(deal,now)) reject(409, 'This reservation expired. Refresh transactions.');
   const next = { ...deal };
   if (action === 'cancel') {
     next.status = 'cancelled';

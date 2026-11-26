@@ -15,6 +15,40 @@
     if (!res.ok) { const e = new Error(data.error || 'Request failed.'); e.status = res.status; throw e; }
     return data;
   }
+  const weekdays=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const campusSpots=['University Center — public entrance','Muntz Library — public entrance'];
+  const campusTime=value=>new Date(value).toLocaleString(undefined,{timeZone:'America/Chicago',timeZoneName:'short'});
+  const availabilityFields=[];
+  async function initAvailability(){
+    try {
+      const {availability}=await api('/api/transactions/availability');
+      const root=$('tx-availability-days'); root.replaceChildren(); availabilityFields.length=0;
+      for(let day=0;day<7;day++){
+        const current=availability.find(slot=>slot.day===day);
+        const group=el('fieldset',null,'tx-availability-day');
+        group.append(el('legend',weekdays[day]));
+        const enabled=el('input');enabled.type='checkbox';enabled.id='available-'+day;enabled.checked=Boolean(current);
+        const label=el('label','Available');label.htmlFor=enabled.id;
+        const check=el('div',null,'tx-day-check');check.append(enabled,label);group.append(check);
+        const start=field(group,'From','available-start-'+day,'time',current?.start||'09:00');
+        const end=field(group,'Until','available-end-'+day,'time',current?.end||'17:00');
+        function sync(){start.disabled=end.disabled=!enabled.checked;}
+        enabled.addEventListener('change',sync);sync();root.append(group);
+        availabilityFields.push({day,enabled,start,end});
+      }
+      $('tx-availability').hidden=false;
+      $('tx-availability-form').querySelector('button').disabled=false;
+    } catch(e){$('tx-availability').hidden=false;$('tx-availability-status').textContent=e.message;}
+  }
+  $('tx-availability-form').addEventListener('submit',async e=>{
+    e.preventDefault();const button=e.currentTarget.querySelector('button');if(button.disabled||busy)return;
+    const availability=availabilityFields.filter(f=>f.enabled.checked).map(f=>({day:f.day,start:f.start.value,end:f.end.value}));
+    if(availability.some(s=>s.start>=s.end)){ $('tx-availability-status').textContent='End time must be later than start time.';return; }
+    button.disabled=true;
+    try {await api('/api/transactions/availability','PUT',{availability});$('tx-availability-status').textContent='Weekly availability saved.';await load();}
+    catch(e){$('tx-availability-status').textContent=e.message;}
+    finally{button.disabled=false;}
+  });
   function priceOf(input) { return Math.round(Number(input.value) * 100); }
   function button(text, fn) { const b=el('button',text); b.type='button'; b.addEventListener('click',fn); return b; }
   function field(form, text, id, type, value) {
@@ -80,8 +114,12 @@
       const buyer=d.buyer_id===userId, ownProposal=d.proposed_by===userId;
       const card=el('article',null,'tx-card');
       card.id='deal-'+d.id; card.tabIndex=-1;
-      card.append(el('h2',d.item_snapshot.title),el('p',(buyer?'Buying from ':'Selling to ')+d.other_name),el('p',labels[d.status]+' · '+money(d.price_cents),'tx-state'));
+      card.append(el('h2',d.item_snapshot.title),el('p',(buyer?'Buying from ':'Selling to ')+d.other_name),el('p',(d.expired_at?'Reservation expired':labels[d.status])+' · '+money(d.price_cents),'tx-state'));
       const actions=el('div',null,'tx-actions');
+      if(buyer && ['pending','reserved'].includes(d.status) && d.seller_availability?.length){
+        const times=el('div',null,'tx-meetup');times.append(el('p','Seller’s weekly availability (Central Time; not a confirmed meetup)'));
+        const list=el('ul');for(const slot of d.seller_availability)list.append(el('li',weekdays[slot.day]+': '+slot.start+'–'+slot.end));times.append(list);card.append(times);
+      }
       if(d.status==='pending') {
         card.append(el('p',ownProposal?'Waiting for the other student to respond.':'The other student proposed this price.'));
         if(!ownProposal) {
@@ -90,22 +128,32 @@
         }
         actions.append(button('Cancel offer',()=>{if(confirm('Cancel this offer?'))act(d,'cancel');}));
       } else if(d.status==='reserved') {
+        if(d.buyer_confirmed||d.seller_confirmed) card.append(el('p','Automatic expiration paused because handover confirmation has started.'));
+        else if(d.reservation_expires_at) card.append(el('p','Reservation expires: '+campusTime(d.reservation_expires_at)+(d.meetup_confirmed?'. Confirm the exchange after handover.':'. Confirm a meetup before this deadline.')));
         if(d.meetup_at) {
           const date=new Date(d.meetup_at);
-          card.append(el('p',(d.meetup_confirmed?'Confirmed meetup: ':'Proposed meetup: ')+date.toLocaleString()+' · '+d.meetup_spot,'tx-meetup'));
+          card.append(el('p',(d.meetup_confirmed?'Confirmed meetup: ':'Proposed meetup: ')+campusTime(date)+' · '+d.meetup_spot,'tx-meetup'));
           if(!d.meetup_confirmed && d.meetup_by!==userId && date.getTime()>Date.now()) actions.append(button('Confirm meetup',()=>act(d,'confirm_meetup')));
         }
         if(!d.buyer_confirmed&&!d.seller_confirmed) {
           const form=el('form');
+          const suggestionLabel=el('label','Suggested public campus locations'); suggestionLabel.htmlFor='campus-spot-'+d.id;
+          const suggestion=el('select');suggestion.id=suggestionLabel.htmlFor;
+          const placeholder=el('option','Select a suggestion or enter another public place');placeholder.value='';suggestion.append(placeholder);
+          for(const name of campusSpots){const option=el('option',name);option.value=name;suggestion.append(option);}
+          form.append(suggestionLabel,suggestion);
           const spot=field(form,'Public meeting location','spot-'+d.id,'text',d.meetup_spot||d.item_snapshot.meeting_spot||''); spot.maxLength=120;
+          suggestion.addEventListener('change',()=>{if(suggestion.value)spot.value=suggestion.value;});
           const when=field(form,'Meeting date & time (your local time)','when-'+d.id,'datetime-local');
           submit(form,d.meetup_at?'Propose new meetup':'Propose meetup',()=>{const date=new Date(when.value);if(!Number.isFinite(date.getTime()))return status('Enter a valid meeting time.',true);act(d,'meetup',{spot:spot.value,at:date.toISOString()});});
-          card.append(form,el('p','Choose a busy, well-lit public place. Inspect the item before paying.'));
+          card.append(form,el('p','Suggestions are not university-designated exchange zones. Confirm opening hours, choose a busy well-lit public place, and inspect the item before paying.'));
         }
         const mine=buyer?d.buyer_confirmed:d.seller_confirmed;
         card.append(el('p','Buyer: '+(d.buyer_confirmed?'confirmed receipt':'not yet confirmed')+' · Seller: '+(d.seller_confirmed?'confirmed handover':'not yet confirmed')));
         if(d.meetup_confirmed&&!mine) actions.append(button(buyer?'Confirm item received':'Confirm item handed over',()=>{if(confirm('Confirm only after the physical exchange has actually happened. Continue?'))act(d,'complete');}));
         actions.append(button('Cancel reservation',()=>{if(confirm('Cancel this reservation and make the item available again? This does not refund any payment.'))act(d,'cancel');}));
+      } else if(d.expired_at) {
+        card.append(el('p','The reservation expired on '+campusTime(d.expired_at)+'. No payment was handled by UniMarket.'));
       } else if(d.status==='completed') {
         card.append(el('p','Both students confirmed the exchange on '+new Date(d.completed_at).toLocaleDateString()+'.'));
         if(buyer) { const link=el('a','Relist this purchase'); link.href='/post.html?purchase='+encodeURIComponent(d.id); card.append(link); }
@@ -130,5 +178,5 @@
   $('tx-filter').addEventListener('change',render);
   $('tx-refresh').addEventListener('click',async()=>{if(busy)return;try{await load();status('Transactions refreshed.');}catch(e){status(e.message,true);}});
   $('tx-offer').addEventListener('submit',e=>{e.preventDefault();if(e.target.reportValidity())mutate('/api/transactions','POST',{listing_id:Number(listingId),price_cents:priceOf($('tx-price'))});});
-  load().then(()=>status('')).catch(e=>{status(e.message,true);$('tx-login').hidden=e.status!==401;});
+  load().then(()=>{status('');void initAvailability();}).catch(e=>{status(e.message,true);$('tx-login').hidden=e.status!==401;});
 })();

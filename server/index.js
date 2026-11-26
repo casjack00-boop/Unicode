@@ -70,6 +70,8 @@ app.get('/api/health', async (req, res) => {
 
 // Start listening for visitors
 const port = process.env.PORT || 3000;
+const { startReservationExpiry } = require('./reservation-expiry');
 app.listen(port, () => {
+  startReservationExpiry(pool);
   console.log(`UniMarket server running at http://localhost:${port}`);
 });

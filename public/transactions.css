@@ -23,3 +23,12 @@
 .tx-reputation, .tx-reputation > div { display:grid; gap:10px; }
 .tx-reputation > div[hidden] { display:none; }
 .tx-reputation form { padding-top:10px; border-top:1px solid var(--line); }
+
+#tx-availability[hidden] { display:none; }
+#tx-availability-days { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%, 185px),1fr)); gap:8px; }
+.tx-availability-day { min-width:0; display:grid; gap:6px; border:1px solid var(--line); border-radius:8px; padding:8px; }
+.tx-day-check { display:flex; align-items:center; gap:8px; }
+.tx-day-check input[type="checkbox"] { min-width:20px; min-height:20px; width:20px; height:20px; accent-color:var(--link); }
+.tx-availability-day input:disabled { opacity:.65; }
+
+#tx-availability summary { cursor:pointer; font-weight:600; padding:8px 0; }

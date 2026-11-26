@@ -3,6 +3,7 @@ const pool = require('../db');
 const requireUser = require('../requireUser');
 const { DealError, cents, transition } = require('../deal-rules');
 const {safetyError} = require('../safety-rules');
+const {parseAvailability} = require('../meetup-rules');
 const router = express.Router();
 router.use(requireUser, (req,res,next) => { res.setHeader('Cache-Control','private, no-store'); next(); });
 const idOf = value => { const n = Number(value); if (!/^\d+$/.test(String(value)) || !Number.isInteger(n) || n < 1 || n > 2147483647) throw new DealError(400,'Invalid ID.'); return n; };
@@ -17,10 +18,28 @@ async function atomic(fn) {
   catch(e) { await client.query('ROLLBACK'); throw e; } finally { client.release(); }
 }
 const snapshot = l => Object.fromEntries(['title','description','price_cents','category','condition','meeting_spot','department','course_number','edition','author','isbn','width_measure','height_measure','depth_measure','dimension_unit'].map(k=>[k,l[k] ?? null]));
+router.get('/availability', async (req,res) => {
+  try {
+    const {rows}=await pool.query('SELECT meetup_availability FROM users WHERE id=$1 AND verified',[req.user.id]);
+    if(!rows.length) return res.status(404).json({error:'Student not found.'});
+    res.json({availability:rows[0].meetup_availability});
+  } catch(e){fail(res,e);}
+});
+router.put('/availability', async (req,res) => {
+  const availability=parseAvailability(req.body?.availability);
+  if(availability===null) return res.status(400).json({error:'Enter one valid same-day time range per selected weekday.'});
+  try {
+    const {rows}=await pool.query('UPDATE users SET meetup_availability=$2::jsonb WHERE id=$1 AND verified RETURNING meetup_availability',[req.user.id,JSON.stringify(availability)]);
+    if(!rows.length) return res.status(404).json({error:'Student not found.'});
+    res.json({availability:rows[0].meetup_availability});
+  } catch(e){fail(res,e);}
+});
 router.get('/', async (req,res) => {
   try {
     const {rows} = await pool.query(`SELECT d.*, l.status AS listing_status,
-      CASE WHEN d.buyer_id = $1 THEN s.display_name ELSE b.display_name END AS other_name
+      CASE WHEN d.buyer_id = $1 THEN s.display_name ELSE b.display_name END AS other_name,
+      CASE WHEN d.status IN ('pending','reserved') AND NOT uni_contact_blocked(d.buyer_id,d.seller_id)
+        THEN s.meetup_availability ELSE '[]'::jsonb END AS seller_availability
       FROM marketplace_deals d JOIN listings l ON l.id=d.listing_id
       JOIN users s ON s.id=d.seller_id JOIN users b ON b.id=d.buyer_id
       WHERE d.buyer_id=$1 OR d.seller_id=$1
@@ -31,6 +50,7 @@ router.get('/', async (req,res) => {
 router.post('/', async (req,res) => {
   try {
     const listingId = idOf(req.body?.listing_id), price = cents(req.body?.price_cents), buyer = req.user.id;
+    await pool.query('SELECT uni_expire_reservations($1)',[listingId]);
     const deal = await atomic(async c => {
       const l = (await c.query('SELECT * FROM listings WHERE id=$1 FOR UPDATE',[listingId])).rows[0];
       if (!l || l.status !== 'active') throw new DealError(409,'This item is not available.');
