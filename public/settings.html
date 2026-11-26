@@ -11,6 +11,8 @@
   <link rel="stylesheet" href="/notifications.css">
   <script src="/notifications.js" defer></script>
   <script src="/settings.js" defer></script>
+  <link rel="stylesheet" href="/academic.css">
+  <script src="/academic.js" defer></script>
   <script src="/safety.js" defer></script>
   <link rel="stylesheet" href="/safety.css">
   <link rel="manifest" href="/manifest.webmanifest">
@@ -21,12 +23,13 @@
 </head>
 <body>
   <div class="app">
-    <header class="top">
-      <div class="top-row"><a class="brand" href="/">UniMarket</a><span class="verified">Settings</span></div>
+    <header class="top settings-header">
+      <a class="settings-back" id="settings-back" href="/" aria-label="Back to home" title="Back to home">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+      </a>
+      <h1>Settings</h1>
     </header>
     <main class="settings-main">
-      <a class="settings-back" id="settings-back" href="/">Back to home</a>
-      <h1>Settings</h1>
       <section class="a11y-settings" data-appearance-settings aria-labelledby="appearance-heading">
         <h2 id="appearance-heading">Accessibility &amp; appearance</h2>
         <div class="a11y-options">
@@ -40,6 +43,16 @@
           <button type="button" id="a11y-reset">Reset preferences</button>
           <p id="a11y-status" role="status"></p>
         </div>
+      </section>
+      <section class="notice-panel academic-panel" id="academic-preferences" hidden aria-labelledby="academic-heading">
+        <h2 id="academic-heading">Academic preferences</h2>
+        <p>Optional and private. Choose a department to find relevant textbook listings. Clear both fields to remove your preferences.</p>
+        <form id="academic-form">
+          <label>Major <input name="major" maxlength="80" placeholder="Computer Science"></label>
+          <label>Department code <input name="department" maxlength="16" placeholder="CSCI"></label>
+          <button type="submit">Save academic preferences</button>
+        </form>
+        <p id="academic-pref-status" role="status"></p>
       </section>
       <section id="notification-preferences" class="notice-panel" aria-labelledby="notice-pref-heading">
         <h2 id="notice-pref-heading">Notification preferences</h2>

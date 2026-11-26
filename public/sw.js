@@ -2,7 +2,7 @@
 'use strict';
 const CACHE = 'unimarket-offline-v1';
 const PUBLIC_ASSETS = ['/offline.html', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/maskable-512.png', '/icons/apple-touch-icon.png'];
-const APP_PAGES = new Set(['/', '/index.html', '/browse.html', '/item.html', '/login.html', '/messages.html', '/my-listings.html', '/notifications.html', '/post.html', '/profile.html', '/roommates.html', '/safety.html', '/saved.html', '/settings.html', '/transactions.html', '/offline.html']);
+const APP_PAGES = new Set(['/', '/index.html', '/browse.html', '/academic.html', '/item.html', '/login.html', '/messages.html', '/my-listings.html', '/notifications.html', '/post.html', '/profile.html', '/roommates.html', '/safety.html', '/saved.html', '/settings.html', '/transactions.html', '/offline.html']);
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(PUBLIC_ASSETS.map(path => new Request(path, { cache: 'reload', credentials: 'omit' })))));

@@ -62,7 +62,8 @@
     if (destination) {
       const back = document.getElementById('settings-back');
       back.href = destination[0];
-      back.textContent = destination[1];
+      back.setAttribute('aria-label', destination[1]);
+      back.title = destination[1];
     }
     const theme = panel.querySelector('#a11y-theme');
     const size = panel.querySelector('#a11y-size');

@@ -81,11 +81,12 @@ input::placeholder, textarea::placeholder { color: var(--placeholder); opacity: 
 .a11y-skip { position: fixed; top: 8px; left: 8px; z-index: 1000; transform: translateY(-200%); padding: 12px; background: var(--surface); color: var(--link); border: 2px solid var(--field); }
 .a11y-skip:focus { transform: none; }
 .settings-main { padding: 16px; display: grid; gap: 16px; }
-.settings-main h1 { font: 800 1.5rem Archivo, sans-serif; margin: 0; }
+.settings-header { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; gap: 0; padding: 12px 16px; }
+.settings-header h1 { font: 800 1.25rem Archivo, sans-serif; margin: 0; color: #fff; text-align: center; }
 .settings-main h2 { font: 600 1.125rem Archivo, sans-serif; margin: 0 0 12px; }
 .settings-main p { margin: 0; color: var(--muted); }
 .settings-back, .settings-access-link { display: inline-flex; align-items: center; min-height: 44px; color: var(--link); font-weight: 600; text-decoration: underline; }
-.settings-back { align-self: start; justify-self: start; }
+.settings-header .settings-back { width: 44px; height: 44px; justify-content: center; color: #fff; text-decoration: none; border-radius: 50%; }
 .footer .settings-access-link { color: #fff; }
 .settings-main .a11y-settings { background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 12px; padding: 16px; min-width: 0; }
 .a11y-options { display: grid; gap: 8px; padding: 0; }
