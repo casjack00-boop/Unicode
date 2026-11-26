@@ -3,6 +3,7 @@ const express = require('express');
 const pool = require('../db');
 const requireUser = require('../requireUser');
 const { normalizeISBN } = require('../isbn');
+const { parseDimensions } = require('../listing-dimensions');
 
 const router = express.Router();
 
@@ -199,6 +200,46 @@ router.get('/mine', requireUser, async (req, res) => {
   }
 });
 
+// Retrieve only an owned listing's editable metadata, including sold listings.
+// Photos are deliberately excluded: a duplicate must have current photos.
+router.get('/:id/copy', requireUser, async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isSafeInteger(id) || id <= 0) return res.status(400).json({ error: 'Invalid listing ID.' });
+  try {
+    const result = await pool.query(`SELECT title, description, price_cents, category, condition,
+      meeting_spot, department, course_number, edition, author, isbn,
+      width_measure, height_measure, depth_measure, dimension_unit
+      FROM listings WHERE id = $1 AND seller_id = $2 AND status <> 'removed'`, [id, req.user.id]);
+    if (!result.rows.length) return res.status(404).json({ error: 'Listing not found.' });
+    res.setHeader('Cache-Control', 'no-store');
+    res.json({ listing: result.rows[0] });
+  } catch (error) {
+    console.error('Copy listing error:', error);
+    res.status(500).json({ error: 'Unable to copy listing.' });
+  }
+});
+
+// Active listings only; price alerts can later be triggered by this endpoint.
+router.patch('/:id/price', requireUser, async (req, res) => {
+  const id = Number(req.params.id);
+  const price = req.body?.price;
+  if (!Number.isSafeInteger(id) || id <= 0) return res.status(400).json({ error: 'Invalid listing ID.' });
+  if (typeof price !== 'number' || !Number.isFinite(price) || price < 0 || price > 10000 ||
+      Math.abs(price * 100 - Math.round(price * 100)) > 1e-7) {
+    return res.status(400).json({ error: 'Enter a price from $0 to $10,000 with up to two decimal places.' });
+  }
+  try {
+    const result = await pool.query(`UPDATE listings SET price_cents = $1
+      WHERE id = $2 AND seller_id = $3 AND status = 'active' RETURNING id, price_cents`,
+      [Math.round(price * 100), id, req.user.id]);
+    if (!result.rows.length) return res.status(404).json({ error: 'Active listing not found.' });
+    res.json({ ok: true, listing: result.rows[0] });
+  } catch (error) {
+    console.error('Update price error:', error);
+    res.status(500).json({ error: 'Unable to update price.' });
+  }
+});
+
 // Mark your own listing as sold (or bring it back) or remove it
 const STATUS_CHANGES = ['active', 'sold', 'removed'];
 
@@ -319,6 +360,10 @@ router.post('/', requireUser, async (req, res) => {
     return res.status(400).json({ error: 'Please pick a condition.' });
   }
 
+  let dimensions;
+  try { dimensions = parseDimensions(category, req.body.dimensions); }
+  catch (error) { return res.status(400).json({ error: error.message }); }
+
   // Textbook details only matter for textbooks
   const isBook = category === 'textbooks';
   const rawISBN = req.body.isbn;
@@ -337,8 +382,9 @@ router.post('/', requireUser, async (req, res) => {
     const result = await pool.query(`
       INSERT INTO listings
         (seller_id, title, description, price_cents, category, condition, meeting_spot,
-         department, course_number, edition, author, isbn)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+         department, course_number, edition, author, isbn,
+         width_measure, height_measure, depth_measure, dimension_unit)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
       RETURNING id
     `, [
       req.user.id, title, description, Math.round(price * 100), category, condition, meetingSpot,
@@ -346,7 +392,7 @@ router.post('/', requireUser, async (req, res) => {
       isBook ? cleanText(req.body.courseNumber, 20) : null,
       isBook ? cleanText(req.body.edition, 30) : null,
       isBook ? cleanText(req.body.author, 80) : null,
-      isbn
+      isbn, ...dimensions
     ]);
     res.status(201).json({ ok: true, id: result.rows[0].id });
   } catch (error) {

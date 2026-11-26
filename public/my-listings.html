@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="/post.css">
   <script src="/my-listings.js" defer></script>
   <link rel="stylesheet" href="/accessibility.css">
+  <link rel="stylesheet" href="/seller-tools.css">
   <script src="/accessibility.js"></script>
 </head>
 <body>
@@ -26,6 +27,13 @@
         <a href="/post.html" class="sell-link">+ Sell</a>
       </div>
       <p id="message" class="message" role="status" aria-live="polite"></p>
+      <section id="seller-summary" class="seller-panel" aria-labelledby="seller-summary-heading" hidden>
+        <h2 id="seller-summary-heading">Listing overview</h2>
+        <dl class="seller-dimensions" id="seller-summary-values"></dl>
+        <p class="hint">Asking value is not revenue or completed payments.</p>
+        <label for="listing-status-filter">Show listings</label>
+        <select id="listing-status-filter"><option value="all">All listings</option><option value="active">For sale</option><option value="sold">Sold</option></select>
+      </section>
       <div id="listings"><p class="empty">Loading your listings...</p></div>
     </main>
   </div>

@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="/item.css">
   <link rel="stylesheet" href="/accessibility.css">
   <link rel="stylesheet" href="/discovery.css">
+  <link rel="stylesheet" href="/seller-tools.css">
   <script src="/accessibility.js"></script>
 </head>
 <body>
@@ -44,6 +45,10 @@
 
           <p id="description" class="description"></p>
           <p id="isbn-details" class="description" hidden></p>
+          <section id="item-dimensions" class="seller-panel" aria-labelledby="dimensions-heading" hidden>
+            <h2 id="dimensions-heading">Dimensions</h2>
+            <dl id="dimension-values" class="seller-dimensions"></dl>
+          </section>
 
           <!-- Seller card -->
           <div class="card seller">

@@ -60,6 +60,7 @@
       use.addEventListener('click', () => {
         title.value = book.title.slice(0, title.maxLength > 0 ? title.maxLength : 80);
         if (book.author) author.value = book.author.slice(0, author.maxLength > 0 ? author.maxLength : 80);
+        title.dispatchEvent(new Event('input', { bubbles: true }));
         status.textContent = 'Book details filled in. Review them before posting.';
         use.disabled = true;
       });

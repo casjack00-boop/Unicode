@@ -1,0 +1,18 @@
+.seller-panel { background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin: 0; min-width: 0; }
+.seller-panel h2, .seller-panel legend { font: 600 1.0625rem Archivo, sans-serif; margin: 0 0 8px; }
+.seller-panel p { margin: 8px 0; font-size: .9375rem; color: var(--muted); }
+.seller-panel label { font-weight: 600; }
+.seller-panel select { width: 100%; margin-top: 6px; }
+.seller-measures { display: grid; grid-template-columns: repeat(auto-fit, minmax(85px, 1fr)); gap: 10px; margin: 12px 0; }
+.seller-measures input { min-width: 0; padding: 0 8px; }
+.seller-dimensions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px 12px; margin: 8px 0; }
+.seller-dimensions dd { margin: 0; text-align: right; font-weight: 600; }
+.seller-button { border: 1px solid var(--field); border-radius: 8px; background: var(--surface); color: var(--link); min-height: 44px; padding: 8px 12px; font: inherit; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+.seller-button:disabled { opacity: .6; cursor: default; }
+#seller-summary { margin: 12px 0; }
+#listings .row { flex-wrap: wrap; }
+#listings .row-actions { flex-direction: row; flex-wrap: wrap; flex-basis: 100%; gap: 8px; }
+#listings .row-actions .small-btn { min-height: 44px; }
+.seller-edit { flex-basis: 100%; display: grid; gap: 8px; padding-top: 10px; border-top: 1px solid var(--line); }
+.seller-edit input { width: 100%; min-width: 0; }
+.seller-edit-actions { display: flex; flex-wrap: wrap; gap: 8px; }

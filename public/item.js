@@ -123,6 +123,17 @@ async function loadListing() {
       isbnDetails.hidden = !(listing.category === 'textbooks' && listing.isbn);
       isbnDetails.textContent = isbnDetails.hidden ? '' : 'ISBN: ' + listing.isbn;
     }
+    const dimensionsPanel = document.getElementById('item-dimensions');
+    if (listing.category === 'furniture' && listing.dimension_unit && listing.width_measure != null && listing.height_measure != null && listing.depth_measure != null) {
+      const values = document.getElementById('dimension-values');
+      values.replaceChildren();
+      for (const [label, value] of [['Width', listing.width_measure], ['Height', listing.height_measure], ['Depth', listing.depth_measure]]) {
+        const term = document.createElement('dt'); term.textContent = label;
+        const detail = document.createElement('dd'); detail.textContent = `${Number(value)} ${listing.dimension_unit}`;
+        values.append(term, detail);
+      }
+      dimensionsPanel.hidden = false;
+    }
     setText('posted', postedAgo(listing.created_at));
     setText('seller-name', listing.seller_name);
 

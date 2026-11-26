@@ -12,6 +12,7 @@ const MAX_PHOTOS = 3;
 const MAX_BYTES = 5 * 1024 * 1024;
 const OK_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
+let photoURLs = [];
 let photos = [];           // files the student picked
 let condition = 'good';    // chosen condition chip
 
@@ -25,9 +26,13 @@ async function checkLogin() {
   try {
     const res = await fetch('/api/auth/me', { credentials: 'same-origin' });
     if (!res.ok) throw new Error();
+    const { user } = await res.json();
+    if (!user?.id) throw new Error();
+    return user;
   } catch (e) {
     document.getElementById('loginNote').hidden = false;
     postBtn.disabled = true;
+    return null;
   }
 }
 
@@ -60,6 +65,8 @@ window.addEventListener('pageshow', () => {
 document.getElementById('initialAddPhoto').addEventListener('click', () => photoInput.click());
 
 function drawPhotos() {
+  photoURLs.forEach(url => URL.revokeObjectURL(url));
+  photoURLs = [];
   photoSlots.replaceChildren();
 
   photos.forEach((file, i) => {
@@ -67,6 +74,7 @@ function drawPhotos() {
     box.className = 'thumb';
     const img = document.createElement('img');
     img.src = URL.createObjectURL(file);
+    photoURLs.push(img.src);
     img.alt = 'Photo ' + (i + 1);
     const remove = document.createElement('button');
     remove.type = 'button';
@@ -132,7 +140,8 @@ function checkForm() {
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
 
-  const problem = checkForm();
+  if (postBtn.disabled || form.inert) return;
+  const problem = checkForm() || window.UniMarketSeller?.validateDimensions();
   for (const field of form.querySelectorAll('input, select, textarea')) {
     if (field.classList.contains('invalid')) field.setAttribute('aria-invalid', 'true');
     else field.removeAttribute('aria-invalid');
@@ -158,6 +167,9 @@ form.addEventListener('submit', async (event) => {
     item.isbn = document.getElementById('isbnInput')?.value.trim() || '';
   }
 
+  if (item.category === 'furniture') item.dimensions = window.UniMarketSeller?.dimensions() || null;
+
+  let postedId = null;
   try {
     // 1. Create the listing
     const response = await fetch('/api/listings', {
@@ -168,6 +180,9 @@ form.addEventListener('submit', async (event) => {
     });
     const result = await response.json();
     if (!response.ok || !result.ok) throw new Error(result.error || 'Unable to post item.');
+    postedId = result.id;
+    window.UniMarketSeller?.clearAfterPost();
+    form.inert = true;
 
     // 2. Upload the photos to it (Kenny's photo route)
     if (photos.length) {
@@ -192,10 +207,15 @@ form.addEventListener('submit', async (event) => {
     window.location.href = '/item.html?id=' + encodeURIComponent(result.id);
 
   } catch (error) {
+    if (postedId !== null) {
+      showMessage('Your listing was posted, but photo upload failed. Do not submit it again.', 'error');
+      setTimeout(() => { window.location.href = '/item.html?id=' + encodeURIComponent(postedId); }, 2500);
+      return;
+    }
     showMessage(error.message, 'error');
     postBtn.disabled = false;
   }
 });
 
 drawPhotos();
-checkLogin();
+// seller-tools.js initializes the authenticated draft before enabling the form.
