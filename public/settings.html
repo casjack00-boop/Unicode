@@ -13,6 +13,11 @@
   <script src="/settings.js" defer></script>
   <script src="/safety.js" defer></script>
   <link rel="stylesheet" href="/safety.css">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#002D72">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="/pwa.css">
+  <script src="/pwa.js" defer></script>
 </head>
 <body>
   <div class="app">
@@ -51,6 +56,13 @@
         <h2 id="blocked-heading">Blocked accounts</h2>
         <p id="blocked-status" role="status"></p><div id="blocked-list"></div>
         <a href="/safety.html" class="safety-link">Community safety guidance</a>
+      </section>
+      <section class="notice-panel pwa-panel" aria-labelledby="install-heading" data-install-panel>
+        <h2 id="install-heading">Install UniMarket</h2>
+        <p data-install-status role="status">Add UniMarket to your home screen for quick access.</p>
+        <button type="button" data-install-button hidden>Install app</button>
+        <p data-install-help>On iPhone, open Safari's Share menu and choose Add to Home Screen. On Android or desktop, look for Install app or Add to Home screen in your browser menu.</p>
+        <p>Internet access is required for marketplace activity.</p>
       </section>
       <section id="account-session" class="notice-panel" aria-labelledby="session-heading" hidden>
         <h2 id="session-heading">Account</h2>
