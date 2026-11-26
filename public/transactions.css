@@ -19,3 +19,7 @@
 .tx-meetup { border-top: 1px solid var(--line); padding-top: 10px; }
 .tx-card form[hidden] { display: none !important; }
 .tx-card textarea { min-width: 0; width: 100%; resize: vertical; font: inherit; padding: 8px; border: 1px solid var(--field); border-radius: 8px; background: var(--surface); color: var(--ink); }
+
+.tx-reputation, .tx-reputation > div { display:grid; gap:10px; }
+.tx-reputation > div[hidden] { display:none; }
+.tx-reputation form { padding-top:10px; border-top:1px solid var(--line); }

@@ -31,7 +31,26 @@
           <p class="verified-student">✓ Verified UT Tyler student</p>
           <p id="housing" class="profile-muted"></p>
           <p id="member-since" class="profile-muted"></p>
-          <p id="rating" class="profile-rating">Loading ratings...</p>
+          <div class="profile-reputation" aria-label="Student reputation">
+            <div class="profile-reputation-grid">
+              <div class="profile-reputation-cell">
+                <p class="profile-muted">Seller rating</p>
+                <p id="rating" class="profile-score">—</p>
+                <p id="seller-stars" class="profile-stars" aria-hidden="true"></p>
+                <p id="seller-rating-count" class="profile-muted">Loading reviews...</p>
+              </div>
+              <div class="profile-reputation-cell">
+                <p class="profile-muted">Buyer rating</p>
+                <p id="buyer-rating" class="profile-score">—</p>
+                <p id="buyer-stars" class="profile-stars" aria-hidden="true"></p>
+                <p id="buyer-rating-count" class="profile-muted">Loading reviews...</p>
+              </div>
+            </div>
+            <div id="exchange-count" class="profile-reputation-grid profile-exchange-grid" aria-label="Completed exchanges">
+              <div class="profile-reputation-cell"><p id="completed-sales" class="profile-score">—</p><p class="profile-muted">Completed sales</p></div>
+              <div class="profile-reputation-cell"><p id="completed-purchases" class="profile-score">—</p><p class="profile-muted">Completed purchases</p></div>
+            </div>
+          </div>
           <a id="profile-safety" class="safety-link" hidden>Report or block student</a>
           <button id="edit-button" type="button" class="profile-button" hidden>Edit profile</button>
         </section>
@@ -52,7 +71,8 @@
           <a class="profile-link" href="/my-listings.html">Manage my listings <span aria-hidden="true">›</span></a>
         </section>
         <section class="profile-panel"><h2>Active listings</h2><div id="active-listings" class="grid"></div></section>
-        <section class="profile-panel"><h2>Recent reviews</h2><div id="reviews"></div></section>
+        <section class="profile-panel"><h2>Seller reviews</h2><div id="reviews"></div></section>
+        <section class="profile-panel"><h2>Buyer reviews</h2><div id="buyer-reviews"></div></section>
       </div>
     </main>
     <nav class="bottom-nav" aria-label="Main">

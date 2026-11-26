@@ -59,10 +59,23 @@ function renderListings(listings) {
   }
 }
 
+function showRating(role, data) {
+  const score = el(role === 'seller' ? 'rating' : 'buyer-rating');
+  const stars = el(role + '-stars');
+  const count = el(role + '-rating-count');
+  const average = Number(data?.average);
+  const total = Number(data?.count);
+  const rated = data && total > 0 && Number.isFinite(average) && average >= 0 && average <= 5;
+  score.textContent = rated ? `${average.toFixed(1)} / 5` : '—';
+  const filled = rated ? Math.round(average) : 0;
+  stars.textContent = '★'.repeat(filled) + '☆'.repeat(5 - filled);
+  count.textContent = !data ? 'Unavailable' : rated ? `${total} ${total === 1 ? 'review' : 'reviews'}` : 'No ratings yet';
+}
+
 async function loadRatings(id) {
   try {
     const data = await api('/api/sellers/' + encodeURIComponent(id) + '/rating');
-    el('rating').textContent = data.count ? `★ ${data.average.toFixed(1)} / 5 (${data.count} ratings)` : 'No ratings yet';
+    showRating('seller', data);
     const reviews = el('reviews');
     reviews.replaceChildren();
     if (!data.recent.length) reviews.textContent = 'No written reviews yet.';
@@ -77,7 +90,7 @@ async function loadRatings(id) {
       reviews.append(box);
     }
   } catch (err) {
-    el('rating').textContent = 'Ratings unavailable';
+    showRating('seller', null);
     el('reviews').textContent = 'Unable to load reviews.';
   }
 }
@@ -110,6 +123,18 @@ el('edit-form').addEventListener('submit', async (event) => {
   finally { el('save-button').disabled = false; }
 });
 
+async function loadBuyerReputation(id) {
+  try {
+    const data=await api('/api/reputation/buyer/'+encodeURIComponent(id));
+    showRating('buyer', data);
+    el('completed-sales').textContent = data.completed_sales;
+    el('completed-purchases').textContent = data.completed_purchases;
+    const list=el('buyer-reviews');list.replaceChildren();
+    if(!data.recent.length)list.textContent='No buyer reviews yet.';
+    for(const r of data.recent){const box=document.createElement('div');box.className='review';const name=document.createElement('strong');name.textContent=r.rater_name+' · '+r.stars+' / 5';const comment=document.createElement('p');comment.textContent=r.comment;box.append(name,comment);list.append(box);}
+  } catch(e){showRating('buyer', null);el('buyer-reviews').textContent='Unable to load buyer reviews.';el('completed-sales').textContent='—';el('completed-purchases').textContent='—';}
+}
+
 async function loadProfile() {
   el('profile-settings').hidden = true;
   el('profile').hidden = true;
@@ -128,7 +153,7 @@ async function loadProfile() {
     el('profile-safety').hidden = ownProfile;
     el('status').hidden = true;
     el('profile').hidden = false;
-    await loadRatings(data.user.id);
+    await Promise.all([loadRatings(data.user.id),loadBuyerReputation(data.user.id)]);
   } catch (err) {
     el('status').textContent = err.message;
     el('status').classList.add('profile-error');

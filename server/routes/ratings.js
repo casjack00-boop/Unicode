@@ -98,11 +98,11 @@ router.post('/:id/rating', requireUser, async (req, res) => {
     if (!seller.rows.length) return res.status(404).json({ error: 'Seller not found.' });
 
     const result = await pool.query(
-      `INSERT INTO seller_ratings (seller_id, rater_id, stars, comment)
-       SELECT $1, $2, $3, $4 WHERE EXISTS (SELECT 1 FROM marketplace_deals
+      `INSERT INTO seller_ratings (seller_id, rater_id, stars, comment, deal_id)
+       SELECT $1, $2, $3, $4, (SELECT id FROM marketplace_deals WHERE seller_id=$1 AND buyer_id=$2 AND status='completed' ORDER BY completed_at DESC,id DESC LIMIT 1) WHERE EXISTS (SELECT 1 FROM marketplace_deals
          WHERE seller_id=$1 AND buyer_id=$2 AND status='completed')
        ON CONFLICT (seller_id, rater_id)
-       DO UPDATE SET stars = EXCLUDED.stars, comment = EXCLUDED.comment, created_at = NOW()
+       DO UPDATE SET stars = EXCLUDED.stars, comment = EXCLUDED.comment, deal_id = EXCLUDED.deal_id, created_at = NOW()
        RETURNING seller_id`,
       [sellerId, req.user.id, stars, comment]
     );

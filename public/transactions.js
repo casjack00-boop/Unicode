@@ -32,39 +32,44 @@
     finally { busy=false; controls.forEach(b=>b.disabled=false); }
   }
   function act(d,action,extra={}) { return mutate('/api/transactions/'+d.id,'PATCH',{action,revision:d.revision,...extra}); }
-  function ratingForm(d, card) {
-    const form = el('form'); form.hidden = true;
-    const toggle = button('Rate seller', async () => {
-      if (!form.hidden) { form.hidden = true; toggle.setAttribute('aria-expanded','false'); return; }
-      toggle.disabled = true;
-      try {
-        const data = await api('/api/sellers/' + encodeURIComponent(d.seller_id) + '/rating');
-        if (!data.canRate) throw new Error('A completed purchase is required to rate this seller.');
-        stars.value = data.mine ? String(data.mine.stars) : '';
-        comment.value = data.mine?.comment || '';
-        form.hidden = false; toggle.setAttribute('aria-expanded','true'); stars.focus();
-      } catch(e) { status(e.message,true); }
-      finally { toggle.disabled = false; }
-    });
-    form.id = 'seller-review-' + d.id;
-    toggle.setAttribute('aria-controls',form.id); toggle.setAttribute('aria-expanded','false');
-    const label = el('label','Seller rating'); label.htmlFor = 'review-stars-' + d.id;
-    const stars = el('select'); stars.id = label.htmlFor; stars.required = true;
-    const placeholder = el('option','Choose 1–5 stars'); placeholder.value = ''; stars.append(placeholder);
-    for (let n=1;n<=5;n++) { const opt=el('option',n+' / 5'); opt.value=String(n); stars.append(opt); }
-    const commentLabel = el('label','Review (optional)'); commentLabel.htmlFor='review-comment-'+d.id;
-    const comment=el('textarea'); comment.id=commentLabel.htmlFor; comment.maxLength=300; comment.rows=3;
+  function reputationForm(d, card) {
+    const root = el('div',null,'tx-reputation');
     const msg=el('p'); msg.setAttribute('role','status');
-    form.append(label,stars,commentLabel,comment,msg);
-    const send=el('button','Save seller rating'); send.type='submit'; form.append(send);
-    form.addEventListener('submit',async event=>{
-      event.preventDefault(); if(!form.reportValidity()||send.disabled)return;
-      send.disabled=true;
-      try { await api('/api/sellers/'+encodeURIComponent(d.seller_id)+'/rating','POST',{stars:Number(stars.value),comment:comment.value}); msg.textContent='Your seller rating was saved.'; }
-      catch(e){msg.textContent=e.message;}
-      finally{send.disabled=false;}
+    const path='/api/reputation/deals/'+d.id;
+    const toggle=button(d.status==='completed'?'Reviews & dispute':'Report a transaction problem', async()=>{
+      if(!panel.hidden){panel.hidden=true;toggle.setAttribute('aria-expanded','false');return;}
+      toggle.disabled=true;
+      try {
+        const data=await api(path);
+        if(review){stars.value=data.stars?String(data.stars):'';comment.value=data.comment||'';}
+        dispute.hidden=Boolean(data.dispute_id);
+        msg.textContent=data.dispute_id?'Your dispute #'+data.dispute_id+' · '+data.dispute_status:'';
+        panel.hidden=false;toggle.setAttribute('aria-expanded','true');
+        (review?stars:dispute.hidden?toggle:details).focus();
+      } catch(e){msg.textContent=e.message;}
+      finally{toggle.disabled=false;}
     });
-    card.append(toggle,form);
+    const panel=el('div'); panel.hidden=true; panel.id='reputation-'+d.id;
+    toggle.setAttribute('aria-controls',panel.id);toggle.setAttribute('aria-expanded','false');
+    let review,stars,comment;
+    if(d.status==='completed'){
+      review=el('form'); const who=d.buyer_id===userId?'seller':'buyer';
+      const label=el('label','Rate '+who);label.htmlFor='review-stars-'+d.id;
+      stars=el('select');stars.id=label.htmlFor;stars.required=true;
+      const empty=el('option','Choose 1–5 stars');empty.value='';stars.append(empty);
+      for(let n=1;n<=5;n++){const opt=el('option',n+' / 5');opt.value=String(n);stars.append(opt);}
+      const cl=el('label','Review (optional)');cl.htmlFor='review-comment-'+d.id;
+      comment=el('textarea');comment.id=cl.htmlFor;comment.maxLength=300;comment.rows=3;
+      const send=el('button','Save '+who+' rating');send.type='submit';review.append(label,stars,cl,comment,send);
+      review.addEventListener('submit',async e=>{e.preventDefault();if(!review.reportValidity()||send.disabled)return;send.disabled=true;try{await api(path+'/review','POST',{stars:Number(stars.value),comment:comment.value});msg.textContent='Review saved.';}catch(e){msg.textContent=e.message;}finally{send.disabled=false;}});
+      panel.append(review);
+    }
+    const dispute=el('form'),dl=el('label','Describe the transaction problem');dl.htmlFor='dispute-'+d.id;
+    const details=el('textarea');details.id=dl.htmlFor;details.required=true;details.maxLength=1000;details.rows=4;
+    const submitDispute=el('button','Submit dispute');submitDispute.type='submit';
+    dispute.append(dl,details,el('p','This requests operator review. UniMarket cannot refund or recover payments.'),submitDispute);
+    dispute.addEventListener('submit',async e=>{e.preventDefault();if(!dispute.reportValidity()||submitDispute.disabled||!confirm('Submit this problem for moderator review?'))return;submitDispute.disabled=true;try{const data=await api(path+'/dispute','POST',{details:details.value});dispute.hidden=true;msg.textContent='Dispute #'+data.id+' submitted.';}catch(e){msg.textContent=e.message;}finally{submitDispute.disabled=false;}});
+    panel.append(dispute);root.append(toggle,panel,msg);card.append(root);
   }
   function render() {
     const list=$('tx-list'); list.replaceChildren();
@@ -103,8 +108,9 @@
         actions.append(button('Cancel reservation',()=>{if(confirm('Cancel this reservation and make the item available again? This does not refund any payment.'))act(d,'cancel');}));
       } else if(d.status==='completed') {
         card.append(el('p','Both students confirmed the exchange on '+new Date(d.completed_at).toLocaleDateString()+'.'));
-        if(buyer) { const link=el('a','Relist this purchase'); link.href='/post.html?purchase='+encodeURIComponent(d.id); card.append(link); ratingForm(d, card); }
+        if(buyer) { const link=el('a','Relist this purchase'); link.href='/post.html?purchase='+encodeURIComponent(d.id); card.append(link); }
       }
+      if(['reserved','completed','cancelled'].includes(d.status)) reputationForm(d,card);
       if(actions.childElementCount) card.append(actions);
       if(d.listing_status==='active'||d.listing_status==='reserved') { const link=el('a','View original listing');link.href='/item.html?id='+encodeURIComponent(d.listing_id);card.append(link); }
       list.append(card);

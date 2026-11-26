@@ -7,9 +7,14 @@
   let loggingOut = false;
   async function checkSession() {
     section.hidden = true;
+    document.getElementById('moderation-link').hidden = true;
     try {
       const response = await fetch('/api/auth/me', { cache: 'no-store' });
-      if (response.ok && (await response.json()).user && !loggingOut) section.hidden = false;
+      if (response.ok && (await response.json()).user && !loggingOut) {
+        section.hidden = false;
+        const role=await fetch('/api/reputation/admin-access',{cache:'no-store'});
+        if(role.ok && (await role.json()).allowed && !loggingOut) document.getElementById('moderation-link').hidden=false;
+      }
     } catch (_) { /* Appearance settings remain available without a session. */ }
   }
   logout.addEventListener('click', async () => {
