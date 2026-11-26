@@ -95,11 +95,14 @@
       const raw = localStorage.getItem(key);
       if (raw) { const data = JSON.parse(raw); if (data && typeof data.fields === 'object' && data.fields && nonempty(data)) existing = data; }
     } catch { storageError = true; }
-    const copy = new URLSearchParams(location.search).get('copy');
+    const params = new URLSearchParams(location.search);
+    const purchase = params.get('purchase');
+    const copy = purchase || params.get('copy');
     let copied = false, copyError = '';
     if (copy && (!existing || confirm('Replace your saved draft with a copy of this listing?'))) {
       try {
-        const response = await fetch('/api/listings/' + encodeURIComponent(copy) + '/copy', { credentials: 'same-origin', cache: 'no-store' });
+        const endpoint = purchase ? '/api/transactions/' + encodeURIComponent(copy) + '/relist' : '/api/listings/' + encodeURIComponent(copy) + '/copy';
+        const response = await fetch(endpoint, { credentials: 'same-origin', cache: 'no-store' });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Unable to copy listing.');
         apply(fromListing(data.listing));
@@ -112,7 +115,7 @@
     form.inert = false;
     byId('postBtn').disabled = false;
     syncDimensions();
-    if (copied) { save(); status.textContent = 'Listing copied into the form. Review details and select new photos before posting.'; }
+    if (copied) { save(); status.textContent = 'Listing copied into the form. Review details, current condition and price; select new photos before posting.'; }
     else if (existing) { discard.disabled = false; status.textContent = 'Draft restored. Select photos again if needed.'; }
     else status.textContent = storageError ? 'Draft storage is unavailable.' : 'Draft details will be saved as you type.';
     if (copyError) status.textContent = copyError + (existing ? ' Your original draft was restored.' : ' You can still create a new listing.');

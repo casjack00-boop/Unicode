@@ -8,7 +8,7 @@ function updateSummary(items) {
   const values = document.getElementById('seller-summary-values');
   values.replaceChildren();
   const active = items.filter(item => item.status === 'active');
-  for (const [name, value] of [['For sale', active.length], ['Sold', items.filter(item => item.status === 'sold').length],
+  for (const [name, value] of [['For sale', active.length], ['Reserved', items.filter(item => item.status === 'reserved').length], ['Sold', items.filter(item => item.status === 'sold').length],
     ['Active asking value', formatPrice(active.reduce((sum, item) => sum + Number(item.price_cents), 0))]]) {
     values.append(el('dt', null, name), el('dd', null, String(value)));
   }
@@ -86,6 +86,7 @@ async function loadMyListings() {
 
     data.listings.forEach((item) => {
       const sold = item.status === 'sold';
+      const reserved = item.status === 'reserved';
       const row = el('div', 'row' + (sold ? ' sold' : ''));
       row.dataset.listingStatus = item.status;
 
@@ -101,7 +102,7 @@ async function loadMyListings() {
       const title = el(sold ? 'span' : 'a', 'row-title', item.title);
       if (!sold) title.href = '/item.html?id=' + encodeURIComponent(item.id);
       text.append(title, el('span', 'row-price', formatPrice(item.price_cents)));
-      text.append(el('span', 'badge' + (sold ? ' sold' : ''), sold ? 'Sold' : 'For sale'));
+      text.append(el('span', 'badge' + (sold ? ' sold' : ''), sold ? 'Sold' : reserved ? 'Reserved' : 'For sale'));
 
       const actions = el('div', 'row-actions');
       const soldBtn = el('button', 'small-btn', sold ? 'Relist' : 'Mark sold');
@@ -121,9 +122,15 @@ async function loadMyListings() {
       });
       const copy = el('a', 'seller-button', 'Duplicate');
       copy.href = '/post.html?copy=' + encodeURIComponent(item.id);
-      actions.append(soldBtn, copy, removeBtn);
+      if (reserved) {
+        const manage = el('a', 'seller-button', 'Manage reservation');
+        manage.href = '/transactions.html'; actions.append(manage);
+      } else {
+        if (!sold || !item.transaction_completed) actions.append(soldBtn);
+        actions.append(copy, removeBtn);
+      }
       row.append(photo, text, actions);
-      if (!sold) {
+      if (!sold && !reserved) {
         const edit = el('button', 'small-btn', 'Edit price'); edit.type = 'button';
         const priceForm = el('form', 'seller-edit'); priceForm.hidden = true;
         priceForm.id = 'price-form-' + item.id;

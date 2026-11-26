@@ -186,6 +186,7 @@ router.get('/mine', requireUser, async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT l.id, l.title, l.price_cents, l.category, l.condition, l.status, l.created_at,
+              EXISTS (SELECT 1 FROM marketplace_deals d WHERE d.listing_id=l.id AND d.status='completed') AS transaction_completed,
               (SELECT lp.url FROM listing_photos lp
                 WHERE lp.listing_id = l.id ORDER BY lp.position LIMIT 1) AS photo_url
          FROM listings l
@@ -254,22 +255,28 @@ router.patch('/:id/status', requireUser, async (req, res) => {
     return res.status(400).json({ error: 'Status must be active, sold, or removed.' });
   }
 
+  let client;
   try {
-    // Only the seller can change it: the WHERE checks both the id and the owner
-    const result = await pool.query(
-      `UPDATE listings SET status = $1
-        WHERE id = $2 AND seller_id = $3 AND status <> 'removed'
-        RETURNING id, status`,
-      [status, id, req.user.id]
-    );
+    client = await pool.connect();
+    await client.query('BEGIN');
+    const result = await client.query(`UPDATE listings SET status=$1
+      WHERE id=$2 AND seller_id=$3 AND status NOT IN ('removed','reserved')
+        AND ($1 <> 'active' OR NOT EXISTS (SELECT 1 FROM marketplace_deals d WHERE d.listing_id=$2 AND d.status='completed'))
+      RETURNING id,status`, [status,id,req.user.id]);
     if (!result.rows.length) {
-      return res.status(404).json({ error: 'Listing not found.' });
+      await client.query('ROLLBACK');
+      return res.status(409).json({ error: 'Listing is unavailable, reserved, or already exchanged. Manage reservations in Transactions.' });
     }
+    if (status !== 'active') await client.query(`UPDATE marketplace_deals
+      SET status='cancelled',revision=revision+1,updated_at=NOW()
+      WHERE listing_id=$1 AND status='pending'`, [id]);
+    await client.query('COMMIT');
     res.json({ ok: true, listing: result.rows[0] });
   } catch (error) {
+    if (client) await client.query('ROLLBACK').catch(() => {});
     console.error('Update status error:', error);
     res.status(500).json({ error: 'Unable to update listing.' });
-  }
+  } finally { client?.release(); }
 });
 
 
@@ -306,7 +313,7 @@ router.get('/:id', async (req, res) => {
        FROM listings l
        JOIN users u ON u.id = l.seller_id
        WHERE l.id = $1
-         AND l.status = 'active'`,
+         AND l.status IN ('active','reserved')`,
       [id]
     );
 

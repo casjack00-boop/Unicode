@@ -1,0 +1,19 @@
+.tx-main { padding: 16px; display: grid; gap: 14px; }
+.tx-main h1 { margin: 0; font-size: 1.5rem; }
+.tx-main h2 { margin: 0; font-size: 1.125rem; }
+.tx-main p { margin: 0; }
+.tx-main a { color: var(--link); }
+.tx-header-link { color: white; }
+.tx-card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: grid; gap: 10px; min-width: 0; }
+.tx-card form, #tx-controls { display: grid; gap: 8px; }
+.tx-main button, .tx-main input, .tx-main select { min-width: 0; min-height: 44px; font: inherit; border: 1px solid var(--field); border-radius: 8px; padding: 8px 10px; color: var(--ink); background: var(--surface); }
+.tx-main button { cursor: pointer; font-weight: 600; color: var(--link); }
+.tx-main button:disabled { opacity: .65; cursor: default; }
+.tx-main button[type="submit"] { background: var(--navy); color: white; }
+.tx-main label { font-weight: 600; }
+#tx-list { display: grid; gap: 12px; }
+.tx-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.tx-actions button { flex: 1 1 auto; }
+.tx-state { font-weight: 700; color: var(--link); }
+.tx-error { color: var(--error); }
+.tx-meetup { border-top: 1px solid var(--line); padding-top: 10px; }

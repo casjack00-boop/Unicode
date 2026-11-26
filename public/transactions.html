@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Offers &amp; transactions | UniMarket</title>
+  <link rel="stylesheet" href="/browse.css"><link rel="stylesheet" href="/accessibility.css"><link rel="stylesheet" href="/transactions.css">
+  <script src="/accessibility.js"></script><script src="/transactions.js" defer></script>
+</head>
+<body><div class="app">
+  <header class="top"><div class="top-row"><a class="brand" href="/browse.html">UniMarket</a><a class="tx-header-link" href="/profile.html">Profile</a></div></header>
+  <main class="tx-main">
+    <h1>Offers &amp; transactions</h1>
+    <p>Agree on a price, reserve an item and arrange a public meetup. Payments take place outside UniMarket. No deposits or payment guarantees.</p>
+    <p id="tx-status" role="status" tabindex="-1">Loading transactions…</p>
+    <a id="tx-login" href="/login.html" hidden>Log in to continue</a>
+    <section class="tx-card" id="tx-new" hidden aria-labelledby="new-heading">
+      <h2 id="new-heading">Make an offer</h2><p id="tx-item"></p>
+      <form id="tx-offer"><label for="tx-price">Your offer ($)</label><input id="tx-price" type="number" min="0" max="10000" step="0.01" required><button type="submit">Send offer</button></form>
+      <p>Offer the asking price for a straightforward purchase, or propose a different price. The seller must accept before the item is reserved.</p>
+    </section>
+    <div id="tx-controls" hidden><label for="tx-filter">Show transactions</label><select id="tx-filter"><option value="open">Open offers and reservations</option><option value="completed">Completed exchanges</option><option value="all">All transactions</option></select><button id="tx-refresh" type="button">Refresh</button></div>
+    <div id="tx-list"></div>
+    <p><a href="/browse.html">Back to marketplace</a> · <a href="/messages.html">Messages</a></p>
+  </main>
+</div></body></html>

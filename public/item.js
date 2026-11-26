@@ -159,6 +159,11 @@ async function loadListing() {
     statusEl.hidden = true;
     itemEl.hidden = false;
     window.UniMarketDiscovery?.initItem(listing);
+    const offerLink = document.getElementById('offer-link');
+    const reserved = listing.status === 'reserved';
+    document.getElementById('purchase-state').textContent = reserved ? 'Reserved — not currently available for new offers.' : 'Agree a price and arrange an in-person exchange. No payment is collected here.';
+    offerLink.href = reserved ? '/transactions.html' : '/transactions.html?listing=' + encodeURIComponent(listing.id);
+    offerLink.textContent = reserved ? 'View my transactions' : 'Make an offer / reserve';
   } catch (err) {
     // Network problem or the server is down
     console.error(err);

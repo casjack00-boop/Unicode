@@ -29,11 +29,11 @@
         img.addEventListener('error', () => img.remove());
         card.append(img);
       }
-      const available = item.status === 'active';
+      const available = ['active','reserved'].includes(item.status);
       const title = el(available ? 'a' : 'span', item.title);
       if (available) title.href = '/item.html?id=' + encodeURIComponent(item.id);
       card.append(title, el('strong', price(item.price_cents)),
-        el('p', available ? String(item.condition || '').replaceAll('_', ' ') : 'Sold / unavailable'));
+        el('p', item.status === 'reserved' ? 'Reserved' : available ? String(item.condition || '').replaceAll('_', ' ') : 'Sold / unavailable'));
       if (onRemove) {
         const button = el('button', 'Remove saved item', 'discovery-button');
         button.type = 'button'; button.setAttribute('aria-label', 'Remove ' + item.title + ' from saved items');
