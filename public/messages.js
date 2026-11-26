@@ -9,6 +9,14 @@ let sending = false;
 let contactBlocked = false;
 let timer;
 let historySignature = null;
+let replyTarget = null;
+let actionTarget = null;
+let actionTrigger = null;
+let reportTarget = null;
+let reportSending = false;
+let toastTimer;
+const actionMenu = el('message-actions');
+const reportDialog = el('report-dialog');
 
 async function api(path, options = {}) {
   const response = await fetch('/api/messages' + path, { cache: 'no-store', ...options });
@@ -82,11 +90,110 @@ async function refreshInbox() {
   el('search-box').hidden = false;
   status('');
 }
+function showToast(text, success = true) {
+  const toast = el('copy-toast');
+  clearTimeout(toastTimer);
+  toast.querySelector('span').textContent = text;
+  toast.classList.toggle('toast-error', !success);
+  toast.classList.add('visible');
+  toastTimer = setTimeout(() => { toast.classList.remove('visible'); toast.querySelector('span').textContent = ''; }, 2000);
+}
+function closeActions(restoreFocus = false) {
+  const trigger = actionTrigger;
+  if (trigger) trigger.setAttribute('aria-expanded', 'false');
+  actionMenu.hidden = true;
+  actionTarget = null;
+  actionTrigger = null;
+  if (restoreFocus && trigger?.isConnected) trigger.focus({ preventScroll: true });
+}
+function openActions(trigger, message, mine, senderName) {
+  if (actionTrigger === trigger) { closeActions(true); return; }
+  closeActions();
+  actionTarget = { message, mine, senderName };
+  actionTrigger = trigger;
+  trigger.setAttribute('aria-expanded', 'true');
+  actionMenu.querySelector('[data-action="report"]').hidden = mine;
+  actionMenu.querySelector('[data-action="reply"]').disabled = contactBlocked;
+  actionMenu.hidden = false;
+  const rect = trigger.getBoundingClientRect();
+  const width = actionMenu.offsetWidth, height = actionMenu.offsetHeight;
+  const left = Math.max(8, Math.min(innerWidth - width - 8, mine ? rect.left : rect.right - width));
+  const top = rect.bottom + height + 8 <= innerHeight ? rect.bottom + 4 : Math.max(8, rect.top - height - 4);
+  actionMenu.style.left = left + 'px';
+  actionMenu.style.top = top + 'px';
+  actionMenu.querySelector('button').focus({ preventScroll: true });
+}
+function clearReply() {
+  replyTarget = null;
+  el('reply-preview').hidden = true;
+  el('reply-author').textContent = '';
+  el('reply-excerpt').textContent = '';
+}
+function selectReply(target) {
+  if (contactBlocked) return;
+  replyTarget = target.message.id;
+  el('reply-author').textContent = 'Replying to ' + target.senderName;
+  el('reply-excerpt').textContent = target.message.body;
+  el('reply-preview').hidden = false;
+  el('message-input').focus();
+}
+async function copyMessage(body) {
+  try {
+    await navigator.clipboard.writeText(body);
+    showToast('Copied to clipboard');
+  } catch (_) { showToast('Could not copy. Select the message text to copy it.', false); }
+}
+actionMenu.addEventListener('click', event => {
+  const button = event.target.closest('button[data-action]');
+  if (!button || button.disabled || !actionTarget) return;
+  const target = actionTarget;
+  closeActions(true);
+  if (button.dataset.action === 'copy') copyMessage(target.message.body);
+  else if (button.dataset.action === 'reply') selectReply(target);
+  else if (button.dataset.action === 'report' && !target.mine) {
+    reportTarget = target.message.id;
+    el('message-report-form').reset();
+    el('report-excerpt').textContent = target.message.body;
+    el('message-report-status').textContent = '';
+    reportDialog.showModal();
+    el('cancel-report').focus();
+  }
+});
+document.addEventListener('click', event => {
+  if (!actionMenu.hidden && !actionMenu.contains(event.target) && !actionTrigger?.contains(event.target)) closeActions();
+});
+document.addEventListener('keydown', event => {
+  if (!actionMenu.hidden && event.key === 'Escape') { event.preventDefault(); closeActions(true); }
+});
+actionMenu.addEventListener('focusout', event => {
+  if (event.relatedTarget && !actionMenu.contains(event.relatedTarget)) closeActions();
+});
+el('message-history').addEventListener('scroll', () => closeActions(), { passive: true });
+window.addEventListener('resize', () => closeActions());
+el('cancel-reply').addEventListener('click', () => { clearReply(); el('message-input').focus(); });
+el('cancel-report').addEventListener('click', () => { if (!reportSending) reportDialog.close(); });
+reportDialog.addEventListener('cancel', event => { if (reportSending) event.preventDefault(); });
+reportDialog.addEventListener('close', () => { reportTarget = null; el('report-excerpt').textContent = ''; });
+el('message-report-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  if (reportSending || reportTarget === null) return;
+  reportSending = true;
+  el('confirm-report').disabled = el('cancel-report').disabled = true;
+  el('message-report-status').textContent = '';
+  try {
+    const response = await fetch('/api/safety/reports', json('POST', { type: 'message', id: reportTarget, reason: el('message-report-reason').value, details: el('message-report-details').value }));
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Could not submit report.');
+    reportDialog.close();
+    showToast('Report submitted. Reference #' + result.id);
+  } catch (error) { el('message-report-status').textContent = error.message || 'Could not submit report.'; }
+  finally { reportSending = false; el('confirm-report').disabled = el('cancel-report').disabled = false; }
+});
 function renderHistory(data) {
   const history = el('message-history');
   // Read status changes do not require replacing the displayed bubbles.
   const signature = data.messages.map(m => m.id).join(',');
-  if (signature === historySignature) return;
+  if (signature === historySignature || !actionMenu.hidden || reportDialog.open) return;
   const atBottom = history.scrollHeight - history.scrollTop - history.clientHeight < 90;
   const first = historySignature === null;
   historySignature = signature;
@@ -94,14 +201,27 @@ function renderHistory(data) {
   history.replaceChildren();
   if (!data.messages.length) history.append(element('p', 'empty', 'Start the conversation with a friendly message.'));
   for (const m of data.messages) {
-    const row = element('div', 'bubble-row' + (m.sender_id === data.user_id ? ' mine' : ''));
-    const speaker = element('span', 'sr-only', m.sender_id === data.user_id ? 'You: ' : 'Other student: ');
-    row.append(speaker, element('div', 'bubble', m.body), element('span', 'bubble-time', timestamp(m.created_at)));
-    if (m.sender_id !== data.user_id) {
-      const report = element('a', 'safety-link', 'Report message');
-      report.href = '/safety.html?message=' + encodeURIComponent(m.id) + '&conversation=' + encodeURIComponent(conversationId);
-      row.append(report);
+    const mine = m.sender_id === data.user_id;
+    const senderName = mine ? 'yourself' : data.conversation.other_name;
+    const row = element('div', 'bubble-row' + (mine ? ' mine' : ''));
+    const speaker = element('span', 'sr-only', mine ? 'You: ' : 'Other student: ');
+    const line = element('div', 'bubble-line');
+    const bubble = element('div', 'bubble');
+    if (m.reply_to_id && m.reply_body != null) {
+      const quote = element('blockquote', 'bubble-quote');
+      quote.append(element('strong', '', m.reply_sender_id === data.user_id ? 'You' : data.conversation.other_name), element('span', '', m.reply_body));
+      bubble.append(quote);
     }
+    bubble.append(element('span', 'bubble-body', m.body));
+    const trigger = element('button', 'message-more');
+    trigger.type = 'button';
+    trigger.setAttribute('aria-label', 'More actions for ' + (mine ? 'your' : 'received') + ' message: ' + m.body.slice(0, 60));
+    trigger.setAttribute('aria-expanded', 'false');
+    trigger.setAttribute('aria-controls', 'message-actions');
+    trigger.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>';
+    trigger.addEventListener('click', () => openActions(trigger, m, mine, senderName));
+    line.append(bubble, trigger);
+    row.append(speaker, line, element('span', 'bubble-time', timestamp(m.created_at)));
     history.append(row);
   }
   if (first || atBottom) history.scrollTop = history.scrollHeight;
@@ -120,6 +240,7 @@ async function refreshChat() {
   el('listing-link').hidden = c.listing_status !== 'active';
   el('chat').hidden = false;
   contactBlocked = Boolean(c.contact_blocked);
+  if (contactBlocked) { clearReply(); closeActions(); }
   el('chat-safety').href = '/safety.html?user=' + encodeURIComponent(c.other_id);
   el('chat-safety').hidden = false;
   el('chat-blocked').hidden = !contactBlocked;
@@ -154,8 +275,9 @@ el('message-form').addEventListener('submit', async event => {
   try {
     if (refreshPromise) await refreshPromise;
     if (stopped) return;
-    await api('/conversations/' + encodeURIComponent(conversationId), json('POST', { body }));
+    await api('/conversations/' + encodeURIComponent(conversationId), json('POST', { body, reply_to_id: replyTarget }));
     input.value = '';
+    clearReply();
     status('');
     await refreshChat();
     el('message-history').scrollTop = el('message-history').scrollHeight;

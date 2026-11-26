@@ -80,8 +80,10 @@ router.get('/conversations/:id', async (req, res) => {
     const result = await pool.query(`SELECT ${conversationFields}, uni_contact_blocked(c.buyer_id,c.seller_id) AS contact_blocked ${conversationJoins}
       WHERE ${participant} AND c.id = $2`, [req.user.id, id]);
     if (!result.rows.length) return res.status(404).json({ error: 'Conversation not found.' });
-    const history = await pool.query(`SELECT m.id, m.sender_id, m.body, m.created_at, m.read_at
+    const history = await pool.query(`SELECT m.id, m.sender_id, m.body, m.created_at, m.read_at, m.reply_to_id,
+        parent.body AS reply_body, parent.sender_id AS reply_sender_id
       FROM messages m JOIN conversations c ON c.id = m.conversation_id
+      LEFT JOIN messages parent ON parent.id = m.reply_to_id AND parent.conversation_id = m.conversation_id
       WHERE ${participant} AND c.id = $2 ORDER BY m.id`, [req.user.id, id]);
     res.json({ conversation: result.rows[0], messages: history.rows, user_id: req.user.id });
   } catch (err) { fail(res, err); }
@@ -92,11 +94,14 @@ router.post('/conversations/:id', async (req, res) => {
   const id = validId(req.params.id);
   const body = typeof req.body?.body === 'string' ? req.body.body.trim() : '';
   if (!id) return res.status(400).json({ error: 'Invalid conversation ID.' });
+  const replyTo = req.body?.reply_to_id == null ? null : validId(req.body.reply_to_id);
+  if (req.body?.reply_to_id != null && !replyTo) return res.status(400).json({ error: 'Invalid reply message.' });
   if (!body || body.length > 2000 || body.includes('\u0000')) return res.status(400).json({ error: 'Enter a message between 1 and 2000 characters.' });
   try {
-    const result = await pool.query(`INSERT INTO messages (conversation_id, sender_id, body)
-      SELECT c.id, $1, $3 FROM conversations c WHERE ${participant} AND c.id = $2
-      RETURNING id, sender_id, body, created_at, read_at`, [req.user.id, id, body]);
+    const result = await pool.query(`INSERT INTO messages (conversation_id, sender_id, body, reply_to_id)
+      SELECT c.id, $1, $3, $4 FROM conversations c WHERE ${participant} AND c.id = $2
+      AND ($4::integer IS NULL OR EXISTS (SELECT 1 FROM messages parent WHERE parent.id = $4 AND parent.conversation_id = c.id))
+      RETURNING id, sender_id, body, created_at, read_at, reply_to_id`, [req.user.id, id, body, replyTo]);
     if (!result.rows.length) return res.status(404).json({ error: 'Conversation not found.' });
     res.status(201).json({ message: result.rows[0] });
   } catch (err) { fail(res, err); }
