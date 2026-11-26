@@ -22,7 +22,7 @@
 #edit-form input, #edit-form select { min-height: 44px; border: 1.5px solid var(--chip-line); border-radius: 10px; padding: 8px 12px; font: inherit; color: var(--ink); width: 100%; }
 .profile-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
 .profile-link { display: flex; justify-content: space-between; color: var(--link); font-weight: 600; text-decoration: none; padding: 14px 0; border-top: 1px solid var(--line); }
-#logout { width: 100%; }
+.profile-settings { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex: 0 0 44px; border-radius: 50%; color: #fff; background: rgba(255,255,255,.14); text-decoration: none; }
 #edit-status:empty { display: none; }
 .profile-error { color: var(--error); }
 .review { border-top: 1px solid var(--line); padding: 10px 0; overflow-wrap: anywhere; }

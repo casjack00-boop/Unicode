@@ -109,19 +109,20 @@ el('edit-form').addEventListener('submit', async (event) => {
   } catch (err) { setEditStatus(err.message, true); }
   finally { el('save-button').disabled = false; }
 });
-el('logout').addEventListener('click', async () => {
-  el('logout').disabled = true;
-  try { await api('/api/auth/logout', { method: 'POST' }); location.href = '/login.html'; }
-  catch (err) { setEditStatus(err.message, true); el('logout').disabled = false; }
-});
 
 async function loadProfile() {
-  el('page-label').textContent = ownProfile ? 'My profile' : 'Student profile';
+  el('profile-settings').hidden = true;
+  el('profile').hidden = true;
+  el('status').hidden = false;
+  el('status').textContent = 'Loading profile...';
+  el('status').classList.remove('profile-error');
+  el('login-link').hidden = true;
   try {
     const data = await api('/api/profiles/' + (ownProfile ? 'me' : encodeURIComponent(viewedId)));
     showUser(data.user);
     renderListings(data.listings);
     el('account').hidden = !ownProfile;
+    el('profile-settings').hidden = !ownProfile;
     el('edit-button').hidden = !ownProfile;
     el('status').hidden = true;
     el('profile').hidden = false;
@@ -133,3 +134,4 @@ async function loadProfile() {
   }
 }
 loadProfile();
+window.addEventListener('pageshow', event => { if (event.persisted) loadProfile(); });

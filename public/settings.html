@@ -10,6 +10,7 @@
   <script src="/accessibility.js"></script>
   <link rel="stylesheet" href="/notifications.css">
   <script src="/notifications.js" defer></script>
+  <script src="/settings.js" defer></script>
 </head>
 <body>
   <div class="app">
@@ -43,7 +44,11 @@
           <label class="notice-pref-check"><input type="checkbox" name="saved_searches"> New items matching saved searches</label>
           <button type="submit">Save notification preferences</button>
         </form>
-        <a href="/notifications.html">Manage notifications and saved searches</a>
+      </section>
+      <section id="account-session" class="notice-panel" aria-labelledby="session-heading" hidden>
+        <h2 id="session-heading">Account</h2>
+        <button id="logout" type="button">Log out</button>
+        <p id="logout-status" role="status"></p>
       </section>
     </main>
   </div>
