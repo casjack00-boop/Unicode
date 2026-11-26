@@ -57,6 +57,8 @@ window.addEventListener('pageshow', () => {
 });
 
 // ---------- Photos ----------
+document.getElementById('initialAddPhoto').addEventListener('click', () => photoInput.click());
+
 function drawPhotos() {
   photoSlots.replaceChildren();
 
@@ -79,13 +81,12 @@ function drawPhotos() {
   });
 
   if (photos.length < MAX_PHOTOS) {
-    const add = document.createElement('label');
+    const add = document.createElement('button');
+    add.type = 'button';
     add.className = 'add-photo';
-    add.htmlFor = 'photoInput';
-    add.tabIndex = 0;
     add.innerHTML = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B4500C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg>';
     add.append('Add photo');
-    add.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); photoInput.click(); } });
+    add.addEventListener('click', () => photoInput.click());
     photoSlots.append(add);
   }
   for (let i = photos.length + 1; i < MAX_PHOTOS; i++) {
@@ -132,7 +133,11 @@ form.addEventListener('submit', async (event) => {
   event.preventDefault();
 
   const problem = checkForm();
-  if (problem) { showMessage(problem, 'error'); return; }
+  for (const field of form.querySelectorAll('input, select, textarea')) {
+    if (field.classList.contains('invalid')) field.setAttribute('aria-invalid', 'true');
+    else field.removeAttribute('aria-invalid');
+  }
+  if (problem) { showMessage(problem, 'error'); form.querySelector('.invalid')?.focus(); return; }
 
   postBtn.disabled = true;
   showMessage('Posting your item...');

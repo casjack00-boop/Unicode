@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap">
   <link rel="stylesheet" href="/browse.css">
   <script src="/browse.js" defer></script>
+  <link rel="stylesheet" href="/accessibility.css">
+  <script src="/accessibility.js"></script>
 </head>
 <body>
   <div class="app">
@@ -27,7 +29,7 @@
           <label for="searchInput" class="sr-only">Search listings</label>
           <input id="searchInput" type="search" placeholder="Search by title, ISBN, or item">
         </div>
-        <button id="filterToggle" class="filter-btn" type="button" aria-label="Show filters" aria-expanded="false">
+        <button id="filterToggle" class="filter-btn" type="button" aria-label="Filters" aria-controls="filters" aria-expanded="false">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"></path></svg>
         </button>
       </div>
@@ -35,13 +37,13 @@
 
     <!-- Category chips -->
     <nav class="chips" aria-label="Item categories">
-      <button class="chip active" data-category="all">All</button>
-      <button class="chip" data-category="textbooks">Textbooks</button>
-      <button class="chip" data-category="furniture">Furniture</button>
-      <button class="chip" data-category="dorm">Dorm</button>
-      <button class="chip" data-category="electronics">Electronics</button>
-      <button class="chip" data-category="clothing">Clothing</button>
-      <button class="chip" data-category="other">Other</button>
+      <button class="chip active" data-category="all" type="button" aria-pressed="true">All</button>
+      <button class="chip" data-category="textbooks" type="button" aria-pressed="false">Textbooks</button>
+      <button class="chip" data-category="furniture" type="button" aria-pressed="false">Furniture</button>
+      <button class="chip" data-category="dorm" type="button" aria-pressed="false">Dorm</button>
+      <button class="chip" data-category="electronics" type="button" aria-pressed="false">Electronics</button>
+      <button class="chip" data-category="clothing" type="button" aria-pressed="false">Clothing</button>
+      <button class="chip" data-category="other" type="button" aria-pressed="false">Other</button>
     </nav>
 
     <main class="content">
@@ -70,7 +72,7 @@
       </section>
 
       <div class="toolbar">
-        <span id="resultCount">Loading...</span>
+        <span id="resultCount" role="status">Loading...</span>
         <label class="sort">Sort
           <select id="sortSelect">
             <option value="recommended">Recommended</option>
@@ -81,7 +83,7 @@
         </label>
       </div>
 
-      <div id="listingResults" class="grid" aria-live="polite"></div>
+      <div id="listingResults" class="grid"></div>
       <p id="errorMessage" class="error" role="alert" hidden></p>
     </main>
 

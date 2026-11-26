@@ -58,12 +58,11 @@ function showPhotos(photos, title) {
   function draw() {
     img.src = photos[which].url;
     counter.textContent = `${which + 1} / ${photos.length}`;
+    counter.setAttribute('aria-label', `Photo ${which + 1} of ${photos.length}. Show next photo`);
   }
 
   if (photos.length > 1) {
     counter.hidden = false;
-    counter.setAttribute('role', 'button');
-    counter.tabIndex = 0;
     counter.title = 'Next photo';
     const next = () => { which = (which + 1) % photos.length; draw(); };
     counter.addEventListener('click', next);

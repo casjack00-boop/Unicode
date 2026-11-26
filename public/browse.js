@@ -159,6 +159,7 @@ document.querySelectorAll('.chip').forEach(button => {
 
     document.querySelectorAll('.chip').forEach(b => {
       b.classList.toggle('active', b === button);
+      b.setAttribute('aria-pressed', String(b === button));
     });
 
     textbookFilters.hidden = category !== 'textbooks';

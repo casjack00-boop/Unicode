@@ -94,7 +94,8 @@ function renderHistory(data) {
   if (!data.messages.length) history.append(element('p', 'empty', 'Start the conversation with a friendly message.'));
   for (const m of data.messages) {
     const row = element('div', 'bubble-row' + (m.sender_id === data.user_id ? ' mine' : ''));
-    row.append(element('div', 'bubble', m.body), element('span', 'bubble-time', timestamp(m.created_at)));
+    const speaker = element('span', 'sr-only', m.sender_id === data.user_id ? 'You: ' : 'Other student: ');
+    row.append(speaker, element('div', 'bubble', m.body), element('span', 'bubble-time', timestamp(m.created_at)));
     history.append(row);
   }
   if (first || atBottom) history.scrollTop = history.scrollHeight;

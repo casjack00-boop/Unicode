@@ -7,11 +7,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap">
   <link rel="stylesheet" href="/item.css">
+  <link rel="stylesheet" href="/accessibility.css">
+  <script src="/accessibility.js"></script>
 </head>
 <body>
-  <div class="app">
+  <main class="app">
     <!-- Shown while the item loads, and if something goes wrong -->
-    <p id="status" class="status">Loading...</p>
+    <p id="status" class="status" role="status">Loading...</p>
 
     <!-- Hidden until the data arrives (item.js un-hides it) -->
     <article id="item" class="item" hidden>
@@ -25,7 +27,7 @@
           <a href="/browse.html" class="back" aria-label="Back to Browse">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#002D72" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
           </a>
-          <span id="photo-count" class="photo-count" hidden></span>
+          <button type="button" id="photo-count" class="photo-count" hidden></button>
         </div>
 
         <div class="info">
@@ -63,12 +65,12 @@
 
             <form id="rate-form" class="rate-form" hidden>
               <span class="rate-label">Bought from this seller? Rate them:</span>
-              <div class="star-pick" id="star-pick" role="radiogroup" aria-label="Stars">
-                <button type="button" data-stars="1" aria-label="1 star">★</button>
-                <button type="button" data-stars="2" aria-label="2 stars">★</button>
-                <button type="button" data-stars="3" aria-label="3 stars">★</button>
-                <button type="button" data-stars="4" aria-label="4 stars">★</button>
-                <button type="button" data-stars="5" aria-label="5 stars">★</button>
+              <div class="star-pick" id="star-pick" role="group" aria-label="Star rating">
+                <button type="button" data-stars="1" aria-pressed="false" aria-label="1 star">★</button>
+                <button type="button" data-stars="2" aria-pressed="false" aria-label="2 stars">★</button>
+                <button type="button" data-stars="3" aria-pressed="false" aria-label="3 stars">★</button>
+                <button type="button" data-stars="4" aria-pressed="false" aria-label="4 stars">★</button>
+                <button type="button" data-stars="5" aria-pressed="false" aria-label="5 stars">★</button>
               </div>
               <input id="rate-comment" type="text" maxlength="300" placeholder="Add a comment (optional)" aria-label="Comment">
               <button type="submit" class="rate-btn">Save rating</button>
@@ -107,7 +109,7 @@
         </button>
       </div>
     </article>
-  </div>
+  </main>
 
   <script src="/item.js"></script>
 </body>

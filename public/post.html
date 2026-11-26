@@ -14,6 +14,8 @@
   <script src="/isbn.js" defer></script>
   <script src="/vendor/quagga.min.js" defer></script>
   <script src="/isbn-scanner.js" defer></script>
+  <link rel="stylesheet" href="/accessibility.css">
+  <script src="/accessibility.js"></script>
 </head>
 <body>
   <div class="app">
@@ -32,16 +34,17 @@
       Please <a href="/login.html">log in</a> with your UT Tyler email to sell an item.
     </div>
 
+    <main>
     <form id="postForm" class="form" novalidate>
 
       <!-- Photos -->
       <div class="field">
         <span class="label">Photos <span class="hint">(up to 3)</span></span>
         <div class="photos" id="photoSlots">
-          <label class="add-photo" for="photoInput">
+          <button type="button" class="add-photo" id="initialAddPhoto">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B4500C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg>
             Add photo
-          </label>
+          </button>
           <div class="slot"></div>
           <div class="slot"></div>
         </div>
@@ -132,6 +135,7 @@
       </div>
 
     </form>
+    </main>
 
     <!-- Sticky bottom bar -->
     <div class="actions">
