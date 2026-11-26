@@ -121,6 +121,8 @@ async function loadListings() {
   if (minPrice.value) params.set('minPrice', minPrice.value);
   if (maxPrice.value) params.set('maxPrice', maxPrice.value);
 
+  window.UniMarketDiscovery?.showPersonalRecommendations(category === 'all' && sortSelect.value === 'recommended' &&
+    !searchInput.value.trim() && !conditionFilter.value && !housingFilter.value && !minPrice.value && !maxPrice.value);
   count.textContent = 'Loading...';
   errorMessage.hidden = true;
 
@@ -207,6 +209,7 @@ searchInput.addEventListener('input', () => {
 
 loadFilterOptions();
 loadListings();
+window.addEventListener('pageshow', event => { if (event.persisted) loadListings(); });
 
 // Open the alert form with the current keyword, category and maximum price.
 document.getElementById('save-search-alert').addEventListener('click', () => {

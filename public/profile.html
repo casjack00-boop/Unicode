@@ -31,6 +31,7 @@
           <p class="verified-student">✓ Verified UT Tyler student</p>
           <p id="housing" class="profile-muted"></p>
           <p id="member-since" class="profile-muted"></p>
+          <p id="profile-biography" class="profile-biography" hidden></p>
           <div class="profile-reputation" aria-label="Student reputation">
             <div class="profile-reputation-grid">
               <div class="profile-reputation-cell">
@@ -63,6 +64,9 @@
             <input id="display-name" maxlength="80" required>
             <label for="housing-select">Housing</label>
             <select id="housing-select"><option value="">Prefer not to say</option><option value="on_campus">On campus</option><option value="off_campus">Off campus</option></select>
+            <label for="biography">Biography (optional, visible to other students)</label>
+            <textarea id="biography" rows="4" maxlength="500" aria-describedby="biography-help"></textarea>
+            <p id="biography-help" class="profile-muted">Up to 500 characters. Avoid sharing private contact details.</p>
             <div class="profile-actions"><button type="submit" class="profile-button" id="save-button">Save changes</button><button type="button" class="profile-secondary" id="cancel-button">Cancel</button></div>
           </form>
           <p id="edit-status" role="status"></p>

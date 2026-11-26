@@ -36,3 +36,6 @@
 .profile-exchange-grid { border-top: 1px solid var(--line); }
 .profile-score { color: var(--ink); font: 800 1.25rem/1.3 Archivo, sans-serif; font-variant-numeric: tabular-nums; }
 .profile-stars { color: var(--orange-text); font-size: 1rem; letter-spacing: .04em; line-height: 1.3; min-height: 1.3em; }
+
+.profile-biography { width: 100%; white-space: pre-wrap; overflow-wrap: anywhere; text-align: center; }
+#edit-form textarea { min-height: 100px; width: 100%; padding: 8px 12px; border: 1.5px solid var(--chip-line); border-radius: 10px; background: var(--surface); color: var(--ink); font: inherit; resize: vertical; }

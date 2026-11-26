@@ -63,7 +63,7 @@
         </button></div>
         <label class="sort">Sort
           <select id="sortSelect">
-            <option value="recommended">Recommended</option>
+            <option value="recommended">Best match</option>
             <option value="newest">Newest</option>
             <option value="price_asc">Price: low to high</option>
             <option value="price_desc">Price: high to low</option>
@@ -103,6 +103,12 @@
         <button id="clearFilters" class="clear-btn" type="button">Clear filters</button>
       </section>
 
+      <section id="personal-recommendations" class="discovery-section" aria-labelledby="personal-heading" hidden>
+        <h2 id="personal-heading">Recommended for you</h2>
+        <p id="personal-status" role="status"></p>
+        <div id="personal-list" class="discovery-list"></div>
+        <a href="/settings.html?from=browse#personalisation" class="discovery-link">Manage recommendation privacy</a>
+      </section>
       <p id="browse-save-status" class="discovery-status" role="status"></p>
       <div id="listingResults" class="grid"></div>
       <p id="errorMessage" class="error" role="alert" hidden></p>

@@ -54,6 +54,33 @@ router.use(requireUser, (req, res, next) => {
   res.setHeader('Cache-Control', 'private, no-store');
   next();
 });
+// A single statement reads consent and results in the same database snapshot.
+router.get('/recommendations', async (req, res) => {
+  try {
+    const { rows } = await pool.query(`SELECT u.personalised_recommendations AS enabled,
+      CASE WHEN u.personalised_recommendations THEN COALESCE(
+        (SELECT jsonb_agg(to_jsonb(r)) FROM uni_personal_recommendations(u.id) r), '[]'::jsonb)
+        ELSE '[]'::jsonb END AS listings FROM users u WHERE u.id=$1 AND u.verified`, [req.user.id]);
+    if (!rows.length) return res.status(404).json({ error: 'Student not found.' });
+    res.json(rows[0]);
+  } catch (error) { fail(res, error); }
+});
+router.get('/recommendation-preferences', async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT personalised_recommendations AS enabled FROM users WHERE id=$1 AND verified', [req.user.id]);
+    if (!rows.length) return res.status(404).json({ error: 'Student not found.' });
+    res.json(rows[0]);
+  } catch (error) { fail(res, error); }
+});
+router.put('/recommendation-preferences', async (req, res) => {
+  if (typeof req.body?.enabled !== 'boolean') return res.status(400).json({ error: 'Choose whether to enable recommendations.' });
+  try {
+    const { rows } = await pool.query(`UPDATE users SET personalised_recommendations=$2
+      WHERE id=$1 AND verified RETURNING personalised_recommendations AS enabled`, [req.user.id, req.body.enabled]);
+    if (!rows.length) return res.status(404).json({ error: 'Student not found.' });
+    res.json(rows[0]);
+  } catch (error) { fail(res, error); }
+});
 router.get('/saved', async (req, res) => {
   try {
     const { rows } = await pool.query(`SELECT ${fields} FROM saved_listings s JOIN listings l ON l.id = s.listing_id

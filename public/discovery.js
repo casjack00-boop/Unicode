@@ -2,8 +2,10 @@
   'use strict';
   const byId = id => document.getElementById(id);
   const endpoint = '/api/discovery';
-  async function request(path, method = 'GET') {
-    const response = await fetch(endpoint + path, { method, credentials: 'same-origin', cache: 'no-store' });
+  async function request(path, method = 'GET', body) {
+    const options = { method, credentials: 'same-origin', cache: 'no-store' };
+    if (body !== undefined) { options.headers = { 'Content-Type': 'application/json' }; options.body = JSON.stringify(body); }
+    const response = await fetch(endpoint + path, options);
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
       const error = new Error(data.error || 'Unable to complete this request.');
@@ -178,7 +180,62 @@
       finally { button.disabled = false; }
     });
   }
-  window.UniMarketDiscovery = { initBrowse, initItem(listing) { initItem(listing); showSimilar(listing); initShare(listing); } };
+  let personalRequest = 0;
+  async function showPersonalRecommendations(visible) {
+    const panel = byId('personal-recommendations');
+    if (!panel) return;
+    const current = ++personalRequest;
+    panel.hidden = true;
+    byId('personal-list').replaceChildren();
+    if (!visible) return;
+    try {
+      const data = await request('/recommendations');
+      if (current !== personalRequest) return;
+      byId('personal-status').textContent = data.enabled
+        ? (data.listings.length ? 'Based on items you recently viewed.' : 'View a few items to discover relevant suggestions.')
+        : 'Personalised suggestions are off. Enable them in Settings if you wish.';
+      if (data.enabled) renderCards(byId('personal-list'), data.listings);
+      panel.hidden = false;
+    } catch (_) { /* Personalisation is optional; never interrupt normal browsing. */ }
+  }
+  async function initPersonalisation() {
+    const panel = byId('personalisation');
+    if (!panel) return;
+    const form = byId('personalisation-form');
+    const status = byId('personalisation-status');
+    const toggle = form.elements.enabled;
+    const button = form.querySelector('button');
+    let saving = false;
+    async function refresh() {
+      if (saving) return;
+      panel.hidden = true;
+      form.hidden = true;
+      try {
+        const data = await request('/recommendation-preferences');
+        toggle.checked = data.enabled;
+        status.textContent = '';
+        panel.hidden = false;
+        form.hidden = false;
+      } catch (error) {
+        if (error.status !== 401) { panel.hidden = false; status.textContent = error.message; }
+      }
+    }
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      if (saving) return;
+      saving = true; button.disabled = true; toggle.disabled = true;
+      try {
+        const data = await request('/recommendation-preferences', 'PUT', { enabled: toggle.checked });
+        toggle.checked = data.enabled;
+        status.textContent = data.enabled ? 'Personalised recommendations enabled.' : 'Personalised recommendations disabled.';
+      } catch (error) { status.textContent = error.message; }
+      finally { saving = false; button.disabled = false; toggle.disabled = false; }
+    });
+    refresh();
+    window.addEventListener('pageshow', event => { if (event.persisted) refresh(); });
+  }
+  window.UniMarketDiscovery = { initBrowse, showPersonalRecommendations, initItem(listing) { initItem(listing); showSimilar(listing); initShare(listing); } };
   if (byId('library-status')) initLibrary();
   initPricing();
+  initPersonalisation();
 })();

@@ -21,6 +21,8 @@ function showUser(user) {
   el('avatar').textContent = user.display_name.trim().split(/\s+/).slice(0, 2).map(s => s.charAt(0).toUpperCase()).join('');
   el('housing').textContent = ({ on_campus: 'On campus', off_campus: 'Off campus' })[user.housing] || 'Housing not specified';
   el('member-since').textContent = 'Member since ' + new Date(user.created_at).toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+  el('profile-biography').textContent = user.biography || '';
+  el('profile-biography').hidden = !user.biography;
   if (ownProfile) el('email').textContent = user.email;
 }
 
@@ -103,6 +105,7 @@ function setEditStatus(message, error = false) {
 el('edit-button').addEventListener('click', () => {
   el('display-name').value = currentUser.display_name;
   el('housing-select').value = currentUser.housing || '';
+  el('biography').value = currentUser.biography || '';
   el('edit-form').hidden = false;
   setEditStatus('');
   el('display-name').focus();
@@ -114,7 +117,7 @@ el('edit-form').addEventListener('submit', async (event) => {
   try {
     const data = await api('/api/profiles/me', {
       method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ display_name: el('display-name').value, housing: el('housing-select').value || null })
+      body: JSON.stringify({ display_name: el('display-name').value, housing: el('housing-select').value || null, biography: el('biography').value })
     });
     showUser(data.user);
     el('edit-form').hidden = true;

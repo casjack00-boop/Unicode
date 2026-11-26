@@ -55,6 +55,7 @@
     const from = new URLSearchParams(location.search).get('from');
     const destinations = new Map([
       ['profile', ['/profile.html', 'Back to profile']],
+      ['browse', ['/browse.html', 'Back to browse']],
       ['login', ['/login.html', 'Back to login']],
       ['home', ['/', 'Back to home']]
     ]);

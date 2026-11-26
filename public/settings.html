@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="/notifications.css">
   <script src="/notifications.js" defer></script>
   <script src="/settings.js" defer></script>
+  <script src="/discovery.js" defer></script>
   <link rel="stylesheet" href="/academic.css">
   <script src="/academic.js" defer></script>
   <script src="/safety.js" defer></script>
@@ -53,6 +54,16 @@
           <button type="submit">Save academic preferences</button>
         </form>
         <p id="academic-pref-status" role="status"></p>
+      </section>
+      <section id="personalisation" class="notice-panel" aria-labelledby="personalisation-heading" hidden>
+        <h2 id="personalisation-heading">Recommendation privacy</h2>
+        <p>Optional. Use recently viewed marketplace items and completed purchases to suggest relevant listings. Turning this off stops personalised suggestions; your private Recently viewed list is separate.</p>
+        <form id="personalisation-form" hidden>
+          <label class="notice-pref-check"><input type="checkbox" name="enabled"> Use my browsing history for recommendations</label>
+          <button type="submit">Save recommendation preference</button>
+        </form>
+        <p id="personalisation-status" role="status"></p>
+        <a href="/saved.html">View or clear my recent history</a>
       </section>
       <section id="notification-preferences" class="notice-panel" aria-labelledby="notice-pref-heading">
         <h2 id="notice-pref-heading">Notification preferences</h2>

@@ -4,11 +4,14 @@ const pool = require('../db');
 const requireUser = require('../requireUser');
 const router = express.Router();
 
-router.use(requireUser);
+router.use(requireUser, (req, res, next) => {
+  res.setHeader('Cache-Control', 'private, no-store');
+  next();
+});
 
 async function getProfile(id, includeEmail) {
   const { rows } = await pool.query(
-    `SELECT id, display_name, housing, verified, created_at${includeEmail ? ', email' : ''}
+    `SELECT id, display_name, housing, biography, verified, created_at${includeEmail ? ', email' : ''}
        FROM users WHERE id = $1 AND verified = TRUE`, [id]
   );
   if (!rows.length) return null;
@@ -34,7 +37,10 @@ router.get('/me', async (req, res) => {
 });
 
 router.patch('/me', async (req, res) => {
-  const { display_name, housing } = req.body || {};
+  const { display_name, housing, biography } = req.body || {};
+  if (biography !== undefined && (typeof biography !== 'string' || biography.includes('\u0000') || Array.from(biography.trim()).length > 500)) {
+    return res.status(400).json({ error: 'Biography must be at most 500 characters.' });
+  }
   if (typeof display_name !== 'string' || !display_name.trim() || display_name.trim().length > 80) {
     return res.status(400).json({ error: 'Enter a name between 1 and 80 characters.' });
   }
@@ -43,10 +49,10 @@ router.patch('/me', async (req, res) => {
   }
   try {
     const { rows } = await pool.query(
-      `UPDATE users SET display_name = $1, housing = $2
-       WHERE id = $3 AND verified = TRUE
-       RETURNING id, email, display_name, housing, verified, created_at`,
-      [display_name.trim(), housing, req.user.id]
+      `UPDATE users SET display_name = $1, housing = $2, biography = COALESCE($3, biography)
+       WHERE id = $4 AND verified = TRUE
+       RETURNING id, email, display_name, housing, biography, verified, created_at`,
+      [display_name.trim(), housing, biography === undefined ? null : biography.trim(), req.user.id]
     );
     if (!rows.length) return res.status(404).json({ error: 'Student not found.' });
     res.json({ ok: true, user: rows[0] });
