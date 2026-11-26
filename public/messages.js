@@ -16,10 +16,13 @@ let reportTarget = null;
 let reportSending = false;
 let toastTimer;
 let pendingPress = null;
+let selectingPointer = null;
 const MESSAGE_HOLD_MS = 500;
 const MESSAGE_MOVE_LIMIT = 10;
 const actionMenu = el('message-actions');
 const reportDialog = el('report-dialog');
+const selectionDialog = el('selection-dialog');
+const selectionText = el('selection-text');
 
 async function api(path, options = {}) {
   const response = await fetch('/api/messages' + path, { cache: 'no-store', ...options });
@@ -139,7 +142,13 @@ function openActions(trigger, message, mine, senderName) {
   actionMenu.style.top = top + 'px';
   actionMenu.querySelector('button').focus({ preventScroll: true });
 }
-// Long press opens actions without preventing normal vertical scrolling.
+// Keep native desktop selections intact, including during background polling.
+function hasMessageSelection() {
+  const selection = window.getSelection();
+  return Boolean(selection && !selection.isCollapsed && selection.rangeCount &&
+    selection.getRangeAt(0).intersectsNode(el('message-history')));
+}
+// Touch long press opens actions without preventing normal vertical scrolling.
 function cancelMessagePress() {
   if (!pendingPress) return;
   clearTimeout(pendingPress.timer);
@@ -152,7 +161,7 @@ function bindMessageActions(bubble, message, mine, senderName) {
   bubble.setAttribute('aria-expanded', 'false');
   bubble.setAttribute('aria-controls', 'message-actions');
   bubble.addEventListener('pointerdown', event => {
-    if (!event.isPrimary || event.button !== 0) return;
+    if (!event.isPrimary || event.button !== 0 || event.pointerType === 'mouse') return;
     cancelMessagePress();
     const press = { id: event.pointerId, x: event.clientX, y: event.clientY };
     pendingPress = press;
@@ -163,6 +172,8 @@ function bindMessageActions(bubble, message, mine, senderName) {
     }, MESSAGE_HOLD_MS);
   });
   bubble.addEventListener('contextmenu', event => {
+    // Let the browser offer its native Copy action for selected desktop text.
+    if (hasMessageSelection()) return;
     event.preventDefault();
     cancelMessagePress();
     openActions(bubble, message, mine, senderName);
@@ -179,16 +190,21 @@ function bindMessageActions(bubble, message, mine, senderName) {
     if (event.detail === 0) openActions(bubble, message, mine, senderName);
   });
 }
-document.addEventListener('pointerdown', cancelMessagePress, true);
+document.addEventListener('pointerdown', event => {
+  cancelMessagePress();
+  if (event.isPrimary && event.pointerType === 'mouse' && event.button === 0 &&
+      el('message-history').contains(event.target)) selectingPointer = event.pointerId;
+}, true);
 document.addEventListener('pointermove', event => {
   if (pendingPress?.id === event.pointerId && Math.hypot(event.clientX - pendingPress.x, event.clientY - pendingPress.y) > MESSAGE_MOVE_LIMIT) cancelMessagePress();
 }, { passive: true });
 for (const name of ['pointerup', 'pointercancel']) {
   document.addEventListener(name, event => {
     if (pendingPress?.id === event.pointerId) cancelMessagePress();
+    if (selectingPointer === event.pointerId) selectingPointer = null;
   });
 }
-window.addEventListener('blur', cancelMessagePress);
+window.addEventListener('blur', () => { cancelMessagePress(); selectingPointer = null; });
 function clearReply() {
   replyTarget = null;
   el('reply-preview').hidden = true;
@@ -209,12 +225,41 @@ async function copyMessage(body) {
     showToast('Copied to clipboard');
   } catch (_) { showToast('Could not copy. Check clipboard permissions and try again.', false); }
 }
+// A read-only native text field provides selection handles on touch devices.
+function openTextSelection(body) {
+  selectionText.value = body;
+  el('selection-status').textContent = '';
+  selectionDialog.showModal();
+  selectionText.focus({ preventScroll: true });
+  selectionText.select();
+}
+el('close-selection').addEventListener('click', () => selectionDialog.close());
+selectionDialog.addEventListener('close', () => {
+  selectionText.value = '';
+  el('selection-status').textContent = '';
+});
+el('copy-selection').addEventListener('click', async () => {
+  const selected = selectionText.value.slice(selectionText.selectionStart, selectionText.selectionEnd);
+  if (!selected) {
+    el('selection-status').textContent = 'Select some text first.';
+    selectionText.focus();
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(selected);
+    if (selectionDialog.open) selectionDialog.close();
+    showToast('Copied to clipboard');
+  } catch (_) {
+    if (selectionDialog.open) el('selection-status').textContent = 'Use your device’s native Copy command or Ctrl+C / Command+C.';
+  }
+});
 actionMenu.addEventListener('click', event => {
   const button = event.target.closest('button[data-action]');
   if (!button || button.disabled || !actionTarget) return;
   const target = actionTarget;
   closeActions(true);
   if (button.dataset.action === 'copy') copyMessage(target.message.body);
+  else if (button.dataset.action === 'select') openTextSelection(target.message.body);
   else if (button.dataset.action === 'reply') selectReply(target);
   else if (button.dataset.action === 'report' && !target.mine) {
     reportTarget = target.message.id;
@@ -259,7 +304,7 @@ function renderHistory(data) {
   const history = el('message-history');
   // Read status changes do not require replacing the displayed bubbles.
   const signature = data.messages.map(m => m.id).join(',');
-  if (signature === historySignature || pendingPress || !actionMenu.hidden || reportDialog.open) return;
+  if (signature === historySignature || pendingPress || selectingPointer !== null || hasMessageSelection() || !actionMenu.hidden || reportDialog.open || selectionDialog.open) return;
   const atBottom = history.scrollHeight - history.scrollTop - history.clientHeight < 90;
   const first = historySignature === null;
   historySignature = signature;

@@ -80,10 +80,20 @@
   </div>
   <div id="message-actions" class="message-actions" role="group" aria-label="Message actions" hidden>
     <button type="button" data-action="copy"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>Copy</button>
+    <button type="button" data-action="select"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h5m6 0h5M4 20h5m6 0h5M4 4v5m16-5v5M4 20v-5m16 5v-5M9 8h6m-3 0v8m-2 0h4"/></svg>Select text</button>
     <button type="button" data-action="reply"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 10-5 5 5 5M4 15h10a6 6 0 0 0 6-6V4"/></svg>Reply</button>
     <button type="button" data-action="report" class="report-action"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V3m0 1c5-4 9 4 14 0v11c-5 4-9-4-14 0"/></svg>Report</button>
   </div>
   <div id="copy-toast" class="copy-toast" role="status" aria-live="polite"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><span></span></div>
+  <dialog id="selection-dialog" class="report-dialog selection-dialog" aria-labelledby="selection-title" aria-describedby="selection-help">
+    <div class="selection-content">
+      <h2 id="selection-title">Select text</h2>
+      <p id="selection-help">Press and hold the text, then adjust the selection handles. On a computer, drag to highlight the part you want.</p>
+      <textarea id="selection-text" rows="5" readonly aria-label="Message text"></textarea>
+      <p id="selection-status" role="status"></p>
+      <div class="report-dialog-buttons"><button type="button" id="close-selection">Done</button><button type="button" id="copy-selection">Copy selection</button></div>
+    </div>
+  </dialog>
   <dialog id="report-dialog" class="report-dialog" aria-labelledby="report-dialog-title">
     <form id="message-report-form">
       <h2 id="report-dialog-title">Report this message?</h2>
