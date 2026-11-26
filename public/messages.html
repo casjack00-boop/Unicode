@@ -15,13 +15,15 @@
 <body>
   <div class="app messaging-app">
     <header class="top messaging-header">
-      <div class="top-row">
+      <div class="message-header-row">
         <a class="brand" href="/browse.html">UniMarket</a>
-        <div class="chat-header-actions"><a id="back-inbox" href="/messages.html" hidden>‹ Inbox</a>
-        <a id="chat-safety" class="chat-safety-icon" aria-label="Report or block student" title="Report or block student" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11zM12 8v4m0 4h.01"/></svg></a></div>
+        <a id="back-inbox" class="chat-back-icon" href="/messages.html" aria-label="Back to inbox" title="Back to inbox" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></a>
+        <div class="message-heading">
+          <h1 id="page-title">Messages</h1>
+          <a id="other-profile" hidden></a>
+        </div>
+        <a id="chat-safety" class="chat-safety-icon" aria-label="Report or block student" title="Report or block student" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11zM12 8v4m0 4h.01"/></svg></a>
       </div>
-      <h1 id="page-title">Messages</h1>
-      <a id="other-profile" hidden></a>
       <div id="search-box" class="search" hidden>
         <label for="conversation-search" class="sr-only">Search conversations</label>
         <input id="conversation-search" type="search" placeholder="Search conversations">

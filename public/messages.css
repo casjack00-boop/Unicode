@@ -39,16 +39,29 @@
 .compose button:disabled { opacity: .5; cursor: not-allowed; }
 .compose textarea:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
 
-/* Compact message actions: visible only when the ellipsis is opened. */
-.chat-header-actions { display:flex; align-items:center; gap:12px; }
-.chat-safety-icon { display:grid; place-items:center; width:44px; height:44px; border-radius:50%; }
+/* Message actions: hold, right-click or keyboard activation. */
+/* Inbox and conversation share a header, with distinct navigation. */
+.message-header-row { display:flex; align-items:center; justify-content:space-between; gap:8px; min-width:0; }
+.message-header-row .brand { flex-shrink:0; }
+.message-heading { flex:1; min-width:0; text-align:right; }
+.messaging-header .message-heading h1 { font-size:1.125rem; }
+.chat-mode .message-header-row .brand { display:none; }
+.chat-mode .message-heading { text-align:left; }
+.chat-mode .messaging-header .message-heading h1 { font-size:1.25rem; }
+.chat-mode .messaging-header #other-profile { display:inline-block; overflow-wrap:anywhere; }
+.chat-back-icon { display:grid; place-items:center; width:44px; height:44px; flex:none; border-radius:50%; }
+.chat-back-icon svg { width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+@media (max-width:360px) { .message-header-row { gap:4px; } .message-header-row .brand { flex-shrink:1; min-width:0; overflow-wrap:anywhere; } }
+:root:not([data-text-size="default"]) .message-header-row .brand { flex-shrink:1; min-width:0; overflow-wrap:anywhere; }
+.chat-safety-icon { display:grid; place-items:center; width:44px; height:44px; flex:none; border-radius:50%; }
 .chat-safety-icon svg, .message-actions svg, .copy-toast svg { width:20px; height:20px; flex:none; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
-.bubble-line { display:flex; align-items:center; gap:2px; max-width:100%; min-width:0; }
+.bubble-line { display:flex; align-items:center; width:100%; min-width:0; }
 .mine .bubble-line { flex-direction:row-reverse; }
-.bubble-line .bubble { min-width:0; max-width:calc(100% - 44px); }
-.message-more { flex:0 0 44px; width:44px; height:44px; display:grid; place-items:center; border:0; border-radius:50%; background:transparent; color:var(--muted); cursor:pointer; padding:0; }
-.message-more:hover, .message-more[aria-expanded="true"] { background:var(--photo-bg); color:var(--ink); }
-.message-more svg { width:20px; height:20px; fill:currentColor; }
+.bubble-line .bubble { min-width:0; max-width:85%; cursor:context-menu; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; }
+.bubble-line .bubble:focus-visible { outline:3px solid var(--orange); outline-offset:3px; }
+.bubble-line .bubble[aria-expanded="true"] { outline:2px solid var(--link); outline-offset:2px; }
+.message-date-separator { align-self:center; max-width:100%; padding:8px 4px 2px; color:var(--muted); font-size:.8rem; font-weight:600; text-align:center; overflow-wrap:anywhere; }
+.message-date-separator:first-child { padding-top:2px; }
 .message-actions { position:fixed; z-index:1100; display:grid; width:max-content; min-width:150px; max-width:calc(100vw - 16px); padding:5px; background:var(--surface); color:var(--ink); border:1px solid var(--line); border-radius:12px; box-shadow:0 6px 22px #0003; }
 .message-actions button { display:flex; align-items:center; gap:12px; border:0; background:transparent; color:inherit; font:inherit; text-align:left; min-height:44px; padding:8px 12px; border-radius:7px; cursor:pointer; }
 .message-actions button:hover, .message-actions button:focus-visible { background:var(--photo-bg); }

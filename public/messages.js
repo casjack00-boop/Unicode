@@ -15,6 +15,9 @@ let actionTrigger = null;
 let reportTarget = null;
 let reportSending = false;
 let toastTimer;
+let pendingPress = null;
+const MESSAGE_HOLD_MS = 500;
+const MESSAGE_MOVE_LIMIT = 10;
 const actionMenu = el('message-actions');
 const reportDialog = el('report-dialog');
 
@@ -59,6 +62,19 @@ function timestamp(value) {
   return date.toLocaleDateString() === new Date().toLocaleDateString()
     ? date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
     : date.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+}
+// Use the browser's default locale and time zone, without forcing an hour cycle.
+const MESSAGE_GROUP_GAP = 30 * 60 * 1000;
+function sameLocalDay(a, b) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+function messageDateLabel(date) {
+  const options = { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' };
+  if (date.getFullYear() !== new Date().getFullYear()) options.year = 'numeric';
+  return new Intl.DateTimeFormat(undefined, options).format(date);
+}
+function startsMessageGroup(previous, current) {
+  return !previous || !sameLocalDay(previous, current) || current - previous >= MESSAGE_GROUP_GAP;
 }
 function renderInbox() {
   const query = el('conversation-search').value.trim().toLowerCase();
@@ -107,7 +123,7 @@ function closeActions(restoreFocus = false) {
   if (restoreFocus && trigger?.isConnected) trigger.focus({ preventScroll: true });
 }
 function openActions(trigger, message, mine, senderName) {
-  if (actionTrigger === trigger) { closeActions(true); return; }
+  if (actionTrigger === trigger) return;
   closeActions();
   actionTarget = { message, mine, senderName };
   actionTrigger = trigger;
@@ -117,12 +133,62 @@ function openActions(trigger, message, mine, senderName) {
   actionMenu.hidden = false;
   const rect = trigger.getBoundingClientRect();
   const width = actionMenu.offsetWidth, height = actionMenu.offsetHeight;
-  const left = Math.max(8, Math.min(innerWidth - width - 8, mine ? rect.left : rect.right - width));
+  const left = Math.max(8, Math.min(innerWidth - width - 8, mine ? rect.right - width : rect.left));
   const top = rect.bottom + height + 8 <= innerHeight ? rect.bottom + 4 : Math.max(8, rect.top - height - 4);
   actionMenu.style.left = left + 'px';
   actionMenu.style.top = top + 'px';
   actionMenu.querySelector('button').focus({ preventScroll: true });
 }
+// Long press opens actions without preventing normal vertical scrolling.
+function cancelMessagePress() {
+  if (!pendingPress) return;
+  clearTimeout(pendingPress.timer);
+  pendingPress = null;
+}
+function bindMessageActions(bubble, message, mine, senderName) {
+  bubble.tabIndex = 0;
+  bubble.setAttribute('role', 'button');
+  bubble.setAttribute('aria-label', (mine ? 'Your message: ' : 'Received message: ') + (message.reply_body != null ? 'Replying to: ' + message.reply_body + '. ' : '') + message.body + '. Message actions. Press Enter or Space.');
+  bubble.setAttribute('aria-expanded', 'false');
+  bubble.setAttribute('aria-controls', 'message-actions');
+  bubble.addEventListener('pointerdown', event => {
+    if (!event.isPrimary || event.button !== 0) return;
+    cancelMessagePress();
+    const press = { id: event.pointerId, x: event.clientX, y: event.clientY };
+    pendingPress = press;
+    press.timer = setTimeout(() => {
+      if (pendingPress !== press || !bubble.isConnected) return;
+      pendingPress = null;
+      openActions(bubble, message, mine, senderName);
+    }, MESSAGE_HOLD_MS);
+  });
+  bubble.addEventListener('contextmenu', event => {
+    event.preventDefault();
+    cancelMessagePress();
+    openActions(bubble, message, mine, senderName);
+  });
+  bubble.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ' || event.key === 'ContextMenu' || (event.shiftKey && event.key === 'F10')) {
+      event.preventDefault();
+      openActions(bubble, message, mine, senderName);
+    }
+  });
+  // Assistive technologies may activate the button using a synthetic click.
+  bubble.addEventListener('click', event => {
+    if (actionTrigger === bubble) { actionMenu.querySelector('button').focus({ preventScroll: true }); return; }
+    if (event.detail === 0) openActions(bubble, message, mine, senderName);
+  });
+}
+document.addEventListener('pointerdown', cancelMessagePress, true);
+document.addEventListener('pointermove', event => {
+  if (pendingPress?.id === event.pointerId && Math.hypot(event.clientX - pendingPress.x, event.clientY - pendingPress.y) > MESSAGE_MOVE_LIMIT) cancelMessagePress();
+}, { passive: true });
+for (const name of ['pointerup', 'pointercancel']) {
+  document.addEventListener(name, event => {
+    if (pendingPress?.id === event.pointerId) cancelMessagePress();
+  });
+}
+window.addEventListener('blur', cancelMessagePress);
 function clearReply() {
   replyTarget = null;
   el('reply-preview').hidden = true;
@@ -141,7 +207,7 @@ async function copyMessage(body) {
   try {
     await navigator.clipboard.writeText(body);
     showToast('Copied to clipboard');
-  } catch (_) { showToast('Could not copy. Select the message text to copy it.', false); }
+  } catch (_) { showToast('Could not copy. Check clipboard permissions and try again.', false); }
 }
 actionMenu.addEventListener('click', event => {
   const button = event.target.closest('button[data-action]');
@@ -166,9 +232,9 @@ document.addEventListener('keydown', event => {
   if (!actionMenu.hidden && event.key === 'Escape') { event.preventDefault(); closeActions(true); }
 });
 actionMenu.addEventListener('focusout', event => {
-  if (event.relatedTarget && !actionMenu.contains(event.relatedTarget)) closeActions();
+  if (event.relatedTarget && event.relatedTarget !== actionTrigger && !actionMenu.contains(event.relatedTarget)) closeActions();
 });
-el('message-history').addEventListener('scroll', () => closeActions(), { passive: true });
+el('message-history').addEventListener('scroll', () => { cancelMessagePress(); closeActions(); }, { passive: true });
 window.addEventListener('resize', () => closeActions());
 el('cancel-reply').addEventListener('click', () => { clearReply(); el('message-input').focus(); });
 el('cancel-report').addEventListener('click', () => { if (!reportSending) reportDialog.close(); });
@@ -193,14 +259,24 @@ function renderHistory(data) {
   const history = el('message-history');
   // Read status changes do not require replacing the displayed bubbles.
   const signature = data.messages.map(m => m.id).join(',');
-  if (signature === historySignature || !actionMenu.hidden || reportDialog.open) return;
+  if (signature === historySignature || pendingPress || !actionMenu.hidden || reportDialog.open) return;
   const atBottom = history.scrollHeight - history.scrollTop - history.clientHeight < 90;
   const first = historySignature === null;
   historySignature = signature;
   const oldScroll = history.scrollTop;
   history.replaceChildren();
   if (!data.messages.length) history.append(element('p', 'empty', 'Start the conversation with a friendly message.'));
+  let previousDate = null;
   for (const m of data.messages) {
+    const date = m.created_at ? new Date(m.created_at) : null;
+    const validDate = date && Number.isFinite(date.getTime());
+    const dateLabel = validDate ? messageDateLabel(date) : '';
+    if (validDate && startsMessageGroup(previousDate, date)) {
+      const separator = element('time', 'message-date-separator', dateLabel);
+      separator.dateTime = date.toISOString();
+      history.append(separator);
+    }
+    if (validDate) previousDate = date;
     const mine = m.sender_id === data.user_id;
     const senderName = mine ? 'yourself' : data.conversation.other_name;
     const row = element('div', 'bubble-row' + (mine ? ' mine' : ''));
@@ -213,15 +289,15 @@ function renderHistory(data) {
       bubble.append(quote);
     }
     bubble.append(element('span', 'bubble-body', m.body));
-    const trigger = element('button', 'message-more');
-    trigger.type = 'button';
-    trigger.setAttribute('aria-label', 'More actions for ' + (mine ? 'your' : 'received') + ' message: ' + m.body.slice(0, 60));
-    trigger.setAttribute('aria-expanded', 'false');
-    trigger.setAttribute('aria-controls', 'message-actions');
-    trigger.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>';
-    trigger.addEventListener('click', () => openActions(trigger, m, mine, senderName));
-    line.append(bubble, trigger);
-    row.append(speaker, line, element('span', 'bubble-time', timestamp(m.created_at)));
+    bindMessageActions(bubble, m, mine, senderName);
+    line.append(bubble);
+    row.append(speaker, line);
+    if (validDate) {
+      const exactTime = element('time', 'sr-only', dateLabel);
+      exactTime.dateTime = date.toISOString();
+      row.append(exactTime);
+      bubble.title = dateLabel;
+    }
     history.append(row);
   }
   if (first || atBottom) history.scrollTop = history.scrollHeight;
@@ -294,6 +370,7 @@ async function start() {
     if (conversationId) {
       document.querySelector('.messaging-app').classList.add('chat-mode');
       document.querySelector('.bottom-nav').hidden = true;
+      el('page-title').textContent = 'Conversation';
       el('back-inbox').hidden = false;
     }
     // Create the timer before the first refresh so terminal errors can stop it.
