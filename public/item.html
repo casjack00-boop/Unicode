@@ -34,7 +34,12 @@
 
         <div class="info">
           <div class="heading">
-            <span id="price" class="price"></span>
+            <div class="price-row"><span id="price" class="price"></span>
+              <div class="price-actions">
+                <button type="button" id="share-listing" class="item-icon" aria-label="Share listing" title="Share listing"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M15 5.63 20.66 12 15 18.37V15h-1c-4.11 0-7.39 1.11-10.16 3.1C5.21 14.77 8.31 11 14 11h1V5.63M14 3v7C6.23 10 3.24 15.13 2 21c3.39-4.1 7.26-5 12-5v5l8-9-8-9z"/></svg></button>
+                <button type="button" id="bookmark-btn" class="item-icon" aria-label="Save item" aria-pressed="false" title="Save item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg></button>
+              </div>
+            </div>
             <h1 id="title" class="title"></h1>
             <div class="tags">
               <span id="condition" class="tag tag-orange"></span>
@@ -45,10 +50,7 @@
 
           <p id="description" class="description"></p>
           <p id="isbn-details" class="description" hidden></p>
-          <section id="item-dimensions" class="seller-panel" aria-labelledby="dimensions-heading" hidden>
-            <h2 id="dimensions-heading">Dimensions</h2>
-            <dl id="dimension-values" class="seller-dimensions"></dl>
-          </section>
+          <p id="item-dimensions" class="description dimension-line" hidden></p>
 
           <!-- Seller card -->
           <div class="card seller">
@@ -101,7 +103,6 @@
           </div>
 
           <section class="seller-panel" aria-labelledby="purchase-heading"><h2 id="purchase-heading">Purchase arrangements</h2><p id="purchase-state" role="status"></p><a id="offer-link" class="seller-button" href="/transactions.html">Make an offer / reserve</a></section>
-          <div class="discovery-links"><button type="button" id="share-listing" class="discovery-button">Share listing</button><a href="/saved.html" class="discovery-link">Saved items</a></div>
           <p id="discovery-item-status" class="discovery-status" role="status"></p>
           <section id="similar-section" class="discovery-section" aria-labelledby="similar-heading" hidden>
             <h2 id="similar-heading">Similar items</h2>
@@ -114,7 +115,7 @@
       <!-- Sticky bottom bar -->
       <div class="actions">
         <button id="save-btn" class="save" type="button" aria-label="Save item" aria-pressed="false">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#002D72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-9-9a4.8 4.8 0 0 1 9-3 4.8 4.8 0 0 1 9 3c-2 4.6-9 9-9 9z"></path></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-9-9a4.8 4.8 0 0 1 9-3 4.8 4.8 0 0 1 9 3c-2 4.6-9 9-9 9z"></path></svg>
         </button>
         <button id="message-btn" class="message" type="button">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"></path></svg>

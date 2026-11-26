@@ -1,6 +1,6 @@
 // UniMarket: seller ratings
 //   GET  /api/sellers/:id/rating   -> average, count, recent comments, and your own rating
-//   POST /api/sellers/:id/rating   -> rate a seller 1-5 stars (must be logged in)
+//   POST /api/sellers/:id/rating   -> rate a seller after a completed purchase
 
 const express = require('express');
 const pool = require('../db');
@@ -29,23 +29,34 @@ router.get('/:id/rating', optionalUser, async (req, res) => {
   const sellerId = sellerIdFrom(req);
   if (!sellerId) return res.status(400).json({ error: 'Invalid seller ID' });
 
+  res.setHeader('Cache-Control', 'private, no-store');
   try {
     const summary = await pool.query(
       `SELECT COUNT(*)::int AS count, ROUND(AVG(stars), 1)::float AS average
-         FROM seller_ratings WHERE seller_id = $1`,
+         FROM seller_ratings r WHERE r.seller_id = $1
+          AND EXISTS (SELECT 1 FROM marketplace_deals d WHERE d.seller_id=r.seller_id
+            AND d.buyer_id=r.rater_id AND d.status='completed')`,
       [sellerId]
     );
     const recent = await pool.query(
       `SELECT r.stars, r.comment, r.created_at, u.display_name AS rater_name
          FROM seller_ratings r JOIN users u ON u.id = r.rater_id
         WHERE r.seller_id = $1 AND r.comment IS NOT NULL
+          AND EXISTS (SELECT 1 FROM marketplace_deals d WHERE d.seller_id=r.seller_id
+            AND d.buyer_id=r.rater_id AND d.status='completed')
         ORDER BY r.created_at DESC LIMIT 5`,
       [sellerId]
     );
 
     const me = req.user ? req.user.id : null;
     let mine = null;
-    if (me) {
+    let canRate = false;
+    if (me && me !== sellerId) {
+      const eligible = await pool.query(`SELECT EXISTS (SELECT 1 FROM marketplace_deals
+        WHERE seller_id=$1 AND buyer_id=$2 AND status='completed') AS eligible`, [sellerId, me]);
+      canRate = eligible.rows[0].eligible;
+    }
+    if (canRate) {
       const own = await pool.query(
         'SELECT stars, comment FROM seller_ratings WHERE seller_id = $1 AND rater_id = $2',
         [sellerId, me]
@@ -59,6 +70,7 @@ router.get('/:id/rating', optionalUser, async (req, res) => {
       recent: recent.rows,
       loggedIn: Boolean(me),
       isSelf: me === sellerId,
+      canRate,
       mine
     });
   } catch (error) {
@@ -85,13 +97,16 @@ router.post('/:id/rating', requireUser, async (req, res) => {
     const seller = await pool.query('SELECT id FROM users WHERE id = $1', [sellerId]);
     if (!seller.rows.length) return res.status(404).json({ error: 'Seller not found.' });
 
-    await pool.query(
+    const result = await pool.query(
       `INSERT INTO seller_ratings (seller_id, rater_id, stars, comment)
-       VALUES ($1, $2, $3, $4)
+       SELECT $1, $2, $3, $4 WHERE EXISTS (SELECT 1 FROM marketplace_deals
+         WHERE seller_id=$1 AND buyer_id=$2 AND status='completed')
        ON CONFLICT (seller_id, rater_id)
-       DO UPDATE SET stars = EXCLUDED.stars, comment = EXCLUDED.comment, created_at = NOW()`,
+       DO UPDATE SET stars = EXCLUDED.stars, comment = EXCLUDED.comment, created_at = NOW()
+       RETURNING seller_id`,
       [sellerId, req.user.id, stars, comment]
     );
+    if (!result.rowCount) return res.status(403).json({ error: 'Only buyers who completed a purchase from this seller can leave a rating.' });
     res.json({ ok: true });
   } catch (error) {
     console.error('Save rating error:', error);

@@ -125,13 +125,8 @@ async function loadListing() {
     }
     const dimensionsPanel = document.getElementById('item-dimensions');
     if (listing.category === 'furniture' && listing.dimension_unit && listing.width_measure != null && listing.height_measure != null && listing.depth_measure != null) {
-      const values = document.getElementById('dimension-values');
-      values.replaceChildren();
-      for (const [label, value] of [['Width', listing.width_measure], ['Height', listing.height_measure], ['Depth', listing.depth_measure]]) {
-        const term = document.createElement('dt'); term.textContent = label;
-        const detail = document.createElement('dd'); detail.textContent = `${Number(value)} ${listing.dimension_unit}`;
-        values.append(term, detail);
-      }
+      const values = [listing.width_measure, listing.height_measure, listing.depth_measure].map(Number);
+      dimensionsPanel.textContent = `Dimension: ${values.join(' × ')} ${listing.dimension_unit} (W × H × D)`;
       dimensionsPanel.hidden = false;
     }
     setText('posted', postedAgo(listing.created_at));
@@ -222,9 +217,9 @@ async function loadRating(sellerId) {
       list.append(li);
     });
 
-    // Only logged-in students who aren't the seller can rate
+    // Only buyers with a completed exchange with this seller can rate.
     const form = document.getElementById('rate-form');
-    form.hidden = !data.loggedIn || data.isSelf;
+    form.hidden = !data.canRate;
     if (data.mine) {
       showPicked(data.mine.stars);
       document.getElementById('rate-comment').value = data.mine.comment || '';

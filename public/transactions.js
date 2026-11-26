@@ -32,6 +32,40 @@
     finally { busy=false; controls.forEach(b=>b.disabled=false); }
   }
   function act(d,action,extra={}) { return mutate('/api/transactions/'+d.id,'PATCH',{action,revision:d.revision,...extra}); }
+  function ratingForm(d, card) {
+    const form = el('form'); form.hidden = true;
+    const toggle = button('Rate seller', async () => {
+      if (!form.hidden) { form.hidden = true; toggle.setAttribute('aria-expanded','false'); return; }
+      toggle.disabled = true;
+      try {
+        const data = await api('/api/sellers/' + encodeURIComponent(d.seller_id) + '/rating');
+        if (!data.canRate) throw new Error('A completed purchase is required to rate this seller.');
+        stars.value = data.mine ? String(data.mine.stars) : '';
+        comment.value = data.mine?.comment || '';
+        form.hidden = false; toggle.setAttribute('aria-expanded','true'); stars.focus();
+      } catch(e) { status(e.message,true); }
+      finally { toggle.disabled = false; }
+    });
+    form.id = 'seller-review-' + d.id;
+    toggle.setAttribute('aria-controls',form.id); toggle.setAttribute('aria-expanded','false');
+    const label = el('label','Seller rating'); label.htmlFor = 'review-stars-' + d.id;
+    const stars = el('select'); stars.id = label.htmlFor; stars.required = true;
+    const placeholder = el('option','Choose 1–5 stars'); placeholder.value = ''; stars.append(placeholder);
+    for (let n=1;n<=5;n++) { const opt=el('option',n+' / 5'); opt.value=String(n); stars.append(opt); }
+    const commentLabel = el('label','Review (optional)'); commentLabel.htmlFor='review-comment-'+d.id;
+    const comment=el('textarea'); comment.id=commentLabel.htmlFor; comment.maxLength=300; comment.rows=3;
+    const msg=el('p'); msg.setAttribute('role','status');
+    form.append(label,stars,commentLabel,comment,msg);
+    const send=el('button','Save seller rating'); send.type='submit'; form.append(send);
+    form.addEventListener('submit',async event=>{
+      event.preventDefault(); if(!form.reportValidity()||send.disabled)return;
+      send.disabled=true;
+      try { await api('/api/sellers/'+encodeURIComponent(d.seller_id)+'/rating','POST',{stars:Number(stars.value),comment:comment.value}); msg.textContent='Your seller rating was saved.'; }
+      catch(e){msg.textContent=e.message;}
+      finally{send.disabled=false;}
+    });
+    card.append(toggle,form);
+  }
   function render() {
     const list=$('tx-list'); list.replaceChildren();
     const filter=$('tx-filter').value;
@@ -69,7 +103,7 @@
         actions.append(button('Cancel reservation',()=>{if(confirm('Cancel this reservation and make the item available again? This does not refund any payment.'))act(d,'cancel');}));
       } else if(d.status==='completed') {
         card.append(el('p','Both students confirmed the exchange on '+new Date(d.completed_at).toLocaleDateString()+'.'));
-        if(buyer) { const link=el('a','Relist this purchase'); link.href='/post.html?purchase='+encodeURIComponent(d.id); card.append(link); }
+        if(buyer) { const link=el('a','Relist this purchase'); link.href='/post.html?purchase='+encodeURIComponent(d.id); card.append(link); ratingForm(d, card); }
       }
       if(actions.childElementCount) card.append(actions);
       if(d.listing_status==='active'||d.listing_status==='reserved') { const link=el('a','View original listing');link.href='/item.html?id='+encodeURIComponent(d.listing_id);card.append(link); }

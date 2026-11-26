@@ -246,3 +246,14 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   font-weight: 600;
   text-decoration: none;
 }
+
+/* Discovery controls: independent button above the listing link. */
+.listing-tile { position: relative; min-width: 0; display: flex; }
+.listing-tile > .card { width: 100%; }
+.wishlist-heart { position: absolute; top: 8px; right: 8px; width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--field); border-radius: 50%; background: var(--surface); color: var(--link); cursor: pointer; }
+.wishlist-heart[aria-pressed="true"] svg { fill: currentColor; }
+.wishlist-heart:disabled { opacity: .65; cursor: wait; }
+.result-tools { display: flex; align-items: center; gap: 6px; }
+.toolbar { flex-wrap: wrap; gap: 8px; }
+.toolbar .filter-btn { width: 44px; height: 44px; color: var(--link); background: var(--surface); border: 1px solid var(--field); }
+.toolbar .filter-btn[aria-expanded="true"] { color: var(--on-orange); background: var(--orange); }

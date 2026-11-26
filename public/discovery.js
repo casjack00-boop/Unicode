@@ -51,46 +51,67 @@
     const link = el('a', 'Log in to UniMarket', 'discovery-link'); link.href = '/login.html';
     status.replaceChildren(document.createTextNode('Sign in to use this feature. '), link);
   }
-  async function initItem(listing) {
+  function saveControl(listing, buttons, status) {
     const id = encodeURIComponent(listing.id);
-    const save = byId('save-btn');
-    const status = byId('discovery-item-status');
-    let saved = false;
-    let busy = false;
+    let saved = false, busy = false;
     function setSaved(value) {
-      saved = value;
-      save.setAttribute('aria-pressed', String(value));
-      save.setAttribute('aria-label', value ? 'Remove from saved items' : 'Save item');
+      saved = Boolean(value);
+      for (const button of buttons) {
+        const label = (saved ? 'Remove from saved items: ' : 'Save item: ') + listing.title;
+        button.setAttribute('aria-pressed', String(saved));
+        button.setAttribute('aria-label', label);
+        button.title = label;
+      }
     }
-    save.disabled = true;
-    try {
-      const data = await request('/saved/' + id);
-      setSaved(data.saved);
-      request('/recent/' + id, 'PUT').catch(() => {});
-    } catch (error) {
-      if (error.status !== 401) status.textContent = error.message;
-    } finally { save.disabled = false; }
-    save.addEventListener('click', async () => {
+    function disable(value) { buttons.forEach(button => { button.disabled = value; }); }
+    async function refresh() {
       if (busy) return;
-      busy = true; save.disabled = true;
+      busy = true; disable(true);
+      try { setSaved((await request('/saved/' + id)).saved); }
+      catch (error) { setSaved(false); if (error.status !== 401) status.textContent = error.message; }
+      finally { busy = false; disable(false); }
+    }
+    for (const button of buttons) button.addEventListener('click', async () => {
+      if (busy) return;
+      busy = true; disable(true);
       try {
         const data = await request('/saved/' + id, saved ? 'DELETE' : 'PUT');
         setSaved(data.saved);
-        status.textContent = saved ? 'Saved to your list.' : 'Removed from saved items.';
+        status.textContent = saved ? 'Saved: ' + listing.title : 'Removed from saved items: ' + listing.title;
       } catch (error) {
         if (error.status === 401) showLogin(status);
         else status.textContent = error.message;
-      } finally { busy = false; save.disabled = false; }
+      } finally { busy = false; disable(false); }
     });
-    // Restore authoritative state when returning via the browser history.
-    window.addEventListener('pageshow', async event => {
-      if (!event.persisted || busy) return;
-      save.disabled = true;
-      try { setSaved((await request('/saved/' + id)).saved); }
-      catch (_) { setSaved(false); }
-      finally { save.disabled = false; }
-    });
+    return { setSaved, disable, refresh, get busy() { return busy; } };
   }
+  async function initItem(listing) {
+    const control = saveControl(listing, [byId('save-btn'), byId('bookmark-btn')], byId('discovery-item-status'));
+    await control.refresh();
+    request('/recent/' + encodeURIComponent(listing.id), 'PUT').catch(() => {});
+    window.addEventListener('pageshow', event => { if (event.persisted) control.refresh(); });
+  }
+  let browseControls = [];
+  async function refreshBrowse(controls = browseControls) {
+    for (const {control} of controls) if (!control.busy) control.disable(true);
+    try {
+      const { listings } = await request('/saved');
+      const savedIds = new Set(listings.map(item => String(item.id)));
+      if (controls !== browseControls) return;
+      for (const {listing, control} of controls) if (!control.busy) control.setSaved(savedIds.has(String(listing.id)));
+    } catch (error) {
+      if (controls !== browseControls) return;
+      for (const {control} of controls) if (!control.busy) control.setSaved(false);
+      if (error.status !== 401) byId('browse-save-status').textContent = error.message;
+    } finally {
+      if (controls === browseControls) for (const {control} of controls) if (!control.busy) control.disable(false);
+    }
+  }
+  function initBrowse(entries) {
+    browseControls = entries.map(({listing, button}) => ({listing, control: saveControl(listing, [button], byId('browse-save-status'))}));
+    if (browseControls.length) refreshBrowse();
+  }
+  window.addEventListener('pageshow', event => { if (event.persisted && browseControls.length) refreshBrowse(); });
   async function showSimilar(listing) {
     const section = byId('similar-section');
     try {
@@ -157,7 +178,7 @@
       finally { button.disabled = false; }
     });
   }
-  window.UniMarketDiscovery = { initItem(listing) { initItem(listing); showSimilar(listing); initShare(listing); } };
+  window.UniMarketDiscovery = { initBrowse, initItem(listing) { initItem(listing); showSimilar(listing); initShare(listing); } };
   if (byId('library-status')) initLibrary();
   initPricing();
 })();

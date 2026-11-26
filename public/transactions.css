@@ -17,3 +17,5 @@
 .tx-state { font-weight: 700; color: var(--link); }
 .tx-error { color: var(--error); }
 .tx-meetup { border-top: 1px solid var(--line); padding-top: 10px; }
+.tx-card form[hidden] { display: none !important; }
+.tx-card textarea { min-width: 0; width: 100%; resize: vertical; font: inherit; padding: 8px; border: 1px solid var(--field); border-radius: 8px; background: var(--surface); color: var(--ink); }

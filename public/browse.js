@@ -55,7 +55,9 @@ function renderListings(listings) {
     return;
   }
 
+  const saveControls = [];
   listings.forEach(item => {
+    const wrapper = createElement('article', 'listing-tile');
     const card = createElement('a', 'card');
     card.href = `/item.html?id=${encodeURIComponent(item.id)}`;
 
@@ -87,8 +89,17 @@ function renderListings(listings) {
 
     card.appendChild(photo);
     card.appendChild(body);
-    results.appendChild(card);
+    const heart = createElement('button', 'wishlist-heart');
+    heart.type = 'button';
+    heart.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-9-9a4.8 4.8 0 0 1 9-3 4.8 4.8 0 0 1 9 3c-2 4.6-9 9-9 9z"/></svg>';
+    heart.disabled = true;
+    heart.setAttribute('aria-pressed', 'false');
+    heart.setAttribute('aria-label', 'Save ' + item.title);
+    wrapper.append(card, heart);
+    results.appendChild(wrapper);
+    saveControls.push({ listing: item, button: heart });
   });
+  window.UniMarketDiscovery?.initBrowse(saveControls);
 }
 
 async function loadListings() {

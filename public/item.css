@@ -251,3 +251,12 @@ a:focus-visible, button:focus-visible {
 .rating-comments b {
   color: var(--ink);
 }
+/* Price and compact listing actions sit together below the photo. */
+.price-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.price-actions { display: flex; gap: 8px; margin-left: auto; }
+.item-icon { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--field); border-radius: 10px; background: var(--surface); color: var(--link); cursor: pointer; }
+.item-icon[aria-pressed="true"] svg { fill: currentColor; }
+.item-icon:disabled, .save:disabled { opacity: .65; cursor: wait; }
+.save { color: var(--link); }
+.save[aria-pressed="true"] svg { fill: currentColor; }
+.dimension-line { overflow-wrap: anywhere; }
