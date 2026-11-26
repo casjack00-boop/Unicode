@@ -80,10 +80,15 @@ input:not([type="checkbox"]):not([type="radio"]), select, textarea { color: var(
 input::placeholder, textarea::placeholder { color: var(--placeholder); opacity: 1; }
 .a11y-skip { position: fixed; top: 8px; left: 8px; z-index: 1000; transform: translateY(-200%); padding: 12px; background: var(--surface); color: var(--link); border: 2px solid var(--field); }
 .a11y-skip:focus { transform: none; }
-.a11y-settings { box-sizing: border-box; background: var(--surface); color: var(--ink); border-bottom: 1px solid var(--line); width: 100%; margin: 0 auto; }
-body > .a11y-settings { max-width: 480px; }
-.a11y-settings summary { cursor: pointer; padding: 10px 16px; font-size: .9375rem; font-weight: 600; min-height: 44px; }
-.a11y-options { display: grid; gap: 8px; padding: 0 16px 16px; }
+.settings-main { padding: 16px; display: grid; gap: 16px; }
+.settings-main h1 { font: 800 1.5rem Archivo, sans-serif; margin: 0; }
+.settings-main h2 { font: 600 1.125rem Archivo, sans-serif; margin: 0 0 12px; }
+.settings-main p { margin: 0; color: var(--muted); }
+.settings-back, .settings-access-link { display: inline-flex; align-items: center; min-height: 44px; color: var(--link); font-weight: 600; text-decoration: underline; }
+.settings-back { align-self: start; justify-self: start; }
+.footer .settings-access-link { color: #fff; }
+.settings-main .a11y-settings { background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 12px; padding: 16px; min-width: 0; }
+.a11y-options { display: grid; gap: 8px; padding: 0; }
 .a11y-options label { font-size: .9375rem; font-weight: 600; }
 .a11y-options select, .a11y-options button { min-height: 44px; height: auto; width: 100%; padding: 8px 12px; border: 1px solid var(--field); border-radius: 8px; font: inherit; }
 .a11y-options button { background: var(--navy); color: #fff; cursor: pointer; }
@@ -122,9 +127,6 @@ body > .a11y-settings { max-width: 480px; }
 @media (forced-colors: active) {
   :where(a, button, input, select, textarea, summary):focus-visible { outline-color: Highlight !important; }
 }
-/* Preserve the settings strip when flex containers have limited height. */
-.a11y-settings { flex-shrink: 0; }
-.a11y-settings summary { box-sizing: border-box; }
 :root[data-theme="dark"] :is(.back, .icon-btn, .save) svg[stroke="#002D72"] { stroke: var(--link); }
 :root[data-theme="dark"] :is(.pin, .add-photo, .seller-sub) svg[stroke="#B4500C"] { stroke: #FFD2AD; }
 :root[data-theme="dark"] .search svg[stroke="#5A6478"] { stroke: var(--muted); }

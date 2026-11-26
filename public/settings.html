@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Settings | UniMarket</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap">
+  <link rel="stylesheet" href="/browse.css">
+  <link rel="stylesheet" href="/accessibility.css">
+  <script src="/accessibility.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="top">
+      <div class="top-row"><a class="brand" href="/">UniMarket</a><span class="verified">Settings</span></div>
+    </header>
+    <main class="settings-main">
+      <a class="settings-back" id="settings-back" href="/">Back to home</a>
+      <h1>Settings</h1>
+      <section class="a11y-settings" data-appearance-settings aria-labelledby="appearance-heading">
+        <h2 id="appearance-heading">Accessibility &amp; appearance</h2>
+        <div class="a11y-options">
+          <p>These preferences apply throughout UniMarket and are saved on this browser and device.</p>
+          <label for="a11y-theme">Appearance</label>
+          <select id="a11y-theme"><option value="system">System default</option><option value="light">Light</option><option value="dark">Dark</option></select>
+          <label for="a11y-size">Text size</label>
+          <select id="a11y-size"><option value="default">Default</option><option value="large">Large (125%)</option><option value="extra">Extra large (150%)</option></select>
+          <label class="a11y-check"><input id="a11y-contrast" type="checkbox"> High contrast</label>
+          <label class="a11y-check"><input id="a11y-motion" type="checkbox"> Reduce motion</label>
+          <button type="button" id="a11y-reset">Reset preferences</button>
+          <p id="a11y-status" role="status"></p>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
