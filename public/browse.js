@@ -12,6 +12,8 @@ const edition = document.getElementById('edition');
 const minPrice = document.getElementById('minPrice');
 const maxPrice = document.getElementById('maxPrice');
 const sortSelect = document.getElementById('sortSelect');
+const conditionFilter = document.getElementById('conditionFilter');
+const housingFilter = document.getElementById('housingFilter');
 
 let category = 'all';
 let requestNumber = 0;
@@ -53,7 +55,9 @@ function renderListings(listings) {
     return;
   }
 
+  const saveControls = [];
   listings.forEach(item => {
+    const wrapper = createElement('article', 'listing-tile');
     const card = createElement('a', 'card');
     card.href = `/item.html?id=${encodeURIComponent(item.id)}`;
 
@@ -85,8 +89,17 @@ function renderListings(listings) {
 
     card.appendChild(photo);
     card.appendChild(body);
-    results.appendChild(card);
+    const heart = createElement('button', 'wishlist-heart');
+    heart.type = 'button';
+    heart.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-9-9a4.8 4.8 0 0 1 9-3 4.8 4.8 0 0 1 9 3c-2 4.6-9 9-9 9z"/></svg>';
+    heart.disabled = true;
+    heart.setAttribute('aria-pressed', 'false');
+    heart.setAttribute('aria-label', 'Save ' + item.title);
+    wrapper.append(card, heart);
+    results.appendChild(wrapper);
+    saveControls.push({ listing: item, button: heart });
   });
+  window.UniMarketDiscovery?.initBrowse(saveControls);
 }
 
 async function loadListings() {
@@ -103,17 +116,20 @@ async function loadListings() {
     if (edition.value) params.set('edition', edition.value);
   }
 
+  if (conditionFilter.value) params.set('condition', conditionFilter.value);
+  if (housingFilter.value) params.set('housing', housingFilter.value);
   if (minPrice.value) params.set('minPrice', minPrice.value);
   if (maxPrice.value) params.set('maxPrice', maxPrice.value);
 
+  window.UniMarketDiscovery?.showPersonalRecommendations(category === 'all' && sortSelect.value === 'recommended' &&
+    !searchInput.value.trim() && !conditionFilter.value && !housingFilter.value && !minPrice.value && !maxPrice.value);
   count.textContent = 'Loading...';
   errorMessage.hidden = true;
 
   try {
     const response = await fetch(`/api/listings?${params}`);
-    if (!response.ok) throw new Error('Could not load listings');
-
     const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Could not load listings');
     if (currentRequest !== requestNumber) return;
 
     count.textContent = `${data.length} ${data.length === 1 ? 'result' : 'results'}`;
@@ -122,7 +138,7 @@ async function loadListings() {
     if (currentRequest !== requestNumber) return;
     count.textContent = '0 results';
     results.replaceChildren();
-    errorMessage.textContent = 'Unable to load listings. Check the server and database.';
+    errorMessage.textContent = error.message || 'Unable to load listings.';
     errorMessage.hidden = false;
   }
 }
@@ -159,6 +175,7 @@ document.querySelectorAll('.chip').forEach(button => {
 
     document.querySelectorAll('.chip').forEach(b => {
       b.classList.toggle('active', b === button);
+      b.setAttribute('aria-pressed', String(b === button));
     });
 
     textbookFilters.hidden = category !== 'textbooks';
@@ -177,6 +194,8 @@ document.getElementById('clearFilters').addEventListener('click', () => {
   edition.value = '';
   minPrice.value = '';
   maxPrice.value = '';
+  conditionFilter.value = '';
+  housingFilter.value = '';
   loadListings();
 });
 
@@ -185,8 +204,15 @@ searchInput.addEventListener('input', () => {
   searchTimer = setTimeout(loadListings, 250);
 });
 
-[department, course, edition, minPrice, maxPrice, sortSelect]
+[department, course, edition, minPrice, maxPrice, sortSelect, conditionFilter, housingFilter]
   .forEach(control => control.addEventListener('change', loadListings));
 
 loadFilterOptions();
 loadListings();
+window.addEventListener('pageshow', event => { if (event.persisted) loadListings(); });
+
+// Open the alert form with the current keyword, category and maximum price.
+document.getElementById('save-search-alert').addEventListener('click', () => {
+  const params = new URLSearchParams({term: searchInput.value.trim(), category, max: maxPrice.value});
+  location.href = '/notifications.html?' + params.toString();
+});

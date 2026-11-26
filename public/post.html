@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,6 +14,17 @@
   <script src="/isbn.js" defer></script>
   <script src="/vendor/quagga.min.js" defer></script>
   <script src="/isbn-scanner.js" defer></script>
+  <script src="/discovery.js" defer></script>
+  <script src="/seller-tools.js" defer></script>
+  <link rel="stylesheet" href="/seller-tools.css">
+  <link rel="stylesheet" href="/accessibility.css">
+  <link rel="stylesheet" href="/discovery.css">
+  <script src="/accessibility.js"></script>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#002D72">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="/pwa.css">
+  <script src="/pwa.js" defer></script>
 </head>
 <body>
   <div class="app">
@@ -32,16 +43,23 @@
       Please <a href="/login.html">log in</a> with your UT Tyler email to sell an item.
     </div>
 
-    <form id="postForm" class="form" novalidate>
+    <main>
+    <form id="postForm" class="form" novalidate inert>
+      <section class="seller-panel" aria-labelledby="draft-heading">
+        <h2 id="draft-heading">Listing draft</h2>
+        <p>Text and measurements are saved on this browser for your account. Photos must be selected again after reopening.</p>
+        <p id="draft-status" role="status">Checking your account…</p>
+        <button type="button" id="discard-draft" class="seller-button" disabled>Discard draft</button>
+      </section>
 
       <!-- Photos -->
       <div class="field">
         <span class="label">Photos <span class="hint">(up to 3)</span></span>
         <div class="photos" id="photoSlots">
-          <label class="add-photo" for="photoInput">
+          <button type="button" class="add-photo" id="initialAddPhoto">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B4500C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg>
             Add photo
-          </label>
+          </button>
           <div class="slot"></div>
           <div class="slot"></div>
         </div>
@@ -102,6 +120,24 @@
         </div>
       </div>
 
+      <fieldset id="dimension-fields" class="seller-panel" hidden>
+        <legend>Furniture dimensions (optional)</legend>
+        <p class="hint">Enter width, height and depth together, using the same unit.</p>
+        <div class="seller-measures">
+          <div class="field"><label for="measure-width">Width</label><input id="measure-width" type="number" min="0.01" max="10000" step="0.01" inputmode="decimal"></div>
+          <div class="field"><label for="measure-height">Height</label><input id="measure-height" type="number" min="0.01" max="10000" step="0.01" inputmode="decimal"></div>
+          <div class="field"><label for="measure-depth">Depth</label><input id="measure-depth" type="number" min="0.01" max="10000" step="0.01" inputmode="decimal"></div>
+        </div>
+        <div class="field"><label for="measure-unit">Unit</label><select id="measure-unit"><option value="in">Inches (in)</option><option value="cm">Centimetres (cm)</option></select></div>
+      </fieldset>
+
+      <section class="discovery-panel" aria-labelledby="price-guide-heading">
+        <h2 id="price-guide-heading">Price guidance</h2>
+        <p>Compare asking prices from similar active listings. This is optional and never changes your price automatically.</p>
+        <button type="button" id="price-guide-button" class="discovery-button">Compare prices</button>
+        <p id="price-guide-status" role="status"></p>
+      </section>
+
       <!-- Condition chips -->
       <fieldset class="field">
         <legend class="label">Condition</legend>
@@ -132,11 +168,12 @@
       </div>
 
     </form>
+    </main>
 
     <!-- Sticky bottom bar -->
     <div class="actions">
       <p id="message" class="message" role="status" aria-live="polite"></p>
-      <button type="submit" form="postForm" id="postBtn" class="post-btn">Post listing</button>
+      <button type="submit" form="postForm" id="postBtn" class="post-btn" disabled>Post listing</button>
     </div>
   </div>
 </body>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saved items | UniMarket</title>
+  <link rel="stylesheet" href="/browse.css">
+  <link rel="stylesheet" href="/accessibility.css">
+  <link rel="stylesheet" href="/discovery.css">
+  <script src="/accessibility.js"></script>
+  <script src="/discovery.js" defer></script>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#002D72">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="/pwa.css">
+  <script src="/pwa.js" defer></script>
+</head>
+<body>
+  <div class="app">
+    <header class="top"><a class="brand" href="/browse.html">UniMarket</a>
+    </header>
+    <main class="discovery-page">
+      <div class="discovery-links"><a class="discovery-link" href="/browse.html">Back to browse</a><a class="discovery-link" href="/profile.html">Profile</a></div>
+      <h1>Your saved items</h1>
+      <p id="library-status" class="discovery-status" role="status">Loading your items…</p>
+      <section class="discovery-section" aria-labelledby="saved-heading">
+        <h2 id="saved-heading" tabindex="-1">Saved listings</h2>
+        <p id="saved-empty" hidden>No saved listings yet. Open a listing and select its heart button to save it.</p>
+        <div id="saved-list" class="discovery-list"></div>
+      </section>
+      <section class="discovery-section" aria-labelledby="recent-heading">
+        <h2 id="recent-heading" tabindex="-1">Recently viewed</h2>
+        <p>Only you can see your account's last 20 viewed listings.</p>
+        <button id="clear-recent" type="button" class="discovery-button" hidden>Clear viewing history</button>
+        <p id="recent-empty" hidden>No recently viewed listings.</p>
+        <div id="recent-list" class="discovery-list"></div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

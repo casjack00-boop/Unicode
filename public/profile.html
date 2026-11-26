@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,21 +8,51 @@
   <link rel="stylesheet" href="/browse.css">
   <link rel="stylesheet" href="/profile.css">
   <script src="/profile.js" defer></script>
+  <link rel="stylesheet" href="/accessibility.css">
+  <script src="/accessibility.js"></script>
+  <link rel="stylesheet" href="/safety.css">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#002D72">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="/pwa.css">
+  <script src="/pwa.js" defer></script>
 </head>
 <body>
   <div class="app">
-    <header class="top"><div class="top-row"><a class="brand" href="/browse.html">UniMarket</a><span class="verified" id="page-label">Profile</span></div></header>
+    <header class="top"><div class="top-row"><a class="brand" href="/browse.html">UniMarket</a><a id="profile-settings" class="profile-settings" href="/settings.html?from=profile" aria-label="Settings" title="Settings" hidden><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.42.24a2 2 0 0 1-2 0l-.15-.09a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.09a2 2 0 0 1 1 1.74v.48a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.09a2 2 0 0 1 2 0l.42.24a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.42-.24a2 2 0 0 1 2 0l.15.09a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.48a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.09a2 2 0 0 1-2 0l-.42-.24a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></a><button id="profile-moderation" class="profile-settings" type="button" aria-label="Moderate this account" title="Moderate this account" aria-haspopup="dialog" hidden><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11z"/><path d="M12 8v4m0 4h.01"/></svg></button></div>
+    </header>
     <main class="profile-main">
       <p id="status" role="status">Loading profile...</p>
       <a id="login-link" href="/login.html" hidden>Log in to UniMarket</a>
       <div id="profile" hidden>
         <section class="profile-panel identity">
           <div class="profile-avatar" id="avatar" aria-hidden="true"></div>
-          <h1 id="name"></h1>
+          <h1><span id="name"></span> <span id="own-student-id" class="profile-student-id" title="UniMarket account ID (visible to the account owner and moderators)" hidden></span></h1>
           <p class="verified-student">✓ Verified UT Tyler student</p>
           <p id="housing" class="profile-muted"></p>
           <p id="member-since" class="profile-muted"></p>
-          <p id="rating" class="profile-rating">Loading ratings...</p>
+          <p id="profile-biography" class="profile-biography" hidden></p>
+          <div class="profile-reputation" aria-label="Student reputation">
+            <div class="profile-reputation-grid">
+              <div class="profile-reputation-cell">
+                <p class="profile-muted">Seller rating</p>
+                <p id="rating" class="profile-score">—</p>
+                <p id="seller-stars" class="profile-stars" aria-hidden="true"></p>
+                <button type="button" id="seller-rating-count" class="profile-review-count" aria-haspopup="dialog" aria-label="Seller review history" disabled>Loading reviews...</button>
+              </div>
+              <div class="profile-reputation-cell">
+                <p class="profile-muted">Buyer rating</p>
+                <p id="buyer-rating" class="profile-score">—</p>
+                <p id="buyer-stars" class="profile-stars" aria-hidden="true"></p>
+                <button type="button" id="buyer-rating-count" class="profile-review-count" aria-haspopup="dialog" aria-label="Buyer review history" disabled>Loading reviews...</button>
+              </div>
+            </div>
+            <div id="exchange-count" class="profile-reputation-grid profile-exchange-grid" aria-label="Completed exchanges">
+              <div class="profile-reputation-cell"><p id="completed-sales" class="profile-score">—</p><p class="profile-muted">Completed sales</p></div>
+              <div class="profile-reputation-cell"><p id="completed-purchases" class="profile-score">—</p><p class="profile-muted">Completed purchases</p></div>
+            </div>
+          </div>
+          <a id="profile-safety" class="safety-link" hidden>Report or block student</a>
           <button id="edit-button" type="button" class="profile-button" hidden>Edit profile</button>
         </section>
         <section id="account" class="profile-panel" hidden>
@@ -34,16 +64,41 @@
             <input id="display-name" maxlength="80" required>
             <label for="housing-select">Housing</label>
             <select id="housing-select"><option value="">Prefer not to say</option><option value="on_campus">On campus</option><option value="off_campus">Off campus</option></select>
+            <label for="biography">Biography (optional, visible to other students)</label>
+            <textarea id="biography" rows="4" maxlength="500" aria-describedby="biography-help"></textarea>
+            <p id="biography-help" class="profile-muted">Up to 500 characters. Avoid sharing private contact details.</p>
             <div class="profile-actions"><button type="submit" class="profile-button" id="save-button">Save changes</button><button type="button" class="profile-secondary" id="cancel-button">Cancel</button></div>
           </form>
           <p id="edit-status" role="status"></p>
+          <a class="profile-link" href="/saved.html">Saved &amp; recently viewed <span aria-hidden="true">›</span></a>
+          <a class="profile-link" href="/transactions.html">Offers &amp; transactions <span aria-hidden="true">›</span></a>
           <a class="profile-link" href="/my-listings.html">Manage my listings <span aria-hidden="true">›</span></a>
-          <button type="button" id="logout" class="profile-secondary">Log out</button>
         </section>
         <section class="profile-panel"><h2>Active listings</h2><div id="active-listings" class="grid"></div></section>
-        <section class="profile-panel"><h2>Recent reviews</h2><div id="reviews"></div></section>
       </div>
     </main>
+    <dialog id="review-dialog" class="profile-review-dialog" aria-labelledby="review-title">
+      <div class="profile-review-header">
+        <h2 id="review-title">Reviews</h2>
+        <button type="button" class="profile-secondary" id="review-close" autofocus>Close</button>
+      </div>
+      <p id="review-status" class="profile-muted" role="status"></p>
+      <div id="review-history"></div>
+      <button type="button" class="profile-secondary" id="review-more" hidden>Load more reviews</button>
+    </dialog>
+    <dialog id="profile-moderation-dialog" class="profile-review-dialog" aria-labelledby="profile-moderation-title">
+      <div class="profile-review-header">
+        <h2 id="profile-moderation-title">Account moderation</h2>
+        <button type="button" class="profile-secondary" id="profile-moderation-close" autofocus>Close</button>
+      </div>
+      <p id="profile-moderation-status" role="status"></p>
+      <p id="profile-moderation-account" class="profile-muted"></p>
+      <form id="profile-moderation-form" hidden>
+        <label for="profile-moderation-reason">Reason (required)</label>
+        <textarea id="profile-moderation-reason" rows="3" maxlength="500" required></textarea>
+        <button id="profile-moderation-submit" type="submit" class="profile-button">Suspend account</button>
+      </form>
+    </dialog>
     <nav class="bottom-nav" aria-label="Main">
       <a href="/browse.html" class="nav-item">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10l9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,11 +7,21 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap">
   <link rel="stylesheet" href="/item.css">
+  <link rel="stylesheet" href="/accessibility.css">
+  <link rel="stylesheet" href="/discovery.css">
+  <link rel="stylesheet" href="/seller-tools.css">
+  <script src="/accessibility.js"></script>
+  <link rel="stylesheet" href="/safety.css">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#002D72">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="/pwa.css">
+  <script src="/pwa.js" defer></script>
 </head>
 <body>
-  <div class="app">
+  <main class="app">
     <!-- Shown while the item loads, and if something goes wrong -->
-    <p id="status" class="status">Loading...</p>
+    <p id="status" class="status" role="status">Loading...</p>
 
     <!-- Hidden until the data arrives (item.js un-hides it) -->
     <article id="item" class="item" hidden>
@@ -25,12 +35,17 @@
           <a href="/browse.html" class="back" aria-label="Back to Browse">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#002D72" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
           </a>
-          <span id="photo-count" class="photo-count" hidden></span>
+          <button type="button" id="photo-count" class="photo-count" hidden></button>
         </div>
 
         <div class="info">
           <div class="heading">
-            <span id="price" class="price"></span>
+            <div class="price-row"><span id="price" class="price"></span>
+              <div class="price-actions">
+                <button type="button" id="share-listing" class="item-icon" aria-label="Share listing" title="Share listing"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M15 5.63 20.66 12 15 18.37V15h-1c-4.11 0-7.39 1.11-10.16 3.1C5.21 14.77 8.31 11 14 11h1V5.63M14 3v7C6.23 10 3.24 15.13 2 21c3.39-4.1 7.26-5 12-5v5l8-9-8-9z"/></svg></button>
+                <button type="button" id="bookmark-btn" class="item-icon" aria-label="Save item" aria-pressed="false" title="Save item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg></button>
+              </div>
+            </div>
             <h1 id="title" class="title"></h1>
             <div class="tags">
               <span id="condition" class="tag tag-orange"></span>
@@ -41,6 +56,7 @@
 
           <p id="description" class="description"></p>
           <p id="isbn-details" class="description" hidden></p>
+          <p id="item-dimensions" class="description dimension-line" hidden></p>
 
           <!-- Seller card -->
           <div class="card seller">
@@ -63,12 +79,12 @@
 
             <form id="rate-form" class="rate-form" hidden>
               <span class="rate-label">Bought from this seller? Rate them:</span>
-              <div class="star-pick" id="star-pick" role="radiogroup" aria-label="Stars">
-                <button type="button" data-stars="1" aria-label="1 star">★</button>
-                <button type="button" data-stars="2" aria-label="2 stars">★</button>
-                <button type="button" data-stars="3" aria-label="3 stars">★</button>
-                <button type="button" data-stars="4" aria-label="4 stars">★</button>
-                <button type="button" data-stars="5" aria-label="5 stars">★</button>
+              <div class="star-pick" id="star-pick" role="group" aria-label="Star rating">
+                <button type="button" data-stars="1" aria-pressed="false" aria-label="1 star">★</button>
+                <button type="button" data-stars="2" aria-pressed="false" aria-label="2 stars">★</button>
+                <button type="button" data-stars="3" aria-pressed="false" aria-label="3 stars">★</button>
+                <button type="button" data-stars="4" aria-pressed="false" aria-label="4 stars">★</button>
+                <button type="button" data-stars="5" aria-pressed="false" aria-label="5 stars">★</button>
               </div>
               <input id="rate-comment" type="text" maxlength="300" placeholder="Add a comment (optional)" aria-label="Comment">
               <button type="submit" class="rate-btn">Save rating</button>
@@ -92,6 +108,13 @@
             </div>
           </div>
 
+          <section class="seller-panel" aria-labelledby="purchase-heading"><h2 id="purchase-heading">Purchase arrangements</h2><p id="purchase-state" role="status"></p><a id="offer-link" class="seller-button" href="/transactions.html">Make an offer / reserve</a></section>
+          <p id="discovery-item-status" class="discovery-status" role="status"></p>
+          <section id="similar-section" class="discovery-section" aria-labelledby="similar-heading" hidden>
+            <h2 id="similar-heading">Similar items</h2>
+            <div id="similar-items" class="discovery-list"></div>
+          </section>
+          <a id="report-listing" class="safety-link" hidden>Report listing</a>
           <p id="coming-soon" class="coming-soon" hidden>Messaging is coming soon.</p>
         </div>
       </div>
@@ -99,7 +122,7 @@
       <!-- Sticky bottom bar -->
       <div class="actions">
         <button id="save-btn" class="save" type="button" aria-label="Save item" aria-pressed="false">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#002D72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-9-9a4.8 4.8 0 0 1 9-3 4.8 4.8 0 0 1 9 3c-2 4.6-9 9-9 9z"></path></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-9-9a4.8 4.8 0 0 1 9-3 4.8 4.8 0 0 1 9 3c-2 4.6-9 9-9 9z"></path></svg>
         </button>
         <button id="message-btn" class="message" type="button">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"></path></svg>
@@ -107,8 +130,9 @@
         </button>
       </div>
     </article>
-  </div>
+  </main>
 
+  <script src="/discovery.js"></script>
   <script src="/item.js"></script>
 </body>
 </html>

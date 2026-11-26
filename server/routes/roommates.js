@@ -18,7 +18,7 @@ function cleanText(value, max) {
 
 // Browse roommate posts
 router.get('/', async (req, res) => {
-  const conditions = ["r.status = 'active'"];
+  const conditions = ["r.status = 'active'", "u.suspended_at IS NULL"];
   const values = [];
 
   // On campus / off campus filter ("either" posts match both)

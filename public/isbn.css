@@ -4,7 +4,7 @@
   padding: 14px;
   border: 1px solid var(--line, #E1E5EE);
   border-radius: 12px;
-  background: #fff;
+  background: var(--surface);
 }
 .isbn-panel p { margin: 0; }
 .isbn-row { display: flex; align-items: center; gap: 8px; }
@@ -14,7 +14,7 @@
   border-radius: 9px;
   background: var(--navy, #002D72);
   color: #fff;
-  font: 600 15px 'Source Sans 3', sans-serif;
+  font: 600 0.9375rem 'Source Sans 3', sans-serif;
   padding: 12px;
   cursor: pointer;
   white-space: nowrap;
@@ -22,7 +22,7 @@
 }
 .isbn-panel button:disabled { opacity: .55; cursor: default; }
 .isbn-panel button:focus-visible { outline: 2px solid var(--orange, #F47A20); outline-offset: 2px; }
-.isbn-status { color: var(--muted, #5A6478); font-size: 14px; }
+.isbn-status { color: var(--muted, #5A6478); font-size: 0.875rem; }
 .isbn-status:empty { display: none; }
 .isbn-status.is-ok { color: var(--ok, #1E7B3A); }
 .isbn-status.is-error { color: var(--error, #B3261E); }

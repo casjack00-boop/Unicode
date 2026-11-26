@@ -17,7 +17,7 @@
 
 body {
   margin: 0;
-  background: #E9EDF4;
+  background: var(--canvas);
   color: var(--ink);
   font-family: 'Source Sans 3', system-ui, sans-serif;
 }
@@ -29,8 +29,8 @@ body {
   background: var(--bg);
 }
 
-.status { text-align: center; color: var(--muted); font-size: 18px; padding: 80px 20px; margin: 0; }
-.status.error { color: #B3261E; font-weight: 600; }
+.status { text-align: center; color: var(--muted); font-size: 1.125rem; padding: 80px 20px; margin: 0; }
+.status.error { color: var(--error); font-weight: 600; }
 .status[hidden], .item[hidden] { display: none; }
 
 .item { padding-bottom: 84px; } /* room for the sticky bar */
@@ -50,13 +50,13 @@ body {
   justify-content: center;
   gap: 6px;
   color: var(--muted);
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 .photo-img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .back {
   position: absolute; top: 16px; left: 16px;
   width: 44px; height: 44px; border-radius: 22px;
-  background: #FFFFFF;
+  background: var(--surface);
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 1px 4px rgba(20, 33, 61, 0.15);
 }
@@ -64,39 +64,39 @@ body {
   position: absolute; bottom: 14px; right: 14px;
   padding: 4px 10px; border-radius: 12px;
   background: rgba(20, 33, 61, 0.75);
-  color: #FFFFFF; font-size: 13px;
+  color: #FFFFFF; font-size: 0.8125rem;
   border: none; font-family: inherit; cursor: pointer;
 }
 
 /* ---------- Info ---------- */
 .info { padding: 20px 20px 24px; display: flex; flex-direction: column; gap: 18px; }
 .heading { display: flex; flex-direction: column; gap: 6px; }
-.price { font-family: Archivo, sans-serif; font-weight: 800; font-size: 30px; color: var(--navy); }
-.title { margin: 0; font-family: Archivo, sans-serif; font-weight: 600; font-size: 22px; }
+.price { font-family: Archivo, sans-serif; font-weight: 800; font-size: 1.875rem; color: var(--link); }
+.title { margin: 0; font-family: Archivo, sans-serif; font-weight: 600; font-size: 1.375rem; }
 .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
-.tag { padding: 4px 10px; border-radius: 12px; background: var(--photo-bg); color: var(--ink); font-size: 14px; }
+.tag { padding: 4px 10px; border-radius: 12px; background: var(--photo-bg); color: var(--ink); font-size: 0.875rem; }
 .tag:empty { display: none; }
 .tag-orange { background: var(--orange-soft); color: var(--orange-text); font-weight: 600; }
-.description { margin: 0; font-size: 16px; line-height: 1.5; white-space: pre-line; }
+.description { margin: 0; font-size: 1rem; line-height: 1.5; white-space: pre-line; }
 .description:empty { display: none; }
 
 .card {
   display: flex; align-items: center; gap: 12px;
   padding: 14px; border-radius: 12px;
-  background: #FFFFFF; border: 1px solid var(--line);
+  background: var(--surface); border: 1px solid var(--line);
 }
 .avatar {
   width: 48px; height: 48px; border-radius: 24px; flex-shrink: 0;
   background: var(--navy); color: #FFFFFF;
   display: flex; align-items: center; justify-content: center;
-  font-family: Archivo, sans-serif; font-weight: 800; font-size: 18px;
+  font-family: Archivo, sans-serif; font-weight: 800; font-size: 1.125rem;
 }
 .seller-text { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-.seller-name { font-weight: 600; font-size: 16px; }
-.seller-sub { font-size: 14px; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+.seller-name { font-weight: 600; font-size: 1rem; }
+.seller-sub { font-size: 0.875rem; color: var(--muted); display: flex; align-items: center; gap: 5px; }
 
 .meet { display: flex; flex-direction: column; gap: 10px; }
-.meet h2 { margin: 0; font-family: Archivo, sans-serif; font-weight: 600; font-size: 17px; }
+.meet h2 { margin: 0; font-family: Archivo, sans-serif; font-weight: 600; font-size: 1.0625rem; }
 .pin {
   width: 40px; height: 40px; border-radius: 20px; flex-shrink: 0;
   background: var(--orange-soft);
@@ -111,12 +111,12 @@ body {
   width: 100%; max-width: 480px;
   padding: 12px 16px 20px;
   display: flex; gap: 10px;
-  background: #FFFFFF; border-top: 1px solid var(--line);
+  background: var(--surface); border-top: 1px solid var(--line);
 }
 .save {
   width: 52px; height: 52px; flex-shrink: 0;
-  border-radius: 10px; border: 1.5px solid #C5CCDA;
-  background: #FFFFFF;
+  border-radius: 10px; border: 1.5px solid var(--field);
+  background: var(--surface);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer;
 }
@@ -124,7 +124,7 @@ body {
 .message {
   flex: 1; height: 52px; border-radius: 10px; border: none;
   background: var(--navy); color: #FFFFFF;
-  font-family: inherit; font-weight: 600; font-size: 17px;
+  font-family: inherit; font-weight: 600; font-size: 1.0625rem;
   display: flex; align-items: center; justify-content: center; gap: 8px;
   cursor: pointer;
 }
@@ -135,7 +135,7 @@ a:focus-visible, button:focus-visible {
   outline-offset: 2px;
 }
 
-.status-back { display: inline-block; margin-top: 16px; color: var(--navy); font-weight: 600; }
+.status-back { display: inline-block; margin-top: 16px; color: var(--link); font-weight: 600; }
 
 /*------Seller rating-----*/ 
 .rating {
@@ -144,7 +144,7 @@ a:focus-visible, button:focus-visible {
   gap: 10px;
   padding: 14px;
   border-radius: 12px;
-  background: #FFFFFF;
+  background: var(--surface);
   border: 1px solid var(--line);
 }
 
@@ -156,13 +156,13 @@ a:focus-visible, button:focus-visible {
 
 .stars-show {
   color: var(--orange);
-  font-size: 20px;
+  font-size: 1.25rem;
   letter-spacing: 2px;
 }
 
 .rating-summary {
   font-weight: 600;
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 
 /* The rate form (only shows when you can rate) */
@@ -179,7 +179,7 @@ a:focus-visible, button:focus-visible {
 }
 
 .rate-level {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--muted);
 }
 
@@ -195,7 +195,7 @@ a:focus-visible, button:focus-visible {
   padding: 0;
   border: none;
   background: none;
-  font-size: 28px;
+  font-size: 1.75rem;
   color: #C5CCDA;
   cursor: pointer;
 }
@@ -208,9 +208,9 @@ a:focus-visible, button:focus-visible {
 .rate-form input {
   height: 42px;
   padding: 0 12px;
-  border: 1.5px solid #C5CCDA;
+  border: 1.5px solid var(--field);
   font-family: inherit;
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 
 .rate-btn {
@@ -223,13 +223,13 @@ a:focus-visible, button:focus-visible {
   color: #FFFFFF;
   font-family: inherit;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 0.9375rem;
   cursor: pointer;
 }
 
 .rate-message {
   margin: 0;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
 }
 
@@ -244,10 +244,19 @@ a:focus-visible, button:focus-visible {
 }
 
 .rating-comments li {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--muted);
 }
 
 .rating-comments b {
   color: var(--ink);
 }
+/* Price and compact listing actions sit together below the photo. */
+.price-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.price-actions { display: flex; gap: 8px; margin-left: auto; }
+.item-icon { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--field); border-radius: 10px; background: var(--surface); color: var(--link); cursor: pointer; }
+.item-icon[aria-pressed="true"] svg { fill: currentColor; }
+.item-icon:disabled, .save:disabled { opacity: .65; cursor: wait; }
+.save { color: var(--link); }
+.save[aria-pressed="true"] svg { fill: currentColor; }
+.dimension-line { overflow-wrap: anywhere; }

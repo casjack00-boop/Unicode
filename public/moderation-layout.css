@@ -1,0 +1,11 @@
+/* Shared layout for the moderator overview and dedicated queues. */
+.mod-overview, .mod-case-list { display: grid; gap: 12px; }
+.mod-overview-card { text-decoration: none; color: var(--ink) !important; min-height: 64px; overflow-wrap: anywhere; }
+.mod-overview-card:hover { border-color: var(--link); }
+.mod-card-heading { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.mod-card-heading h2 { flex: 1 1 auto; min-width: 0; }
+.mod-count { background: var(--orange-soft); color: var(--orange-text); border-radius: 999px; padding: 3px 8px; font-weight: 600; font-size: .875rem; }
+.mod-chevron { flex: none; width: 9px; height: 9px; border-right: 2px solid currentColor; border-top: 2px solid currentColor; transform: rotate(45deg); margin-right: 3px; }
+.mod-overview-card p { color: var(--muted); font-size: .9rem; }
+#account-directory, #account-actions { display: grid; gap: 10px; }
+#account-directory article, #account-actions article { border-top: 1px solid var(--line); padding-top: 10px; display: grid; gap: 6px; overflow-wrap: anywhere; }

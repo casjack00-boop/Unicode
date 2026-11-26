@@ -1,0 +1,5 @@
+.pwa-panel { min-width: 0; overflow-wrap: anywhere; }
+.pwa-panel button { min-height: 44px; padding: 10px 16px; border-radius: 10px; border: 1px solid var(--field); background: var(--surface); color: var(--link); font: inherit; font-weight: 600; cursor: pointer; }
+.pwa-panel button:disabled { opacity: .65; cursor: default; }
+.pwa-panel [hidden] { display: none !important; }
+[data-site-address] { overflow-wrap: anywhere; }

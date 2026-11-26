@@ -1,11 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UniMarket</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap">
   <link rel="stylesheet" href="landing.css">
+  <link rel="stylesheet" href="/accessibility.css">
+  <script src="/accessibility.js"></script>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#002D72">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="/pwa.css">
+  <script src="/pwa.js" defer></script>
 </head>
 <body>
 
@@ -28,6 +35,7 @@
     </div>
   </header>
 
+  <main>
   <!-- Part 2: Navy hero -->
   <section class="hero">
     <div class="wrap hero-inner">
@@ -99,9 +107,13 @@
           <h3>1. Open it on your phone</h3>
           <div class="address-box">
             <span>Type this address:</span>
-            <strong>unimarket (link coming soon)</strong>
+            <strong data-site-address>Open this website on your phone</strong>
           </div>
-          <p>A QR code will go here once UniMarket is online.</p>
+          <div data-install-panel class="pwa-panel">
+            <button type="button" data-install-button hidden>Install app</button>
+            <p data-install-status role="status">Use your browser's installation menu or follow the instructions below.</p>
+            <p data-install-help>Internet access is required to use the marketplace.</p>
+          </div>
         </div>
         <div class="card">
           <h3>2. iPhone</h3>
@@ -132,9 +144,11 @@
     <div class="feature"><span class="check">✓</span><div><h3>Safer meetups</h3><p>Each listing suggests a public, well-lit spot on campus.</p></div></div>
   </section>
 
+  </main>
   <footer class="footer">
     <div class="wrap footer-inner">
       <span class="footer-logo">UniMarket</span>
+      <a class="settings-access-link" href="/settings.html?from=home">Accessibility &amp; appearance</a>
       <span>A UT Tyler student project. Not an official university service.</span>
     </div>
   </footer>

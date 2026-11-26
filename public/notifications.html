@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Notifications | UniMarket</title>
+  <link rel="stylesheet" href="/browse.css">
+  <link rel="stylesheet" href="/accessibility.css">
+  <link rel="stylesheet" href="/notifications.css">
+  <script src="/accessibility.js"></script>
+  <script src="/notifications.js" defer></script>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#002D72">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="/pwa.css">
+  <script src="/pwa.js" defer></script>
+</head>
+<body><div class="app">
+  <header class="top"><a class="brand" href="/browse.html">UniMarket</a></header>
+  <main class="notice-main">
+    <a href="/profile.html">Back to profile</a>
+    <h1>Notifications</h1>
+    <p id="notice-status" role="status">Loading notifications…</p>
+    <a id="notice-login" href="/login.html" hidden>Log in to continue</a>
+    <div id="notice-content" hidden>
+      <div class="notice-actions"><button id="notice-refresh" type="button">Refresh</button><button id="notice-read-all" type="button">Mark all as read</button></div>
+      <div id="notice-list"></div>
+      <button id="notice-more" type="button" hidden>Load older notifications</button>
+      <section class="notice-panel" aria-labelledby="search-heading">
+        <h2 id="search-heading">Saved search alerts</h2>
+        <p>Get an in-app alert when a new listing matches a keyword or exact ISBN, category and optional price limit. Up to 20 saved searches. Keyword alerts use literal text matches, not fuzzy search.</p>
+        <form id="notice-search-form">
+          <label for="notice-term">Keyword or ISBN</label><input id="notice-term" required minlength="2" maxlength="120" type="search">
+          <label for="notice-category">Category</label><select id="notice-category"><option value="all">All categories</option><option value="textbooks">Textbooks</option><option value="furniture">Furniture</option><option value="dorm">Dorm</option><option value="electronics">Electronics</option><option value="clothing">Clothing</option><option value="other">Other</option></select>
+          <label for="notice-max">Maximum price ($, optional)</label><input id="notice-max" type="number" min="0" max="21474836.47" step="0.01">
+          <button type="submit">Save search alert</button>
+        </form>
+        <div id="notice-searches"></div>
+      </section>
+      <a href="/settings.html?from=profile#notification-preferences">Notification preferences</a>
+    </div>
+  </main>
+</div></body>
+</html>

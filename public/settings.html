@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Settings | UniMarket</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap">
+  <link rel="stylesheet" href="/browse.css">
+  <link rel="stylesheet" href="/accessibility.css">
+  <script src="/accessibility.js"></script>
+  <link rel="stylesheet" href="/notifications.css">
+  <script src="/notifications.js" defer></script>
+  <script src="/settings.js" defer></script>
+  <script src="/discovery.js" defer></script>
+  <link rel="stylesheet" href="/academic.css">
+  <script src="/academic.js" defer></script>
+  <script src="/safety.js" defer></script>
+  <link rel="stylesheet" href="/safety.css">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#002D72">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="/pwa.css">
+  <script src="/pwa.js" defer></script>
+  <link rel="stylesheet" href="/settings-layout.css">
+</head>
+<body>
+  <div class="app">
+    <header class="top settings-header">
+      <a class="settings-back" id="settings-back" href="/" aria-label="Back to home" title="Back to home">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+      </a>
+      <h1>Settings</h1>
+      <a class="settings-help" id="settings-help" href="/help.html" aria-label="Help and support" title="Help and support">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 4"/><path d="M12 17h.01"/></svg>
+      </a>
+    </header>
+    <main class="settings-main">
+      <section id="moderation-link" class="notice-panel" hidden><a class="settings-moderation-link" href="/moderation.html"><h2>Moderation</h2><span class="settings-chevron" aria-hidden="true"></span></a></section>
+      <details class="settings-disclosure a11y-settings" data-appearance-settings aria-labelledby="appearance-heading">
+        <summary><h2 id="appearance-heading">Accessibility &amp; appearance</h2></summary>
+        <div class="settings-disclosure-body">
+          <div class="a11y-options">
+            <p>These preferences apply throughout UniMarket and are saved on this browser and device.</p>
+            <label for="a11y-theme">Appearance</label>
+            <select id="a11y-theme"><option value="system">System default</option><option value="light">Light</option><option value="dark">Dark</option></select>
+            <label for="a11y-size">Text size</label>
+            <select id="a11y-size"><option value="default">Default</option><option value="large">Large (125%)</option><option value="extra">Extra large (150%)</option></select>
+            <label class="a11y-check"><input id="a11y-contrast" type="checkbox"> High contrast</label>
+            <label class="a11y-check"><input id="a11y-motion" type="checkbox"> Reduce motion</label>
+            <button type="button" id="a11y-reset">Reset preferences</button>
+            <p id="a11y-status" role="status"></p>
+          </div>
+        </div>
+      </details>
+      <details class="settings-disclosure notice-panel academic-panel" id="academic-preferences" hidden aria-labelledby="academic-heading">
+        <summary><h2 id="academic-heading">Academic preferences</h2></summary>
+        <div class="settings-disclosure-body">
+          <p>Optional and private. Choose a department to find relevant textbook listings. Clear both fields to remove your preferences.</p>
+          <form id="academic-form">
+            <label>Major <input name="major" maxlength="80" placeholder="Computer Science"></label>
+            <label>Department code <input name="department" maxlength="16" placeholder="CSCI"></label>
+            <button type="submit">Save academic preferences</button>
+          </form>
+          <p id="academic-pref-status" role="status"></p>
+        </div>
+      </details>
+      <details id="personalisation" class="settings-disclosure notice-panel" aria-labelledby="personalisation-heading" hidden>
+        <summary><h2 id="personalisation-heading">Recommendation privacy</h2></summary>
+        <div class="settings-disclosure-body">
+          <p>Optional. Use recently viewed marketplace items and completed purchases to suggest relevant listings. Turning this off stops personalised suggestions; your private Recently viewed list is separate.</p>
+          <form id="personalisation-form" hidden>
+            <label class="notice-pref-check"><input type="checkbox" name="enabled"> Use my browsing history for recommendations</label>
+            <button type="submit">Save recommendation preference</button>
+          </form>
+          <p id="personalisation-status" role="status"></p>
+          <a href="/saved.html">View or clear my recent history</a>
+        </div>
+      </details>
+      <details id="notification-preferences" class="settings-disclosure notice-panel" aria-labelledby="notice-pref-heading">
+        <summary><h2 id="notice-pref-heading">Notification preferences</h2></summary>
+        <div class="settings-disclosure-body">
+          <p id="notice-pref-status" role="status">Loading preferences…</p>
+          <form id="notice-pref-form" hidden>
+            <label class="notice-pref-check"><input type="checkbox" name="messages"> Incoming messages</label>
+            <label class="notice-pref-check"><input type="checkbox" name="transactions"> Transaction updates</label>
+            <label class="notice-pref-check"><input type="checkbox" name="price_drops"> Saved-item price drops</label>
+            <label class="notice-pref-check"><input type="checkbox" name="saved_searches"> New items matching saved searches</label>
+            <button type="submit">Save notification preferences</button>
+          </form>
+        </div>
+      </details>
+      <details id="blocked-accounts" class="settings-disclosure safety-panel" aria-labelledby="blocked-heading" hidden>
+        <summary><h2 id="blocked-heading">Blocked accounts</h2></summary>
+        <div class="settings-disclosure-body">
+          <p id="blocked-status" role="status"></p><div id="blocked-list"></div>
+          <a href="/safety.html" class="safety-link">Community safety guidance</a>
+        </div>
+      </details>
+      <details class="settings-disclosure notice-panel pwa-panel" aria-labelledby="install-heading" data-install-panel>
+        <summary><h2 id="install-heading">Install UniMarket</h2></summary>
+        <div class="settings-disclosure-body">
+          <p data-install-status role="status">Add UniMarket to your home screen for quick access.</p>
+          <button type="button" data-install-button hidden>Install app</button>
+          <p data-install-help>On iPhone, open Safari's Share menu and choose Add to Home Screen. On Android or desktop, look for Install app or Add to Home screen in your browser menu.</p>
+          <p>Internet access is required for marketplace activity.</p>
+        </div>
+      </details>
+      <section id="account-session" class="notice-panel" aria-labelledby="session-heading" hidden>
+        <h2 id="session-heading">Account</h2>
+        <button id="logout" type="button">Log out</button>
+        <p id="logout-status" role="status"></p>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

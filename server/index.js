@@ -15,6 +15,10 @@ const bookRoutes = require('./routes/books');
 const roommateRoutes = require('./routes/roommates');
 
 const app = express();
+const { sameOriginWrite, securityHeaders, noStore } = require('./http-security');
+app.disable('x-powered-by');
+app.use(securityHeaders);
+app.use('/api', noStore, sameOriginWrite);
 
 // Let the server read JSON sent from the app
 app.use(express.json());
@@ -34,6 +38,13 @@ app.use('/api/profiles', profileRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/books', bookRoutes);
 app.use('/api/roommates', roommateRoutes);
+app.use('/api/discovery', require('./routes/discovery'));
+app.use('/api/transactions', require('./routes/transactions'));
+app.use('/api/notifications', require('./routes/notifications'));
+app.use('/api/safety', require('./routes/safety'));
+app.use('/api/academic', require('./routes/academic'));
+app.use('/api/reputation', require('./routes/reputation'));
+app.use('/api/support', require('./routes/support'));
  
 
 // Serve the app's pages (HTML, CSS, JavaScript) from the public folder
@@ -64,6 +75,8 @@ app.get('/api/health', async (req, res) => {
 
 // Start listening for visitors
 const port = process.env.PORT || 3000;
+const { startReservationExpiry } = require('./reservation-expiry');
 app.listen(port, () => {
+  startReservationExpiry(pool);
   console.log(`UniMarket server running at http://localhost:${port}`);
 });

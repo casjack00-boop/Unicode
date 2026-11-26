@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,7 +7,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap">
   <link rel="stylesheet" href="/browse.css">
+  <script src="/discovery.js" defer></script>
   <script src="/browse.js" defer></script>
+  <link rel="stylesheet" href="/accessibility.css">
+  <link rel="stylesheet" href="/discovery.css">
+  <script src="/accessibility.js"></script>
+  <link rel="stylesheet" href="/notifications.css">
+  <script src="/notifications.js" defer></script>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#002D72">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="/pwa.css">
+  <script src="/pwa.js" defer></script>
 </head>
 <body>
   <div class="app">
@@ -27,24 +38,39 @@
           <label for="searchInput" class="sr-only">Search listings</label>
           <input id="searchInput" type="search" placeholder="Search by title, ISBN, or item">
         </div>
-        <button id="filterToggle" class="filter-btn" type="button" aria-label="Show filters" aria-expanded="false">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"></path></svg>
-        </button>
+        <a class="notice-link notice-icon" data-notice-link href="/notifications.html" aria-label="Notifications" title="Notifications" hidden><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span hidden aria-hidden="true"></span></a>
       </div>
     </header>
 
     <!-- Category chips -->
     <nav class="chips" aria-label="Item categories">
-      <button class="chip active" data-category="all">All</button>
-      <button class="chip" data-category="textbooks">Textbooks</button>
-      <button class="chip" data-category="furniture">Furniture</button>
-      <button class="chip" data-category="dorm">Dorm</button>
-      <button class="chip" data-category="electronics">Electronics</button>
-      <button class="chip" data-category="clothing">Clothing</button>
-      <button class="chip" data-category="other">Other</button>
+      <button class="chip active" data-category="all" type="button" aria-pressed="true">All</button>
+      <button class="chip" data-category="textbooks" type="button" aria-pressed="false">Textbooks</button>
+      <button class="chip" data-category="furniture" type="button" aria-pressed="false">Furniture</button>
+      <button class="chip" data-category="dorm" type="button" aria-pressed="false">Dorm</button>
+      <button class="chip" data-category="electronics" type="button" aria-pressed="false">Electronics</button>
+      <button class="chip" data-category="clothing" type="button" aria-pressed="false">Clothing</button>
+      <button class="chip" data-category="other" type="button" aria-pressed="false">Other</button>
     </nav>
 
     <main class="content">
+      <button id="save-search-alert" type="button" class="discovery-button">Save search alert</button>
+      <div class="discovery-links"><a class="discovery-link" href="/saved.html">Saved &amp; recently viewed</a><a class="discovery-link" href="/academic.html">Textbook requests &amp; discovery</a></div>
+      <div class="toolbar">
+        <div class="result-tools"><span id="resultCount" role="status">Loading...</span>
+          <button id="filterToggle" class="filter-btn" type="button" aria-label="Filters" aria-controls="filters" aria-expanded="false">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"></path></svg>
+        </button></div>
+        <label class="sort">Sort
+          <select id="sortSelect">
+            <option value="recommended">Best match</option>
+            <option value="newest">Newest</option>
+            <option value="price_asc">Price: low to high</option>
+            <option value="price_desc">Price: high to low</option>
+          </select>
+        </label>
+      </div>
+
       <!-- Filters panel (opens from the filter button) -->
       <section id="filters" class="filters" hidden>
         <div id="textbookFilters" class="filter-grid" hidden>
@@ -66,22 +92,25 @@
             <input id="maxPrice" type="number" min="0" step="0.01" inputmode="decimal">
           </label>
         </div>
+        <div class="filter-grid">
+          <label>Condition
+            <select id="conditionFilter"><option value="">Any condition</option><option value="new">New</option><option value="like_new">Like new</option><option value="good">Good</option><option value="fair">Fair</option></select>
+          </label>
+          <label>Seller housing
+            <select id="housingFilter"><option value="">Any housing</option><option value="on_campus">On campus</option><option value="off_campus">Off campus</option></select>
+          </label>
+        </div>
         <button id="clearFilters" class="clear-btn" type="button">Clear filters</button>
       </section>
 
-      <div class="toolbar">
-        <span id="resultCount">Loading...</span>
-        <label class="sort">Sort
-          <select id="sortSelect">
-            <option value="recommended">Recommended</option>
-            <option value="newest">Newest</option>
-            <option value="price_asc">Price: low to high</option>
-            <option value="price_desc">Price: high to low</option>
-          </select>
-        </label>
-      </div>
-
-      <div id="listingResults" class="grid" aria-live="polite"></div>
+      <section id="personal-recommendations" class="discovery-section" aria-labelledby="personal-heading" hidden>
+        <h2 id="personal-heading">Recommended for you</h2>
+        <p id="personal-status" role="status"></p>
+        <div id="personal-list" class="discovery-list"></div>
+        <a href="/settings.html?from=browse#personalisation" class="discovery-link">Manage recommendation privacy</a>
+      </section>
+      <p id="browse-save-status" class="discovery-status" role="status"></p>
+      <div id="listingResults" class="grid"></div>
       <p id="errorMessage" class="error" role="alert" hidden></p>
     </main>
 

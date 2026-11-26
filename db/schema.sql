@@ -1,5 +1,5 @@
 -- UniMarket database schema
--- Rebuilds every table. Safe to run more than once.
+-- Base schema only. For a fresh database use db/setup.sql.
 
 -- Students
 CREATE TABLE IF NOT EXISTS users (
@@ -79,7 +79,7 @@ id           SERIAL PRIMARY KEY,
 user_id      INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 title        TEXT NOT NULL,
 budget_cents INTEGER NOT NULL CHECK (budget_cents >= 0),
-movie_in     DATE,
+move_in      DATE,
 lease_months INTEGER CHECK (lease_months BETWEEN 1 AND 24),
 location TEXT NOT NULL CHECK (location IN ('on_campus','off_campus', 'either')),
 has_place     BOOLEAN NOT NULL DEFAULT FALSE,

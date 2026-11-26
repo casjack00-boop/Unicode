@@ -2,10 +2,10 @@
 .isbn-scan-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .isbn-scan-actions button { flex: 1 1 auto; white-space: normal; }
 .isbn-scan-actions #isbnPhoto, .isbn-scan-actions #isbnStop {
-  background: #fff; color: var(--navy, #002D72); border: 1px solid var(--navy, #002D72);
+  background: var(--surface); color: var(--navy, #002D72); border: 1px solid var(--navy, #002D72);
 }
 .isbn-scanner [hidden] { display: none !important; }
-#isbnReader { width: 100%; max-width: 100%; overflow: hidden; border-radius: 8px; background: #F5F7FB; }
+#isbnReader { width: 100%; max-width: 100%; overflow: hidden; border-radius: 8px; background: var(--bg); }
 #isbnReader video, #isbnReader canvas { max-width: 100%; }
-#isbnScanStatus { color: var(--muted, #5A6478); font-size: 14px; }
+#isbnScanStatus { color: var(--muted, #5A6478); font-size: 0.875rem; }
 #isbnScanStatus:empty { display: none; }
