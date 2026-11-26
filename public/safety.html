@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Community safety | UniMarket</title>
+  <link rel="stylesheet" href="/browse.css">
+  <link rel="stylesheet" href="/accessibility.css">
+  <link rel="stylesheet" href="/safety.css">
+  <script src="/accessibility.js"></script>
+  <script src="/safety.js" defer></script>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#002D72">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="/pwa.css">
+  <script src="/pwa.js" defer></script>
+</head>
+<body>
+  <div class="app">
+    <header class="top"><div class="top-row"><a class="brand" href="/browse.html">UniMarket</a></div></header>
+    <main class="safety-main">
+      <a id="safety-back" href="/browse.html">Back to Browse</a>
+      <h1>Community safety</h1>
+      <section class="safety-panel" id="report-panel" hidden>
+        <h2 id="report-heading">Report</h2>
+        <p>Reports are private to authorised project operators. A report does not automatically suspend an account.</p>
+        <p id="message-evidence" hidden>The reported message will be included as evidence.</p>
+        <form id="report-form">
+          <label for="report-reason">Reason</label>
+          <select id="report-reason" required>
+            <option value="">Choose a reason</option><option value="scam">Suspected scam</option>
+            <option value="harassment">Harassment</option><option value="misleading">Misleading information</option>
+            <option value="spam">Spam</option><option value="unsafe">Unsafe behaviour</option><option value="other">Other</option>
+          </select>
+          <label for="report-details">Additional details (optional)</label>
+          <textarea id="report-details" maxlength="1000" rows="4" placeholder="Describe what happened. Do not include passwords or payment details."></textarea>
+          <button type="submit">Submit report</button>
+        </form>
+        <p id="report-status" role="status"></p>
+      </section>
+      <section class="safety-panel" id="block-panel" hidden>
+        <h2>Block student</h2>
+        <p>Prevents new messages and offers between both accounts. Existing conversations and reservations remain accessible. You can unblock a student in Settings.</p>
+        <button type="button" id="block-student">Block student</button>
+        <p id="block-status" role="status"></p>
+      </section>
+      <section class="safety-panel">
+        <h2>Safer exchanges</h2>
+        <p>Meet in a public, well-lit location. Inspect the item before paying. Keep communication in UniMarket and do not share passwords or financial credentials.</p>
+        <p>UniMarket does not handle payments, guarantee refunds or provide emergency assistance. If you face immediate danger, contact emergency services.</p>
+      </section>
+      <p id="safety-status" role="status"></p>
+      <a id="safety-login" href="/login.html" hidden>Log in to continue</a>
+    </main>
+  </div>
+</body>
+</html>

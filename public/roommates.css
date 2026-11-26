@@ -21,13 +21,13 @@
 
 body {
   margin: 0;
-  background: #E9EDF4;
+  background: var(--canvas);
   color: var(--ink);
   font-family: 'Source Sans 3', system-ui, sans-serif;
 }
 
 a {
-  color: var(--navy);
+  color: var(--link);
 }
 
 /* Phone-width column, centered on computers */
@@ -57,7 +57,7 @@ a {
   flex: 1;
   font-family: Archivo, sans-serif;
   font-weight: 800;
-  font-size: 22px;
+  font-size: 1.375rem;
 }
 
 .back {
@@ -79,22 +79,22 @@ a {
   border: none;
   border-radius: 19px;
   background: var(--orange);
-  color: var(--ink);
+  color: var(--on-orange);
   font-family: inherit;
   font-weight: 700;
-  font-size: 15px;
+  font-size: 0.9375rem;
   cursor: pointer;
 }
 
 .sub {
   margin: 6px 0 0 48px;
   color: #DCE4F2;
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 
 /* ---------- Cards ---------- */
 .card {
-  background: #FFFFFF;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 16px;
@@ -115,7 +115,7 @@ a {
 .form h2 {
   margin: 0;
   font-family: Archivo, sans-serif;
-  font-size: 19px;
+  font-size: 1.1875rem;
 }
 
 .note {
@@ -140,7 +140,7 @@ a {
 .field label,
 .label {
   font-weight: 600;
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 
 .two {
@@ -156,9 +156,9 @@ textarea {
   height: 46px;
   padding: 0 12px;
   font-family: inherit;
-  font-size: 16px;
+  font-size: 1rem;
   color: var(--ink);
-  background: #FFFFFF;
+  background: var(--surface);
   border: 1.5px solid var(--field);
   border-radius: 10px;
 }
@@ -222,7 +222,7 @@ textarea:focus {
   border-radius: 10px;
   font-family: inherit;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 1rem;
   cursor: pointer;
 }
 
@@ -243,7 +243,7 @@ textarea:focus {
 
 .btn-plain {
   border: 1.5px solid var(--field);
-  background: #FFFFFF;
+  background: var(--surface);
   color: var(--ink);
 }
 
@@ -264,10 +264,10 @@ textarea:focus {
   padding: 0 14px;
   border-radius: 18px;
   border: 1.5px solid var(--field);
-  background: #FFFFFF;
+  background: var(--surface);
   color: var(--ink);
   font-family: inherit;
-  font-size: 15px;
+  font-size: 0.9375rem;
   cursor: pointer;
 }
 
@@ -282,7 +282,7 @@ textarea:focus {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--muted);
 }
 
@@ -301,7 +301,7 @@ textarea:focus {
 
 .count {
   margin: 0;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--muted);
 }
 
@@ -328,13 +328,13 @@ textarea:focus {
   margin: 0;
   font-family: Archivo, sans-serif;
   font-weight: 600;
-  font-size: 18px;
+  font-size: 1.125rem;
 }
 
 .budget {
   font-family: Archivo, sans-serif;
   font-weight: 800;
-  color: var(--navy);
+  color: var(--link);
   white-space: nowrap;
 }
 
@@ -347,8 +347,8 @@ textarea:focus {
 .tag {
   padding: 3px 10px;
   border-radius: 12px;
-  background: #E4E9F2;
-  font-size: 13px;
+  background: var(--photo-bg);
+  font-size: 0.8125rem;
 }
 
 .tag.place {
@@ -373,7 +373,7 @@ textarea:focus {
 }
 
 .poster {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--muted);
 }
 
@@ -390,20 +390,20 @@ textarea:focus {
   color: #FFFFFF;
   font-family: inherit;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 0.875rem;
   cursor: pointer;
   white-space: nowrap;
 }
 
 .small-btn.remove {
-  background: #FFFFFF;
+  background: var(--surface);
   color: var(--error);
   border: 1.5px solid var(--field);
 }
 
 .soon {
   margin: 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--muted);
 }
 

@@ -130,7 +130,10 @@ async function removePost(id, button) {
 document.querySelectorAll('#locationChips .chip').forEach((chip) => {
   chip.addEventListener('click', () => {
     location_ = chip.dataset.location;
-    document.querySelectorAll('#locationChips .chip').forEach((c) => c.classList.toggle('active', c === chip));
+    document.querySelectorAll('#locationChips .chip').forEach((c) => {
+      c.classList.toggle('active', c === chip);
+      c.setAttribute('aria-pressed', String(c === chip));
+    });
     loadPosts();
   });
 });
@@ -144,6 +147,7 @@ document.getElementById('maxBudget').addEventListener('input', () => {
 // ---------- Post form ----------
 document.getElementById('openForm').addEventListener('click', () => {
   form.hidden = false;
+  document.getElementById('openForm').setAttribute('aria-expanded', 'true');
   document.getElementById('loginNote').hidden = Boolean(myId);
   postBtn.disabled = !myId;
   document.getElementById('title').focus();
@@ -151,7 +155,9 @@ document.getElementById('openForm').addEventListener('click', () => {
 
 document.getElementById('cancelForm').addEventListener('click', () => {
   form.hidden = true;
+  document.getElementById('openForm').setAttribute('aria-expanded', 'false');
   formMessage.textContent = '';
+  document.getElementById('openForm').focus();
 });
 
 document.querySelectorAll('#placeChips .chip').forEach((chip) => {
@@ -204,6 +210,8 @@ form.addEventListener('submit', async (event) => {
 
     form.reset();
     form.hidden = true;
+    document.getElementById('openForm').setAttribute('aria-expanded', 'false');
+    document.getElementById('openForm').focus();
     formMessage.textContent = '';
     loadPosts();
   } catch (err) {

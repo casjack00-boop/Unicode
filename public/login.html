@@ -1,4 +1,4 @@
-<!DOCUTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -7,8 +7,15 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap">
     <link rel="stylesheet" href="styles.css">
     
-    </head>
-</body>
+      <link rel="stylesheet" href="/accessibility.css">
+  <script src="/accessibility.js"></script>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#002D72">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="/pwa.css">
+  <script src="/pwa.js" defer></script>
+</head>
+<body>
     <!--Navy header-->
     <header class="hero">
         <div class="brand">
@@ -72,6 +79,7 @@
 
          <!-- Messages (errors and success) show here-->
           <p id="message" role="status"></p>
+          <a class="settings-access-link" href="/settings.html?from=login">Accessibility &amp; appearance settings</a>
     </main>
 
     <script src="app.js"></script>

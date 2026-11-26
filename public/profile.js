@@ -59,10 +59,23 @@ function renderListings(listings) {
   }
 }
 
+function showRating(role, data) {
+  const score = el(role === 'seller' ? 'rating' : 'buyer-rating');
+  const stars = el(role + '-stars');
+  const count = el(role + '-rating-count');
+  const average = Number(data?.average);
+  const total = Number(data?.count);
+  const rated = data && total > 0 && Number.isFinite(average) && average >= 0 && average <= 5;
+  score.textContent = rated ? `${average.toFixed(1)} / 5` : '—';
+  const filled = rated ? Math.round(average) : 0;
+  stars.textContent = '★'.repeat(filled) + '☆'.repeat(5 - filled);
+  count.textContent = !data ? 'Unavailable' : rated ? `${total} ${total === 1 ? 'review' : 'reviews'}` : 'No ratings yet';
+}
+
 async function loadRatings(id) {
   try {
     const data = await api('/api/sellers/' + encodeURIComponent(id) + '/rating');
-    el('rating').textContent = data.count ? `★ ${data.average.toFixed(1)} / 5 (${data.count} ratings)` : 'No ratings yet';
+    showRating('seller', data);
     const reviews = el('reviews');
     reviews.replaceChildren();
     if (!data.recent.length) reviews.textContent = 'No written reviews yet.';
@@ -77,7 +90,7 @@ async function loadRatings(id) {
       reviews.append(box);
     }
   } catch (err) {
-    el('rating').textContent = 'Ratings unavailable';
+    showRating('seller', null);
     el('reviews').textContent = 'Unable to load reviews.';
   }
 }
@@ -109,23 +122,38 @@ el('edit-form').addEventListener('submit', async (event) => {
   } catch (err) { setEditStatus(err.message, true); }
   finally { el('save-button').disabled = false; }
 });
-el('logout').addEventListener('click', async () => {
-  el('logout').disabled = true;
-  try { await api('/api/auth/logout', { method: 'POST' }); location.href = '/login.html'; }
-  catch (err) { setEditStatus(err.message, true); el('logout').disabled = false; }
-});
+
+async function loadBuyerReputation(id) {
+  try {
+    const data=await api('/api/reputation/buyer/'+encodeURIComponent(id));
+    showRating('buyer', data);
+    el('completed-sales').textContent = data.completed_sales;
+    el('completed-purchases').textContent = data.completed_purchases;
+    const list=el('buyer-reviews');list.replaceChildren();
+    if(!data.recent.length)list.textContent='No buyer reviews yet.';
+    for(const r of data.recent){const box=document.createElement('div');box.className='review';const name=document.createElement('strong');name.textContent=r.rater_name+' · '+r.stars+' / 5';const comment=document.createElement('p');comment.textContent=r.comment;box.append(name,comment);list.append(box);}
+  } catch(e){showRating('buyer', null);el('buyer-reviews').textContent='Unable to load buyer reviews.';el('completed-sales').textContent='—';el('completed-purchases').textContent='—';}
+}
 
 async function loadProfile() {
-  el('page-label').textContent = ownProfile ? 'My profile' : 'Student profile';
+  el('profile-settings').hidden = true;
+  el('profile').hidden = true;
+  el('status').hidden = false;
+  el('status').textContent = 'Loading profile...';
+  el('status').classList.remove('profile-error');
+  el('login-link').hidden = true;
   try {
     const data = await api('/api/profiles/' + (ownProfile ? 'me' : encodeURIComponent(viewedId)));
     showUser(data.user);
     renderListings(data.listings);
     el('account').hidden = !ownProfile;
+    el('profile-settings').hidden = !ownProfile;
     el('edit-button').hidden = !ownProfile;
+    el('profile-safety').href = '/safety.html?user=' + encodeURIComponent(data.user.id);
+    el('profile-safety').hidden = ownProfile;
     el('status').hidden = true;
     el('profile').hidden = false;
-    await loadRatings(data.user.id);
+    await Promise.all([loadRatings(data.user.id),loadBuyerReputation(data.user.id)]);
   } catch (err) {
     el('status').textContent = err.message;
     el('status').classList.add('profile-error');
@@ -133,3 +161,4 @@ async function loadProfile() {
   }
 }
 loadProfile();
+window.addEventListener('pageshow', event => { if (event.persisted) loadProfile(); });

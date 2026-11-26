@@ -8,22 +8,34 @@
   <link rel="stylesheet" href="/browse.css">
   <link rel="stylesheet" href="/messages.css">
   <script src="/messages.js" defer></script>
+  <link rel="stylesheet" href="/accessibility.css">
+  <script src="/accessibility.js"></script>
+  <link rel="stylesheet" href="/safety.css">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#002D72">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="/pwa.css">
+  <script src="/pwa.js" defer></script>
 </head>
 <body>
   <div class="app messaging-app">
     <header class="top messaging-header">
-      <div class="top-row">
+      <div class="message-header-row">
         <a class="brand" href="/browse.html">UniMarket</a>
-        <a id="back-inbox" href="/messages.html" hidden>‹ Inbox</a>
+        <a id="back-inbox" class="chat-back-icon" href="/messages.html" aria-label="Back to inbox" title="Back to inbox" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></a>
+        <div class="message-heading">
+          <h1 id="page-title">Messages</h1>
+          <a id="other-profile" hidden></a>
+        </div>
+        <a id="chat-safety" class="chat-safety-icon" aria-label="Report or block student" title="Report or block student" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11zM12 8v4m0 4h.01"/></svg></a>
       </div>
-      <h1 id="page-title">Messages</h1>
-      <a id="other-profile" hidden></a>
       <div id="search-box" class="search" hidden>
         <label for="conversation-search" class="sr-only">Search conversations</label>
         <input id="conversation-search" type="search" placeholder="Search conversations">
       </div>
     </header>
     <main class="message-main">
+      <p><a href="/transactions.html">Offers &amp; transactions</a></p>
       <p id="message-status" role="status">Loading messages...</p>
       <a id="login-link" href="/login.html" hidden>Log in to continue</a>
       <section id="inbox" hidden aria-label="Conversations">
@@ -32,7 +44,12 @@
       <section id="chat" hidden aria-label="Conversation">
         <div class="listing-context"><div><strong id="listing-title"></strong><span id="listing-info"></span></div><a id="listing-link">View item ›</a></div>
         <div id="message-history" role="log" aria-label="Message history" aria-live="polite"></div>
+        <p id="chat-blocked" role="status" hidden>New messages are unavailable for this conversation.</p>
         <form id="message-form" class="compose">
+          <div id="reply-preview" class="reply-preview" hidden>
+            <div><strong id="reply-author"></strong><span id="reply-excerpt"></span></div>
+            <button type="button" id="cancel-reply" aria-label="Cancel reply" title="Cancel reply">×</button>
+          </div>
           <label for="message-input" class="sr-only">Write a message</label>
           <textarea id="message-input" maxlength="2000" rows="2" placeholder="Write a message..." required></textarea>
           <button id="send-button" type="submit">Send</button>
@@ -61,5 +78,36 @@
       </a>
     </nav>
   </div>
+  <div id="message-actions" class="message-actions" role="group" aria-label="Message actions" hidden>
+    <button type="button" data-action="copy"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>Copy</button>
+    <button type="button" data-action="select"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h5m6 0h5M4 20h5m6 0h5M4 4v5m16-5v5M4 20v-5m16 5v-5M9 8h6m-3 0v8m-2 0h4"/></svg>Select text</button>
+    <button type="button" data-action="reply"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 10-5 5 5 5M4 15h10a6 6 0 0 0 6-6V4"/></svg>Reply</button>
+    <button type="button" data-action="report" class="report-action"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V3m0 1c5-4 9 4 14 0v11c-5 4-9-4-14 0"/></svg>Report</button>
+  </div>
+  <div id="copy-toast" class="copy-toast" role="status" aria-live="polite"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><span></span></div>
+  <dialog id="selection-dialog" class="report-dialog selection-dialog" aria-labelledby="selection-title" aria-describedby="selection-help">
+    <div class="selection-content">
+      <h2 id="selection-title">Select text</h2>
+      <p id="selection-help">Press and hold the text, then adjust the selection handles. On a computer, drag to highlight the part you want.</p>
+      <textarea id="selection-text" rows="5" readonly aria-label="Message text"></textarea>
+      <p id="selection-status" role="status"></p>
+      <div class="report-dialog-buttons"><button type="button" id="close-selection">Done</button><button type="button" id="copy-selection">Copy selection</button></div>
+    </div>
+  </dialog>
+  <dialog id="report-dialog" class="report-dialog" aria-labelledby="report-dialog-title">
+    <form id="message-report-form">
+      <h2 id="report-dialog-title">Report this message?</h2>
+      <p>Are you sure you want to report this student’s message? The selected message will be included as evidence.</p>
+      <blockquote id="report-excerpt"></blockquote>
+      <label for="message-report-reason">Reason</label>
+      <select id="message-report-reason" required>
+        <option value="">Choose a reason</option><option value="scam">Suspected scam</option><option value="harassment">Harassment</option><option value="misleading">Misleading information</option><option value="spam">Spam</option><option value="unsafe">Unsafe behaviour</option><option value="other">Other</option>
+      </select>
+      <label for="message-report-details">Additional details (optional)</label>
+      <textarea id="message-report-details" maxlength="1000" rows="3"></textarea>
+      <p id="message-report-status" role="status"></p>
+      <div class="report-dialog-buttons"><button type="button" id="cancel-report">Cancel</button><button type="submit" id="confirm-report">Submit report</button></div>
+    </form>
+  </dialog>
 </body>
 </html>

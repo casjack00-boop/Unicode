@@ -58,12 +58,11 @@ function showPhotos(photos, title) {
   function draw() {
     img.src = photos[which].url;
     counter.textContent = `${which + 1} / ${photos.length}`;
+    counter.setAttribute('aria-label', `Photo ${which + 1} of ${photos.length}. Show next photo`);
   }
 
   if (photos.length > 1) {
     counter.hidden = false;
-    counter.setAttribute('role', 'button');
-    counter.tabIndex = 0;
     counter.title = 'Next photo';
     const next = () => { which = (which + 1) % photos.length; draw(); };
     counter.addEventListener('click', next);
@@ -114,6 +113,9 @@ async function loadListing() {
     }
 
     // Fill in the page
+    const reportLink = document.getElementById('report-listing');
+    reportLink.href = '/safety.html?listing=' + encodeURIComponent(listing.id);
+    reportLink.hidden = false;
     setText('price', formatPrice(listing.price_cents));
     setText('title', listing.title);
     setText('condition', formatLabel(listing.condition));
@@ -123,6 +125,12 @@ async function loadListing() {
     if (isbnDetails) {
       isbnDetails.hidden = !(listing.category === 'textbooks' && listing.isbn);
       isbnDetails.textContent = isbnDetails.hidden ? '' : 'ISBN: ' + listing.isbn;
+    }
+    const dimensionsPanel = document.getElementById('item-dimensions');
+    if (listing.category === 'furniture' && listing.dimension_unit && listing.width_measure != null && listing.height_measure != null && listing.depth_measure != null) {
+      const values = [listing.width_measure, listing.height_measure, listing.depth_measure].map(Number);
+      dimensionsPanel.textContent = `Dimension: ${values.join(' × ')} ${listing.dimension_unit} (W × H × D)`;
+      dimensionsPanel.hidden = false;
     }
     setText('posted', postedAgo(listing.created_at));
     setText('seller-name', listing.seller_name);
@@ -148,6 +156,12 @@ async function loadListing() {
     // Swap "Loading..." for the real content
     statusEl.hidden = true;
     itemEl.hidden = false;
+    window.UniMarketDiscovery?.initItem(listing);
+    const offerLink = document.getElementById('offer-link');
+    const reserved = listing.status === 'reserved';
+    document.getElementById('purchase-state').textContent = reserved ? 'Reserved — not currently available for new offers.' : 'Agree a price and arrange an in-person exchange. No payment is collected here.';
+    offerLink.href = reserved ? '/transactions.html' : '/transactions.html?listing=' + encodeURIComponent(listing.id);
+    offerLink.textContent = reserved ? 'View my transactions' : 'Make an offer / reserve';
   } catch (err) {
     // Network problem or the server is down
     console.error(err);
@@ -163,13 +177,6 @@ messageBtn.addEventListener('click', () => {
     window.location.href =
       '/messages.html?listing=' + encodeURIComponent(id);
   }
-});
-
-// Heart button: save / unsave (just on this screen for now)
-const saveBtn = document.getElementById('save-btn');
-saveBtn.addEventListener('click', () => {
-  const saved = saveBtn.getAttribute('aria-pressed') === 'true';
-  saveBtn.setAttribute('aria-pressed', String(!saved));
 });
 
 // ---------- 5. Seller ratings ----------
@@ -213,9 +220,9 @@ async function loadRating(sellerId) {
       list.append(li);
     });
 
-    // Only logged-in students who aren't the seller can rate
+    // Only buyers with a completed exchange with this seller can rate.
     const form = document.getElementById('rate-form');
-    form.hidden = !data.loggedIn || data.isSelf;
+    form.hidden = !data.canRate;
     if (data.mine) {
       showPicked(data.mine.stars);
       document.getElementById('rate-comment').value = data.mine.comment || '';

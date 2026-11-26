@@ -1,0 +1,23 @@
+/* Shared discovery components use the existing appearance tokens. */
+.discovery-links { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+.discovery-link, .discovery-button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 8px 12px; border: 1px solid var(--field); border-radius: 10px; background: var(--surface); color: var(--link); font: inherit; font-weight: 600; text-decoration: none; cursor: pointer; }
+.discovery-button:disabled { opacity: .65; cursor: wait; }
+.discovery-section { margin: 16px 0; display: grid; gap: 10px; min-width: 0; }
+.discovery-section h2 { margin: 0; font: 600 1.125rem Archivo, sans-serif; color: var(--ink); }
+.discovery-section p, .discovery-status { margin: 0; color: var(--muted); font-size: .9rem; overflow-wrap: anywhere; }
+.discovery-status:empty { display: none; }
+.discovery-list { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+.discovery-card { min-width: 0; display: flex; flex-direction: column; gap: 6px; padding: 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); }
+.discovery-card a { color: var(--link); font-weight: 600; overflow-wrap: anywhere; }
+.discovery-card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; background: var(--photo-bg); }
+.discovery-card strong { font-size: 1.1rem; }
+.discovery-card .discovery-button { margin-top: auto; }
+.discovery-panel { display: grid; gap: 8px; padding: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.discovery-panel h2 { font-size: 1rem; margin: 0; }
+.discovery-panel p { margin: 0; font-size: .9rem; color: var(--muted); }
+.discovery-page { padding: 16px; display: grid; gap: 16px; }
+.discovery-page h1 { margin: 0; font: 800 1.5rem Archivo, sans-serif; }
+.discovery-page .discovery-section { margin: 0; }
+.discovery-page .discovery-links { margin: 0; }
+@media (max-width: 340px) { .discovery-list { grid-template-columns: 1fr; } }
+:root:not([data-text-size="default"]) .discovery-list { grid-template-columns: 1fr; }

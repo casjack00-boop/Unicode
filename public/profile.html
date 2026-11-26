@@ -8,10 +8,19 @@
   <link rel="stylesheet" href="/browse.css">
   <link rel="stylesheet" href="/profile.css">
   <script src="/profile.js" defer></script>
+  <link rel="stylesheet" href="/accessibility.css">
+  <script src="/accessibility.js"></script>
+  <link rel="stylesheet" href="/safety.css">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#002D72">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="/pwa.css">
+  <script src="/pwa.js" defer></script>
 </head>
 <body>
   <div class="app">
-    <header class="top"><div class="top-row"><a class="brand" href="/browse.html">UniMarket</a><span class="verified" id="page-label">Profile</span></div></header>
+    <header class="top"><div class="top-row"><a class="brand" href="/browse.html">UniMarket</a><a id="profile-settings" class="profile-settings" href="/settings.html?from=profile" aria-label="Settings" title="Settings" hidden><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.42.24a2 2 0 0 1-2 0l-.15-.09a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.09a2 2 0 0 1 1 1.74v.48a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.09a2 2 0 0 1 2 0l.42.24a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.42-.24a2 2 0 0 1 2 0l.15.09a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.48a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.09a2 2 0 0 1-2 0l-.42-.24a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></a></div>
+    </header>
     <main class="profile-main">
       <p id="status" role="status">Loading profile...</p>
       <a id="login-link" href="/login.html" hidden>Log in to UniMarket</a>
@@ -22,7 +31,27 @@
           <p class="verified-student">✓ Verified UT Tyler student</p>
           <p id="housing" class="profile-muted"></p>
           <p id="member-since" class="profile-muted"></p>
-          <p id="rating" class="profile-rating">Loading ratings...</p>
+          <div class="profile-reputation" aria-label="Student reputation">
+            <div class="profile-reputation-grid">
+              <div class="profile-reputation-cell">
+                <p class="profile-muted">Seller rating</p>
+                <p id="rating" class="profile-score">—</p>
+                <p id="seller-stars" class="profile-stars" aria-hidden="true"></p>
+                <p id="seller-rating-count" class="profile-muted">Loading reviews...</p>
+              </div>
+              <div class="profile-reputation-cell">
+                <p class="profile-muted">Buyer rating</p>
+                <p id="buyer-rating" class="profile-score">—</p>
+                <p id="buyer-stars" class="profile-stars" aria-hidden="true"></p>
+                <p id="buyer-rating-count" class="profile-muted">Loading reviews...</p>
+              </div>
+            </div>
+            <div id="exchange-count" class="profile-reputation-grid profile-exchange-grid" aria-label="Completed exchanges">
+              <div class="profile-reputation-cell"><p id="completed-sales" class="profile-score">—</p><p class="profile-muted">Completed sales</p></div>
+              <div class="profile-reputation-cell"><p id="completed-purchases" class="profile-score">—</p><p class="profile-muted">Completed purchases</p></div>
+            </div>
+          </div>
+          <a id="profile-safety" class="safety-link" hidden>Report or block student</a>
           <button id="edit-button" type="button" class="profile-button" hidden>Edit profile</button>
         </section>
         <section id="account" class="profile-panel" hidden>
@@ -37,11 +66,13 @@
             <div class="profile-actions"><button type="submit" class="profile-button" id="save-button">Save changes</button><button type="button" class="profile-secondary" id="cancel-button">Cancel</button></div>
           </form>
           <p id="edit-status" role="status"></p>
+          <a class="profile-link" href="/saved.html">Saved &amp; recently viewed <span aria-hidden="true">›</span></a>
+          <a class="profile-link" href="/transactions.html">Offers &amp; transactions <span aria-hidden="true">›</span></a>
           <a class="profile-link" href="/my-listings.html">Manage my listings <span aria-hidden="true">›</span></a>
-          <button type="button" id="logout" class="profile-secondary">Log out</button>
         </section>
         <section class="profile-panel"><h2>Active listings</h2><div id="active-listings" class="grid"></div></section>
-        <section class="profile-panel"><h2>Recent reviews</h2><div id="reviews"></div></section>
+        <section class="profile-panel"><h2>Seller reviews</h2><div id="reviews"></div></section>
+        <section class="profile-panel"><h2>Buyer reviews</h2><div id="buyer-reviews"></div></section>
       </div>
     </main>
     <nav class="bottom-nav" aria-label="Main">

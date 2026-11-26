@@ -16,7 +16,7 @@
 
 body {
   margin: 0;
-  background: #E9EDF4;
+  background: var(--canvas);
   color: var(--ink);
   font-family: 'Source Sans 3', system-ui, sans-serif;
 }
@@ -48,11 +48,11 @@ body {
 .brand {
   font-family: Archivo, sans-serif;
   font-weight: 800;
-  font-size: 24px;
+  font-size: 1.5rem;
   color: #FFFFFF;
   text-decoration: none;
 }
-.verified { font-size: 14px; color: #DCE4F2; display: flex; align-items: center; gap: 6px; }
+.verified { font-size: 0.875rem; color: #DCE4F2; display: flex; align-items: center; gap: 6px; }
 
 .search-row { display: flex; gap: 10px; }
 .search { position: relative; flex: 1; }
@@ -61,14 +61,14 @@ body {
   width: 100%;
   height: 46px;
   padding: 0 14px 0 44px;
-  font-size: 16px;
+  font-size: 1rem;
   font-family: inherit;
   border: none;
   border-radius: 23px;
-  background: #FFFFFF;
+  background: var(--surface);
   color: var(--ink);
 }
-.search input::placeholder { color: #7A8396; }
+.search input::placeholder { color: var(--placeholder); }
 .filter-btn {
   width: 46px; height: 46px; flex-shrink: 0;
   border-radius: 23px; border: none;
@@ -77,7 +77,7 @@ body {
   display: flex; align-items: center; justify-content: center;
   cursor: pointer;
 }
-.filter-btn[aria-expanded="true"] { background: var(--orange); color: var(--ink); }
+.filter-btn[aria-expanded="true"] { background: var(--orange); color: var(--on-orange); }
 
 /* ---------- Category chips ---------- */
 .chips {
@@ -93,10 +93,10 @@ body {
   padding: 0 16px;
   border-radius: 18px;
   border: 1.5px solid var(--chip-line);
-  background: #FFFFFF;
+  background: var(--surface);
   color: var(--ink);
   font-family: inherit;
-  font-size: 15px;
+  font-size: 0.9375rem;
   cursor: pointer;
 }
 .chip.active {
@@ -110,7 +110,7 @@ body {
 .content { padding: 0 16px 16px; }
 
 .filters {
-  background: #FFFFFF;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 14px;
@@ -121,25 +121,25 @@ body {
 }
 .filters[hidden], .filter-grid[hidden] { display: none; }
 .filter-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-.filters label { display: flex; flex-direction: column; gap: 4px; font-size: 14px; font-weight: 600; }
+.filters label { display: flex; flex-direction: column; gap: 4px; font-size: 0.875rem; font-weight: 600; }
 .filters select, .filters input, .sort select {
   height: 42px;
   padding: 0 10px;
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-family: inherit;
   border: 1.5px solid var(--chip-line);
   border-radius: 10px;
-  background: #FFFFFF;
+  background: var(--surface);
   color: var(--ink);
 }
 .clear-btn {
   height: 42px;
   border: 1.5px solid var(--navy);
   border-radius: 10px;
-  background: #FFFFFF;
-  color: var(--navy);
+  background: var(--surface);
+  color: var(--link);
   font-family: inherit;
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
 }
@@ -150,7 +150,7 @@ body {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 12px;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--muted);
 }
 .sort { display: flex; align-items: center; gap: 8px; }
@@ -165,7 +165,7 @@ body {
 .card {
   display: flex;
   flex-direction: column;
-  background: #FFFFFF;
+  background: var(--surface);
   border-radius: 12px;
   overflow: hidden;
   text-decoration: none;
@@ -182,16 +182,16 @@ body {
   justify-content: center;
   gap: 4px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .card-photo img { width: 100%; height: 100%; object-fit: cover; }
 .card-body { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 3px; }
-.card-price { font-family: Archivo, sans-serif; font-weight: 800; font-size: 18px; color: var(--navy); }
-.card-title { font-size: 15px; font-weight: 600; line-height: 1.25; }
-.card-meta { font-size: 13px; color: var(--muted); }
+.card-price { font-family: Archivo, sans-serif; font-weight: 800; font-size: 1.125rem; color: var(--link); }
+.card-title { font-size: 0.9375rem; font-weight: 600; line-height: 1.25; }
+.card-meta { font-size: 0.8125rem; color: var(--muted); }
 
 .empty, .error { grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 30px 0; }
-.error { color: #B3261E; font-weight: 600; }
+.error { color: var(--error); font-weight: 600; }
 
 /* ---------- Bottom nav ---------- */
 .bottom-nav {
@@ -204,7 +204,7 @@ body {
   height: 72px;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  background: #FFFFFF;
+  background: var(--surface);
   border-top: 1px solid var(--line);
 }
 .nav-item {
@@ -215,9 +215,9 @@ body {
   gap: 3px;
   text-decoration: none;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
-.nav-item.active { color: var(--navy); font-weight: 600; }
+.nav-item.active { color: var(--link); font-weight: 600; }
 .sell-dot {
   width: 30px; height: 30px; border-radius: 15px;
   background: var(--orange);
@@ -241,8 +241,19 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   padding: 6px 12px;
   border-radius: 16px;
   background: var(--orange);
-  color: var(--ink);
-  font-size: 14px;
+  color: var(--on-orange);
+  font-size: 0.875rem;
   font-weight: 600;
   text-decoration: none;
 }
+
+/* Discovery controls: independent button above the listing link. */
+.listing-tile { position: relative; min-width: 0; display: flex; }
+.listing-tile > .card { width: 100%; }
+.wishlist-heart { position: absolute; top: 8px; right: 8px; width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--field); border-radius: 50%; background: var(--surface); color: var(--link); cursor: pointer; }
+.wishlist-heart[aria-pressed="true"] svg { fill: currentColor; }
+.wishlist-heart:disabled { opacity: .65; cursor: wait; }
+.result-tools { display: flex; align-items: center; gap: 6px; }
+.toolbar { flex-wrap: wrap; gap: 8px; }
+.toolbar .filter-btn { width: 44px; height: 44px; color: var(--link); background: var(--surface); border: 1px solid var(--field); }
+.toolbar .filter-btn[aria-expanded="true"] { color: var(--on-orange); background: var(--orange); }

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#002D72">
+  <title>Offline | UniMarket</title>
+  <style>
+    :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #F5F7FB; color: #14213D; }
+    main { box-sizing: border-box; width: min(100%, 440px); padding: 24px; text-align: center; overflow-wrap: anywhere; }
+    img { border-radius: 16px; }
+    h1 { font-size: 1.6rem; }
+    p { line-height: 1.55; }
+    button, a { display: block; padding: 14px; margin: 12px auto; border-radius: 10px; font: inherit; font-weight: 600; }
+    button { min-height: 44px; border: 0; background: #002D72; color: white; cursor: pointer; }
+    a { color: #002D72; }
+    :focus-visible { outline: 3px solid #F47A20; outline-offset: 4px; }
+    @media (prefers-color-scheme: dark) { body { background: #131D2C; color: #F0F4FA; } a { color: #A9CEFF; } button { background: #214D88; } }
+  </style>
+</head>
+<body>
+  <main>
+    <img src="/icons/icon-192.png" width="80" height="80" alt="UniMarket">
+    <h1>You're offline</h1>
+    <p>Reconnect to the internet to browse listings, send messages or manage your transactions. Your private information is not available offline.</p>
+    <button type="button" id="retry">Try again</button>
+    <a href="/">Return to home</a>
+  </main>
+  <script>document.getElementById('retry').addEventListener('click', () => location.reload());</script>
+</body>
+</html>
