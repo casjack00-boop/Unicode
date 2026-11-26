@@ -196,3 +196,9 @@ searchInput.addEventListener('input', () => {
 
 loadFilterOptions();
 loadListings();
+
+// Open the alert form with the current keyword, category and maximum price.
+document.getElementById('save-search-alert').addEventListener('click', () => {
+  const params = new URLSearchParams({term: searchInput.value.trim(), category, max: maxPrice.value});
+  location.href = '/notifications.html?' + params.toString();
+});

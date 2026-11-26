@@ -1,6 +1,9 @@
 (() => {
   const $ = id => document.getElementById(id);
   const listingId = new URLSearchParams(location.search).get('listing');
+  const targetDeal = new URLSearchParams(location.search).get('deal');
+  let jumpToDeal = Boolean(targetDeal);
+  if (targetDeal) $('tx-filter').value = 'all';
   let deals = [], userId, busy = false;
   const money = n => '$' + (n / 100).toFixed(2);
   const labels = { pending:'Offer pending', reserved:'Reserved', declined:'Declined / another offer accepted', cancelled:'Cancelled', completed:'Completed' };
@@ -37,6 +40,7 @@
     for(const d of visible) {
       const buyer=d.buyer_id===userId, ownProposal=d.proposed_by===userId;
       const card=el('article',null,'tx-card');
+      card.id='deal-'+d.id; card.tabIndex=-1;
       card.append(el('h2',d.item_snapshot.title),el('p',(buyer?'Buying from ':'Selling to ')+d.other_name),el('p',labels[d.status]+' · '+money(d.price_cents),'tx-state'));
       const actions=el('div',null,'tx-actions');
       if(d.status==='pending') {
@@ -75,6 +79,7 @@
   async function load() {
     const data=await api('/api/transactions'); deals=data.deals; userId=data.user_id;
     $('tx-controls').hidden=false; render();
+    if(jumpToDeal){jumpToDeal=false;const target=$('deal-'+targetDeal);if(target){target.focus({preventScroll:true});target.scrollIntoView({block:'start'});}}
     if(listingId && !deals.some(d=>String(d.listing_id)===listingId&&['pending','reserved'].includes(d.status))) {
       try { const {listing}=await api('/api/listings/'+encodeURIComponent(listingId));
         if(listing.status==='active'&&listing.seller_id!==userId) { $('tx-new').hidden=false; $('tx-item').textContent=listing.title+' · Asking '+money(listing.price_cents); if(!$('tx-price').value)$('tx-price').value=(listing.price_cents/100).toFixed(2); }

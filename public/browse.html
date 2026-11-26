@@ -11,6 +11,8 @@
   <link rel="stylesheet" href="/accessibility.css">
   <link rel="stylesheet" href="/discovery.css">
   <script src="/accessibility.js"></script>
+  <link rel="stylesheet" href="/notifications.css">
+  <script src="/notifications.js" defer></script>
 </head>
 <body>
   <div class="app">
@@ -34,6 +36,7 @@
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"></path></svg>
         </button>
       </div>
+      <a class="notice-link" data-notice-link href="/notifications.html" hidden>Notifications <span hidden aria-hidden="true"></span></a>
     </header>
 
     <!-- Category chips -->
@@ -48,6 +51,7 @@
     </nav>
 
     <main class="content">
+      <button id="save-search-alert" type="button" class="discovery-button">Save search alert</button>
       <!-- Filters panel (opens from the filter button) -->
       <section id="filters" class="filters" hidden>
         <div id="textbookFilters" class="filter-grid" hidden>

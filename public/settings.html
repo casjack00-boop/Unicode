@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="/browse.css">
   <link rel="stylesheet" href="/accessibility.css">
   <script src="/accessibility.js"></script>
+  <link rel="stylesheet" href="/notifications.css">
+  <script src="/notifications.js" defer></script>
 </head>
 <body>
   <div class="app">
@@ -30,6 +32,18 @@
           <button type="button" id="a11y-reset">Reset preferences</button>
           <p id="a11y-status" role="status"></p>
         </div>
+      </section>
+      <section id="notification-preferences" class="notice-panel" aria-labelledby="notice-pref-heading">
+        <h2 id="notice-pref-heading">Notification preferences</h2>
+        <p id="notice-pref-status" role="status">Loading preferences…</p>
+        <form id="notice-pref-form" hidden>
+          <label class="notice-pref-check"><input type="checkbox" name="messages"> Incoming messages</label>
+          <label class="notice-pref-check"><input type="checkbox" name="transactions"> Transaction updates</label>
+          <label class="notice-pref-check"><input type="checkbox" name="price_drops"> Saved-item price drops</label>
+          <label class="notice-pref-check"><input type="checkbox" name="saved_searches"> New items matching saved searches</label>
+          <button type="submit">Save notification preferences</button>
+        </form>
+        <a href="/notifications.html">Manage notifications and saved searches</a>
       </section>
     </main>
   </div>
