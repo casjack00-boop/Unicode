@@ -86,7 +86,8 @@ input::placeholder, textarea::placeholder { color: var(--placeholder); opacity: 
 .settings-main h2 { font: 600 1.125rem Archivo, sans-serif; margin: 0 0 12px; }
 .settings-main p { margin: 0; color: var(--muted); }
 .settings-back, .settings-access-link { display: inline-flex; align-items: center; min-height: 44px; color: var(--link); font-weight: 600; text-decoration: underline; }
-.settings-header .settings-back { width: 44px; height: 44px; justify-content: center; color: #fff; text-decoration: none; border-radius: 50%; }
+.settings-header :is(.settings-back, .settings-help) { display: inline-flex; align-items: center; width: 44px; height: 44px; justify-content: center; color: #fff; text-decoration: none; border-radius: 50%; }
+.settings-header .settings-help:hover { background: rgba(255, 255, 255, .15); }
 .footer .settings-access-link { color: #fff; }
 .settings-main .a11y-settings { background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 12px; padding: 16px; min-width: 0; }
 .a11y-options { display: grid; gap: 8px; padding: 0; }

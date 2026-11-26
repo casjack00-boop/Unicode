@@ -12,7 +12,9 @@
       list.append(card);
     }
   }
+  const type=document.body.dataset.caseType;
+  const list=$(type==='report'?'mod-reports':'mod-disputes');
   let sequence=0;
-  async function load(){const current=++sequence;$('mod-content').hidden=true;$('mod-status').textContent='Loading cases…';try{const data=await api('/moderation?status='+encodeURIComponent($('mod-filter').value));if(current!==sequence)return;render($('mod-reports'),data.reports,'report');render($('mod-disputes'),data.disputes,'dispute');$('mod-content').hidden=false;$('mod-status').textContent='Showing up to 100 recent cases of each type.';}catch(e){if(current===sequence){$('mod-reports').replaceChildren();$('mod-disputes').replaceChildren();$('mod-status').textContent=e.message;}}}
-  $('mod-filter').addEventListener('change',load);$('mod-refresh').addEventListener('click',load);window.addEventListener('pagehide',()=>{$('mod-content').hidden=true;$('mod-reports').replaceChildren();$('mod-disputes').replaceChildren();});window.addEventListener('pageshow',e=>{if(e.persisted)load();});load();
+  async function load(){const current=++sequence;$('mod-content').hidden=true;$('mod-status').textContent='Loading cases…';try{const data=await api('/moderation?status='+encodeURIComponent($('mod-filter').value));if(current!==sequence)return;render(list,type==='report'?data.reports:data.disputes,type);$('mod-content').hidden=false;$('mod-status').textContent='Showing up to 100 recent cases in this view.';}catch(e){if(current===sequence){list.replaceChildren();$('mod-status').textContent=e.message;}}}
+  $('mod-filter').addEventListener('change',load);$('mod-refresh').addEventListener('click',load);window.addEventListener('pagehide',()=>{sequence++;$('mod-content').hidden=true;list.replaceChildren();});window.addEventListener('pageshow',e=>{if(e.persisted)load();});load();
 })();

@@ -19,6 +19,7 @@ router.get('/similar/:id', async (req, res) => {
     const { rows } = await pool.query(`SELECT ${fields} FROM listings l
       JOIN listings source ON source.id = $1 AND source.status = 'active'
       WHERE l.id <> source.id AND l.status = 'active' AND l.category = source.category
+      AND NOT EXISTS (SELECT 1 FROM users u WHERE u.id IN(l.seller_id,source.seller_id) AND u.suspended_at IS NOT NULL)
       ORDER BY CASE WHEN source.isbn IS NOT NULL AND l.isbn = source.isbn THEN 1 ELSE 0 END DESC,
         similarity(lower(l.title), lower(source.title)) DESC,
         CASE WHEN source.department IS NOT NULL AND l.department = source.department
@@ -42,6 +43,7 @@ router.get('/pricing', requireUser, async (req, res) => {
     const { rows } = await pool.query(`SELECT count(*)::int AS count, min(price_cents)::int AS min,
       max(price_cents)::int AS max, round(percentile_cont(0.5) WITHIN GROUP (ORDER BY price_cents)::numeric)::int AS median
       FROM listings WHERE status = 'active' AND category = $1 AND seller_id <> $4
+      AND NOT EXISTS (SELECT 1 FROM users u WHERE u.id=listings.seller_id AND u.suspended_at IS NOT NULL)
       AND (($2::text IS NOT NULL AND isbn = $2) OR ($2::text IS NULL AND
         (similarity(lower(title), lower($3)) >= 0.45 OR word_similarity(lower($3), lower(title)) >= 0.65)))`,
       [category, isbn, title, req.user.id]);
@@ -84,7 +86,7 @@ router.put('/recommendation-preferences', async (req, res) => {
 router.get('/saved', async (req, res) => {
   try {
     const { rows } = await pool.query(`SELECT ${fields} FROM saved_listings s JOIN listings l ON l.id = s.listing_id
-      WHERE s.user_id = $1 AND l.status <> 'removed' ORDER BY s.saved_at DESC, l.id DESC`, [req.user.id]);
+      WHERE s.user_id = $1 AND l.status <> 'removed' AND NOT EXISTS (SELECT 1 FROM users u WHERE u.id=l.seller_id AND u.suspended_at IS NOT NULL) ORDER BY s.saved_at DESC, l.id DESC`, [req.user.id]);
     res.json({ listings: rows });
   } catch (error) { fail(res, error); }
 });
@@ -115,7 +117,7 @@ router.delete('/saved/:id', async (req, res) => {
 router.get('/recent', async (req, res) => {
   try {
     const { rows } = await pool.query(`SELECT ${fields} FROM recently_viewed_listings r JOIN listings l ON l.id = r.listing_id
-      WHERE r.user_id = $1 AND l.status <> 'removed' ORDER BY r.viewed_at DESC, l.id DESC LIMIT 20`, [req.user.id]);
+      WHERE r.user_id = $1 AND l.status <> 'removed' AND NOT EXISTS (SELECT 1 FROM users u WHERE u.id=l.seller_id AND u.suspended_at IS NOT NULL) ORDER BY r.viewed_at DESC, l.id DESC LIMIT 20`, [req.user.id]);
     res.json({ listings: rows });
   } catch (error) { fail(res, error); }
 });

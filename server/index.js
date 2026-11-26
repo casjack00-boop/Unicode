@@ -40,6 +40,7 @@ app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/safety', require('./routes/safety'));
 app.use('/api/academic', require('./routes/academic'));
 app.use('/api/reputation', require('./routes/reputation'));
+app.use('/api/support', require('./routes/support'));
  
 
 // Serve the app's pages (HTML, CSS, JavaScript) from the public folder

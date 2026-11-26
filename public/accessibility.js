@@ -51,7 +51,6 @@
     document.body.prepend(skip);
 
     const panel = document.querySelector('[data-appearance-settings]');
-    if (!panel) return;
     const from = new URLSearchParams(location.search).get('from');
     const destinations = new Map([
       ['profile', ['/profile.html', 'Back to profile']],
@@ -60,6 +59,11 @@
       ['home', ['/', 'Back to home']]
     ]);
     const destination = destinations.get(from);
+    const helpBack = document.getElementById('help-back');
+    if (helpBack && destination) helpBack.href = '/settings.html?from=' + encodeURIComponent(from);
+    if (!panel) return;
+    const help = document.getElementById('settings-help');
+    if (help && destination) help.href = '/help.html?from=' + encodeURIComponent(from);
     if (destination) {
       const back = document.getElementById('settings-back');
       back.href = destination[0];

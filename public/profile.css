@@ -48,3 +48,9 @@
 .profile-review-header h2 { margin: 0; font: 800 1.125rem Archivo, sans-serif; }
 .review-listing { font-weight: 600; }
 #review-more { width: 100%; margin-top: 12px; }
+
+.profile-student-id { display: inline-block; font-size: .8rem; font-weight: 600; color: var(--muted); vertical-align: middle; }
+#profile-moderation { border: 1px solid transparent; cursor: pointer; }
+#profile-moderation-form { display: grid; gap: 8px; }
+#profile-moderation-reason { width: 100%; min-height: 84px; padding: 8px 12px; border: 1.5px solid var(--chip-line); border-radius: 10px; background: var(--surface); color: var(--ink); font: inherit; resize: vertical; }
+#profile-moderation-submit[data-action="suspend"] { background: var(--error); border-color: var(--error); color: #fff; }

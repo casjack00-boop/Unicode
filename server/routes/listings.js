@@ -88,7 +88,7 @@ router.get('/', async (req, res) => {
       return res.status(400).json({ error: 'Minimum exceeds maximum' });
     }
 
-    const conditions = ["l.status = 'active'"];
+    const conditions = ["l.status = 'active'", "NOT EXISTS (SELECT 1 FROM users u WHERE u.id=l.seller_id AND u.suspended_at IS NOT NULL)"];
     const values = [];
 
     function addCondition(sql, value) {
@@ -313,7 +313,7 @@ router.get('/:id', async (req, res) => {
        FROM listings l
        JOIN users u ON u.id = l.seller_id
        WHERE l.id = $1
-         AND l.status IN ('active','reserved')`,
+         AND l.status IN ('active','reserved') AND u.suspended_at IS NULL`,
       [id]
     );
 
@@ -403,6 +403,9 @@ router.post('/', requireUser, async (req, res) => {
     ]);
     res.status(201).json({ ok: true, id: result.rows[0].id });
   } catch (error) {
+    if(error.code==='UMS01') return res.status(429).json({error:'You can post up to 10 listings per hour.'});
+    if(error.code==='UMS02') return res.status(409).json({error:'A matching listing was posted recently. Check My Listings before retrying.'});
+    if(error.code==='UMS03') return res.status(403).json({error:'Account suspended.'});
     console.error('Post listing error:', error);
     res.status(500).json({ error: 'Something went wrong. Please try again.' });
   }

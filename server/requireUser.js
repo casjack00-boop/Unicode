@@ -14,8 +14,9 @@ async function requireUser(req, res, next) {
       `SELECT u.id, u.email, u.display_name, u.housing
        FROM sessions s
        JOIN users u ON u.id = s.user_id
-       WHERE s.token_hash = $1 AND s.expires_at > NOW() AND u.verified = TRUE`,
-      [tokenHash]
+       WHERE s.token_hash = $1 AND s.expires_at > NOW() AND u.verified = TRUE AND u.suspended_at IS NULL
+         AND (NOT $2::boolean OR s.email_authenticated)`,
+      [tokenHash, process.env.NODE_ENV === 'production' || process.env.UNIMARKET_MAIL_MODE === 'email']
     );
 
     if (result.rows.length === 0) {

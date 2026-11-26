@@ -20,6 +20,7 @@ async function getProfile(id, includeEmail) {
        (SELECT p.url FROM listing_photos p WHERE p.listing_id = l.id
         ORDER BY p.position LIMIT 1) AS photo_url
      FROM listings l WHERE l.seller_id = $1 AND l.status = 'active'
+       AND NOT EXISTS (SELECT 1 FROM users u WHERE u.id=l.seller_id AND u.suspended_at IS NOT NULL)
      ORDER BY l.created_at DESC, l.id DESC`, [id]
   );
   return { user: rows[0], listings: listings.rows };
@@ -105,9 +106,10 @@ router.get('/:id', async (req, res) => {
     return res.status(400).json({ error: 'Invalid student ID.' });
   }
   try {
-    const profile = await getProfile(id, false);
+    const isOwner = id === Number(req.user.id);
+    const profile = await getProfile(id, isOwner);
     if (!profile) return res.status(404).json({ error: 'Student not found.' });
-    res.json(profile);
+    res.json({ ...profile, is_owner: isOwner });
   } catch (err) {
     console.error('Public profile error:', err);
     res.status(500).json({ error: 'Unable to load student profile.' });

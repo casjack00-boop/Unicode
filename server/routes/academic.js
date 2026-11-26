@@ -22,20 +22,20 @@ router.put('/preferences', async (req,res) => {
 router.get('/recommendations', async (req,res) => {
   try { const {rows}=await pool.query(`SELECT ${fields} FROM listings l JOIN academic_preferences a ON a.user_id=$1
     WHERE l.status='active' AND l.category='textbooks' AND upper(l.department)=a.department AND l.seller_id<>$1
-    AND NOT EXISTS (SELECT 1 FROM user_blocks b WHERE (b.blocker_id=$1 AND b.blocked_id=l.seller_id) OR (b.blocked_id=$1 AND b.blocker_id=l.seller_id))
+    AND NOT EXISTS (SELECT 1 FROM users su WHERE su.id=l.seller_id AND su.suspended_at IS NOT NULL) AND NOT EXISTS (SELECT 1 FROM user_blocks b WHERE (b.blocker_id=$1 AND b.blocked_id=l.seller_id) OR (b.blocked_id=$1 AND b.blocker_id=l.seller_id))
     ORDER BY l.created_at DESC,l.id DESC LIMIT 12`,[req.user.id]); res.json({listings:rows}); } catch(e){fail(res,e);}
 });
 router.get('/trending', async (req,res) => {
   try { const {rows}=await pool.query(`SELECT ${fields}, s.saves FROM listings l JOIN
     (SELECT sl.listing_id,count(*)::int AS saves FROM saved_listings sl JOIN listings t ON t.id=sl.listing_id
       WHERE sl.saved_at>=now()-interval '7 days' AND sl.user_id<>t.seller_id GROUP BY sl.listing_id) s ON s.listing_id=l.id
-    WHERE l.status='active' AND NOT EXISTS (SELECT 1 FROM user_blocks b WHERE (b.blocker_id=$1 AND b.blocked_id=l.seller_id) OR (b.blocked_id=$1 AND b.blocker_id=l.seller_id))
+    WHERE l.status='active' AND NOT EXISTS (SELECT 1 FROM users su WHERE su.id=l.seller_id AND su.suspended_at IS NOT NULL) AND NOT EXISTS (SELECT 1 FROM user_blocks b WHERE (b.blocker_id=$1 AND b.blocked_id=l.seller_id) OR (b.blocked_id=$1 AND b.blocker_id=l.seller_id))
     ORDER BY s.saves DESC,l.created_at DESC,l.id DESC LIMIT 12`,[req.user.id]); res.json({listings:rows}); } catch(e){fail(res,e);}
 });
 router.get('/requests', async (req,res) => {
   try { const {rows}=await pool.query(`SELECT r.id,r.title,r.isbn,r.department,r.course,r.notes,r.max_price_cents,r.created_at,r.status,
     u.display_name, u.id AS requester_id, (r.user_id=$1) AS own FROM textbook_requests r JOIN users u ON u.id=r.user_id
-    WHERE u.verified AND (r.status='active' OR r.user_id=$1)
+    WHERE u.verified AND u.suspended_at IS NULL AND (r.status='active' OR r.user_id=$1)
       AND NOT EXISTS (SELECT 1 FROM user_blocks b WHERE (b.blocker_id=$1 AND b.blocked_id=r.user_id) OR (b.blocked_id=$1 AND b.blocker_id=r.user_id))
     ORDER BY (r.status='active') DESC,(r.user_id=$1) DESC,r.created_at DESC,r.id DESC LIMIT 100`,[req.user.id]); res.json({requests:rows}); } catch(e){fail(res,e);}
 });
@@ -59,7 +59,7 @@ router.patch('/requests/:id/close', async (req,res) => {
 router.get('/requests/:id/matches', async (req,res) => {
   if(!validId(req.params.id))return res.status(400).json({error:'Invalid request.'});
   try { const {rows}=await pool.query(`SELECT ${fields} FROM textbook_requests r JOIN listings l ON uni_textbook_match(r,l)
-    WHERE r.id=$2 AND r.status='active' AND EXISTS (SELECT 1 FROM users u WHERE u.id=r.user_id AND u.verified) AND NOT EXISTS (SELECT 1 FROM user_blocks b WHERE
+    WHERE r.id=$2 AND r.status='active' AND EXISTS (SELECT 1 FROM users u WHERE u.id=r.user_id AND u.verified AND u.suspended_at IS NULL) AND NOT EXISTS (SELECT 1 FROM users su WHERE su.id=l.seller_id AND su.suspended_at IS NOT NULL) AND NOT EXISTS (SELECT 1 FROM user_blocks b WHERE
       (b.blocker_id=$1 AND b.blocked_id IN (r.user_id,l.seller_id)) OR (b.blocked_id=$1 AND b.blocker_id IN (r.user_id,l.seller_id)))
     ORDER BY l.price_cents,l.id DESC LIMIT 20`,[req.user.id,req.params.id]); res.json({listings:rows}); } catch(e){fail(res,e);}
 });

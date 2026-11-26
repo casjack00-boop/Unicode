@@ -68,6 +68,21 @@ router.get('/admin-access',async(req,res)=>{
 async function requireAdmin(req,res,next){
   try{const {rows}=await pool.query('SELECT 1 FROM moderation_admins WHERE user_id=$1',[req.user.id]);if(!rows.length)return res.status(403).json({error:'Moderator access required.'});next();}catch(e){fail(res,e);}
 }
+// One statement gives a consistent overview; counts are not limited to the latest 100 cases.
+router.get('/moderation/summary',requireAdmin,async(req,res)=>{
+  try{
+    const {rows}=await pool.query(`SELECT
+      (SELECT count(*)::int FROM support_tickets WHERE status='open') AS tickets_count,
+      (SELECT row_to_json(t) FROM (SELECT id,subject,status,created_at FROM support_tickets ORDER BY created_at DESC,id DESC LIMIT 1) t) AS ticket_latest,
+      (SELECT count(*)::int FROM safety_reports WHERE status='open') AS reports_count,
+      (SELECT row_to_json(r) FROM (SELECT id,reason,status,created_at FROM safety_reports ORDER BY created_at DESC,id DESC LIMIT 1) r) AS report_latest,
+      (SELECT count(*)::int FROM transaction_disputes WHERE status='open') AS disputes_count,
+      (SELECT row_to_json(p) FROM (SELECT p.id,p.status,p.created_at,d.item_snapshot->>'title' AS title FROM transaction_disputes p JOIN marketplace_deals d ON d.id=p.deal_id ORDER BY p.created_at DESC,p.id DESC LIMIT 1) p) AS dispute_latest,
+      (SELECT count(*)::int FROM users WHERE suspended_at IS NOT NULL) AS suspended_count,
+      (SELECT row_to_json(a) FROM (SELECT id,user_id,action,created_at FROM account_moderation_actions ORDER BY created_at DESC,id DESC LIMIT 1) a) AS account_latest`);
+    res.json(rows[0]);
+  }catch(e){fail(res,e);}
+});
 router.get('/moderation',requireAdmin,async(req,res)=>{
   const state=req.query.status||'open';if(!['open','reviewed','dismissed'].includes(state))return res.status(400).json({error:'Invalid status.'});
   try{

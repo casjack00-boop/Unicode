@@ -55,7 +55,7 @@ router.post('/', async (req,res) => {
       const l = (await c.query('SELECT * FROM listings WHERE id=$1 FOR UPDATE',[listingId])).rows[0];
       if (!l || l.status !== 'active') throw new DealError(409,'This item is not available.');
       if (l.seller_id === buyer) throw new DealError(400,'You cannot make an offer on your own listing.');
-      const seller = (await c.query('SELECT verified FROM users WHERE id=$1',[l.seller_id])).rows[0];
+      const seller = (await c.query('SELECT verified FROM users WHERE id=$1 AND suspended_at IS NULL',[l.seller_id])).rows[0];
       if (!seller?.verified) throw new DealError(409,'Seller is not verified.');
       const old = (await c.query(`SELECT id FROM marketplace_deals WHERE listing_id=$1 AND buyer_id=$2 AND status IN ('pending','reserved')`,[listingId,buyer])).rows[0];
       if (old) throw new DealError(409,'You already have an open offer for this item. Review it in Transactions.');
