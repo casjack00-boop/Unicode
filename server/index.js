@@ -15,6 +15,10 @@ const bookRoutes = require('./routes/books');
 const roommateRoutes = require('./routes/roommates');
 
 const app = express();
+const { sameOriginWrite, securityHeaders, noStore } = require('./http-security');
+app.disable('x-powered-by');
+app.use(securityHeaders);
+app.use('/api', noStore, sameOriginWrite);
 
 // Let the server read JSON sent from the app
 app.use(express.json());

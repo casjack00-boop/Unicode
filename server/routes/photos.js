@@ -62,6 +62,7 @@ const router = express.Router();
  * copy that exact line here and name the result `db`.
  */
 const db = require('../db');
+const { storePhotoBatch } = require('../photo-storage');
 
 /**
  * (FILL-IN 2: LOGGED-IN USER)
@@ -107,27 +108,6 @@ async function countPhotos(listingId) {
 }
 
 /**
- * (FILL-IN 5: SAVE ONE PHOTO)
- * Insert a row into listing_photos and return the new row's id.
- *   photoUrl = the path to store, like "/api/listings/photo-files/3f2a...c1.jpg"
- *              (the browser uses it directly as <img src>)
- * Needs the listing_photos column names for the listing link and the photo path.
- * If the table has other required columns (position, created_at...), set them here.
- *
- *   const result = await db.query(
- *     'INSERT INTO listing_photos (listing_id, file_path) VALUES ($1, $2) RETURNING id',
- *     [listingId, photoUrl]);
- *   return result.rows[0].id;
- */
-async function savePhoto(listingId, photoUrl, position) {
-  // position is 1, 2, or 3 (the table requires it)
-  const result = await db.query(
-    'INSERT INTO listing_photos (listing_id, url, position) VALUES ($1, $2, $3) RETURNING id',
-    [listingId, photoUrl, position]);
-  return result.rows[0].id;
-}
-
-/**
  * (FILL-IN 6: READ A LISTING'S PHOTOS)
  * Return ALL photos for the listing as [{ id, url }], oldest first.
  * ORDER MATTERS: the first one is the "main" photo shown on Browse cards.
@@ -153,7 +133,9 @@ async function getPhotos(listingId) {
 
 // Saved images go in <project root>/uploads (this file is in server/routes/).
 // The folder is created automatically if missing.
-const UPLOAD_DIR = path.join(__dirname, '..', '..', 'uploads');
+const UPLOAD_DIR = process.env.UNIMARKET_UPLOAD_DIR
+  ? path.resolve(process.env.UNIMARKET_UPLOAD_DIR)
+  : path.join(__dirname, '..', '..', 'uploads');
 
 // URL the browser uses to load a saved image (served by the last route below).
 const PHOTO_URL_PREFIX = '/api/listings/photo-files';
@@ -347,20 +329,15 @@ router.post(
           }
         }
 
-        // All good: record each photo in the database.
-        const saved = [];
-        let position = req.existingPhotoCount;
-        for (const file of files) {
-          const photoUrl = `${PHOTO_URL_PREFIX}/${file.filename}`;
-          position += 1;
-          const id = await savePhoto(req.listing.id, photoUrl, position);
-          saved.push({ id, url: photoUrl });
-        }
+        // Recheck capacity and ownership under a listing lock, then save atomically.
+        const saved = await storePhotoBatch(db, req.listing.id, req.userId,
+          files.map(file => `${PHOTO_URL_PREFIX}/${file.filename}`), MAX_PHOTOS_PER_LISTING);
 
         return res.status(201).json({ ok: true, photos: saved });
       } catch (dbErr) {
+        deleteFiles(files); // no partially committed photo rows
+        if (dbErr.status === 400 || dbErr.status === 403) return res.status(dbErr.status).json({ error: dbErr.message });
         console.error('Saving photos failed:', dbErr);
-        deleteFiles(files); // don't leave orphaned files on disk
         return res.status(500).json({ error: 'Could not save photos.' });
       }
     });
