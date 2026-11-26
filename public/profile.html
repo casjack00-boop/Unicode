@@ -38,13 +38,13 @@
                 <p class="profile-muted">Seller rating</p>
                 <p id="rating" class="profile-score">—</p>
                 <p id="seller-stars" class="profile-stars" aria-hidden="true"></p>
-                <p id="seller-rating-count" class="profile-muted">Loading reviews...</p>
+                <button type="button" id="seller-rating-count" class="profile-review-count" aria-haspopup="dialog" aria-label="Seller review history" disabled>Loading reviews...</button>
               </div>
               <div class="profile-reputation-cell">
                 <p class="profile-muted">Buyer rating</p>
                 <p id="buyer-rating" class="profile-score">—</p>
                 <p id="buyer-stars" class="profile-stars" aria-hidden="true"></p>
-                <p id="buyer-rating-count" class="profile-muted">Loading reviews...</p>
+                <button type="button" id="buyer-rating-count" class="profile-review-count" aria-haspopup="dialog" aria-label="Buyer review history" disabled>Loading reviews...</button>
               </div>
             </div>
             <div id="exchange-count" class="profile-reputation-grid profile-exchange-grid" aria-label="Completed exchanges">
@@ -75,10 +75,17 @@
           <a class="profile-link" href="/my-listings.html">Manage my listings <span aria-hidden="true">›</span></a>
         </section>
         <section class="profile-panel"><h2>Active listings</h2><div id="active-listings" class="grid"></div></section>
-        <section class="profile-panel"><h2>Seller reviews</h2><div id="reviews"></div></section>
-        <section class="profile-panel"><h2>Buyer reviews</h2><div id="buyer-reviews"></div></section>
       </div>
     </main>
+    <dialog id="review-dialog" class="profile-review-dialog" aria-labelledby="review-title">
+      <div class="profile-review-header">
+        <h2 id="review-title">Reviews</h2>
+        <button type="button" class="profile-secondary" id="review-close" autofocus>Close</button>
+      </div>
+      <p id="review-status" class="profile-muted" role="status"></p>
+      <div id="review-history"></div>
+      <button type="button" class="profile-secondary" id="review-more" hidden>Load more reviews</button>
+    </dialog>
     <nav class="bottom-nav" aria-label="Main">
       <a href="/browse.html" class="nav-item">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10l9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg>

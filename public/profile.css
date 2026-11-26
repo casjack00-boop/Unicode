@@ -39,3 +39,12 @@
 
 .profile-biography { width: 100%; white-space: pre-wrap; overflow-wrap: anywhere; text-align: center; }
 #edit-form textarea { min-height: 100px; width: 100%; padding: 8px 12px; border: 1.5px solid var(--chip-line); border-radius: 10px; background: var(--surface); color: var(--ink); font: inherit; resize: vertical; }
+
+.profile-review-count { min-height: 44px; padding: 4px 8px; border: 0; background: transparent; color: var(--link); font: inherit; font-size: .875rem; font-weight: 600; text-decoration: underline; cursor: pointer; }
+.profile-review-count:disabled { color: var(--muted); text-decoration: none; cursor: default; }
+.profile-review-dialog { width: min(440px, calc(100% - 32px)); max-height: 85vh; max-height: 85dvh; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); overflow: auto; }
+.profile-review-dialog::backdrop { background: rgba(0, 0, 0, .55); }
+.profile-review-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.profile-review-header h2 { margin: 0; font: 800 1.125rem Archivo, sans-serif; }
+.review-listing { font-weight: 600; }
+#review-more { width: 100%; margin-top: 12px; }
